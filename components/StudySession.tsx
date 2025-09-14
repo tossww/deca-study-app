@@ -250,9 +250,9 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   const currentQuestion = questions[currentIndex]
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <div className="flex justify-between items-center mb-6">
+    <div className="max-w-4xl mx-auto h-screen flex flex-col py-4">
+      <div className="bg-white rounded-xl shadow-lg p-6 flex-1 flex flex-col overflow-hidden">
+        <div className="flex justify-between items-center mb-4 flex-shrink-0">
           <div className="text-sm text-gray-600">
             Question {currentIndex + 1} of {questions.length}
           </div>
@@ -270,21 +270,21 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">{currentQuestion.question}</h3>
+        <div className="flex-1 flex flex-col min-h-0">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex-shrink-0">{currentQuestion.question}</h3>
 
-          <div className="text-xs text-gray-500 mb-4">
+          <div className="text-xs text-gray-500 mb-3 flex-shrink-0">
             💡 Tip: Use keyboard shortcuts 1-4 or A-D to answer, Enter/Space for next question
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2 flex-1 overflow-y-auto">
             {currentQuestion.options.map((option, index) => (
               <button
                 key={index}
                 onClick={() => handleAnswer(index)}
                 disabled={showExplanation}
                 className={cn(
-                  'w-full text-left p-4 rounded-lg border-2 transition-all',
+                  'w-full text-left p-3 rounded-lg border-2 transition-all',
                   showExplanation && index === currentQuestion.correctAnswer
                     ? 'border-green-500 bg-green-50'
                     : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
@@ -306,17 +306,18 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         </div>
 
-        {showExplanation && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 animate-slide-up">
-            <h4 className="font-semibold text-blue-900 mb-2">Explanation</h4>
-            <p className="text-blue-800">{currentQuestion.explanation}</p>
-          </div>
-        )}
+        <div className="flex-shrink-0 space-y-3 mt-4">
+          {showExplanation && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 animate-slide-up">
+              <h4 className="font-semibold text-blue-900 mb-1 text-sm">Explanation</h4>
+              <p className="text-blue-800 text-sm">{currentQuestion.explanation}</p>
+            </div>
+          )}
 
-        {/* Inline Feedback Section */}
-        {currentAnswerData && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 animate-slide-up">
-            <div className="flex items-center justify-between mb-3">
+          {/* Inline Feedback Section */}
+          {currentAnswerData && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 animate-slide-up">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-4">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
                   {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
@@ -344,7 +345,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
 
             {/* Grade Selector (only shown when user clicks Adjust) */}
             {showGradeSelector && (
-              <div className="border-t border-gray-200 pt-3 mt-3">
+              <div className="border-t border-gray-200 pt-2 mt-2">
                 <p className="text-xs text-gray-600 mb-2">Override suggested grade:</p>
                 <div className="grid grid-cols-4 gap-2">
                   <button
@@ -377,15 +378,16 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         )}
 
-        <div className="flex justify-end">
-          {showExplanation && (
-            <button
-              onClick={nextQuestion}
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question'}
-            </button>
-          )}
+          <div className="flex justify-end">
+            {showExplanation && (
+              <button
+                onClick={nextQuestion}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm"
+              >
+                {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
