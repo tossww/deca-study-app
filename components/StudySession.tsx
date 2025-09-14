@@ -72,6 +72,10 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     }
 
     loadQuestions()
+  }, [topics, sessionStartTime])
+
+  // Timer effect - separate to avoid reloading questions
+  useEffect(() => {
     const interval = setInterval(() => {
       // Only increment timer when quit modal is not open
       if (!showQuitModal) {
@@ -79,7 +83,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
       }
     }, 1000)
     return () => clearInterval(interval)
-  }, [topics, showQuitModal, sessionStartTime])
+  }, [showQuitModal])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -265,7 +269,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
               onClick={handleQuit}
               className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg font-semibold transition-colors text-sm shadow-md hover:shadow-lg border-2 border-red-600 hover:border-red-700"
             >
-              🚪 Quit Study
+              🚪 Quit
             </button>
           </div>
         </div>
