@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react'
 import { TopicSelector } from '@/components/TopicSelector'
 import { StudySession } from '@/components/StudySession'
+import { StudySessionMobile } from '@/components/StudySessionMobile'
 import { Dashboard } from '@/components/Dashboard'
 import { Browse } from '@/components/Browse'
 import { InfoHelp } from '@/components/InfoHelp'
 import { LoginForm } from '@/components/LoginForm'
 import { useStore } from '@/lib/store'
+import { useMobileDetection } from '@/lib/mobile-utils'
 
 export default function Home() {
   const { user, isLoading } = useStore()
   const [currentView, setCurrentView] = useState<'dashboard' | 'study' | 'browse' | 'info' | 'login'>('login')
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
+  const isMobile = useMobileDetection()
 
   useEffect(() => {
     if (user) {
@@ -109,19 +112,35 @@ export default function Home() {
                 />
               </div>
             ) : (
-              <StudySession
-                topics={selectedTopics}
-                onComplete={() => {
-                  setSelectedTopics([]) // Clear local state to return to topic selector
-                  // Keep store.selectedTopics to remember for next session
-                  setCurrentView('dashboard')
-                }}
-                onQuit={() => {
-                  setSelectedTopics([]) // Clear local state to return to topic selector
-                  // Keep store.selectedTopics to remember for next session
-                  setCurrentView('dashboard')
-                }}
-              />
+              isMobile ? (
+                <StudySessionMobile
+                  topics={selectedTopics}
+                  onComplete={() => {
+                    setSelectedTopics([]) // Clear local state to return to topic selector
+                    // Keep store.selectedTopics to remember for next session
+                    setCurrentView('dashboard')
+                  }}
+                  onQuit={() => {
+                    setSelectedTopics([]) // Clear local state to return to topic selector
+                    // Keep store.selectedTopics to remember for next session
+                    setCurrentView('dashboard')
+                  }}
+                />
+              ) : (
+                <StudySession
+                  topics={selectedTopics}
+                  onComplete={() => {
+                    setSelectedTopics([]) // Clear local state to return to topic selector
+                    // Keep store.selectedTopics to remember for next session
+                    setCurrentView('dashboard')
+                  }}
+                  onQuit={() => {
+                    setSelectedTopics([]) // Clear local state to return to topic selector
+                    // Keep store.selectedTopics to remember for next session
+                    setCurrentView('dashboard')
+                  }}
+                />
+              )
             )}
           </div>
         )}

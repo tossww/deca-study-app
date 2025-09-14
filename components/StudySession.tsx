@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { cn, formatTime } from '@/lib/utils'
-import { Quality, suggestGradeFromTime } from '@/lib/spaced-repetition'
-import { useStore } from '@/lib/store'
-import toast from 'react-hot-toast'
+import { Quality } from '@/lib/spaced-repetition'
+import { useStudySession } from '@/hooks/useStudySession'
 
 interface StudySessionProps {
   topics: string[]
@@ -12,238 +11,62 @@ interface StudySessionProps {
   onQuit: () => void
 }
 
-interface Question {
-  id: string
-  question: string
-  options: string[]
-  correctAnswer: number
-  explanation: string
-}
-
 export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) {
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
-  const [showExplanation, setShowExplanation] = useState(false)
-  const [sessionStats, setSessionStats] = useState({
-    correct: 0,
-    total: 0,
-    timeSpent: 0,
-  })
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now())
-  const [showQuitModal, setShowQuitModal] = useState(false)
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [sessionStartTime] = useState(Date.now())
-  const [showGradeSelector, setShowGradeSelector] = useState(false)
-  const [currentAnswerData, setCurrentAnswerData] = useState<{
-    answerIndex: number
-    isCorrect: boolean
-    responseTimeMs: number
-    suggestedGrade: Quality
-  } | null>(null)
-  const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
+  const {
+    currentQuestion,
+    currentIndex,
+    questions,
+    selectedAnswer,
+    showExplanation,
+    sessionStats,
+    showQuitModal,
+    setShowQuitModal,
+    showGradeSelector,
+    setShowGradeSelector,
+    currentAnswerData,
+    handleAnswer,
+    submitAnswer,
+    nextQuestion,
+    handleQuit,
+    confirmQuit,
+    isLoading,
+  } = useStudySession({ topics, onComplete, onQuit })
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        const response = await fetch('/api/questions?' + new URLSearchParams({ topics: topics.join(',') }))
-        const data = await response.json()
-        setQuestions(data.questions || [])
-
-        // Create study session in database
-        if (data.questions && data.questions.length > 0) {
-          const { sessionToken } = useStore.getState()
-          const sessionResponse = await fetch('/api/study-sessions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Session-Token': sessionToken || '',
-            },
-            body: JSON.stringify({
-              startedAt: sessionStartTime,
-            }),
-          })
-          const sessionData = await sessionResponse.json()
-          setSessionId(sessionData.sessionId)
-        }
-      } catch (error) {
-        toast.error('Failed to load questions')
-      }
-    }
-
-    loadQuestions()
-  }, [topics, sessionStartTime])
-
-  // Timer effect - separate to avoid reloading questions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Only increment timer when quit modal is not open
-      if (!showQuitModal) {
-        setSessionStats((prev) => ({ ...prev, timeSpent: prev.timeSpent + 1 }))
-      }
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [showQuitModal])
-
-  // Keyboard shortcuts
+  // Keyboard shortcuts for desktop version
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (showExplanation && e.key !== 'Enter' && e.key !== ' ') return
 
-      if (!showExplanation) {
+      if (!showExplanation && currentQuestion) {
         if (e.key >= '1' && e.key <= '4') {
           const index = parseInt(e.key) - 1
-          if (index < questions[currentIndex]?.options.length) {
-            handleAnswer(index)
-          }
-        } else if (e.key.toLowerCase() >= 'a' && e.key.toLowerCase() <= 'd') {
-          const index = e.key.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0)
-          if (index < questions[currentIndex]?.options.length) {
+          if (index < currentQuestion.options.length) {
             handleAnswer(index)
           }
         }
-      }
+      } else {
+        if (e.key === 'Enter' || e.key === ' ') {
+          nextQuestion()
+        }
 
-      if (showExplanation && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        nextQuestion()
+        // Grade override shortcuts
+        if (e.key === 'a' || e.key === 'A') {
+          submitAnswer(Quality.Again)
+        } else if (e.key === 'h' || e.key === 'H') {
+          submitAnswer(Quality.Hard)
+        } else if (e.key === 'g' || e.key === 'G') {
+          submitAnswer(Quality.Good)
+        } else if (e.key === 'e' || e.key === 'E') {
+          submitAnswer(Quality.Easy)
+        }
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [showExplanation, currentIndex, questions])
+  }, [showExplanation, currentQuestion, handleAnswer, nextQuestion, submitAnswer])
 
-  const handleAnswer = (answerIndex: number) => {
-    if (showExplanation) return
-
-    setSelectedAnswer(answerIndex)
-    setShowExplanation(true)
-
-    const responseTimeMs = Date.now() - questionStartTime
-    const isCorrect = answerIndex === questions[currentIndex].correctAnswer
-
-    setSessionStats((prev) => ({
-      ...prev,
-      correct: isCorrect ? prev.correct + 1 : prev.correct,
-      total: prev.total + 1,
-    }))
-
-    // Get suggested grade based on response time
-    const suggestedGrade = suggestGradeFromTime(responseTimeMs, isCorrect)
-
-    // Store answer data for grade selection
-    setCurrentAnswerData({
-      answerIndex,
-      isCorrect,
-      responseTimeMs,
-      suggestedGrade,
-    })
-
-    // Auto-apply suggested grade after 4 seconds unless user intervenes
-    const timer = setTimeout(() => {
-      submitAnswer(suggestedGrade)
-    }, 4000)
-    setAutoGradeTimer(timer)
-  }
-
-  const submitAnswer = async (selectedGrade: Quality) => {
-    if (!currentAnswerData) return
-
-    const { answerIndex, isCorrect, responseTimeMs } = currentAnswerData
-
-    try {
-      const { sessionToken } = useStore.getState()
-      await fetch('/api/questions/answer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Session-Token': sessionToken || '',
-        },
-        body: JSON.stringify({
-          questionId: questions[currentIndex].id,
-          userAnswer: answerIndex,
-          isCorrect,
-          timeSpent: Math.floor(responseTimeMs / 1000),
-          quality: selectedGrade,
-        }),
-      })
-    } catch (error) {
-      console.error('Failed to save answer:', error)
-    }
-
-    // Clear auto-grade timer and answer data
-    if (autoGradeTimer) {
-      clearTimeout(autoGradeTimer)
-      setAutoGradeTimer(null)
-    }
-    setShowGradeSelector(false)
-    setCurrentAnswerData(null)
-
-    // Auto-proceed to next question after a short delay
-    setTimeout(() => {
-      nextQuestion()
-    }, 500)
-  }
-
-  const completeSession = async () => {
-    if (sessionId) {
-      try {
-        const { sessionToken } = useStore.getState()
-        await fetch('/api/study-sessions', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Session-Token': sessionToken || '',
-          },
-          body: JSON.stringify({
-            sessionId,
-            completedAt: Date.now(),
-            totalAnswers: sessionStats.total,
-            correctAnswers: sessionStats.correct,
-          }),
-        })
-      } catch (error) {
-        console.error('Failed to complete session:', error)
-      }
-    }
-  }
-
-  const nextQuestion = async () => {
-    // Clear any pending auto-grade timer
-    if (autoGradeTimer) {
-      clearTimeout(autoGradeTimer)
-      setAutoGradeTimer(null)
-    }
-
-    // Clear answer data
-    setCurrentAnswerData(null)
-    setShowGradeSelector(false)
-
-    if (currentIndex + 1 >= questions.length) {
-      await completeSession()
-      toast.success(`Session complete! Score: ${sessionStats.correct}/${sessionStats.total}`)
-      onComplete()
-      return
-    }
-
-    setCurrentIndex(currentIndex + 1)
-    setSelectedAnswer(null)
-    setShowExplanation(false)
-    setQuestionStartTime(Date.now())
-  }
-
-  const handleQuit = () => {
-    setShowQuitModal(true)
-  }
-
-  const confirmQuit = async () => {
-    await completeSession()
-    toast.success(`Study session ended. Score: ${sessionStats.correct}/${sessionStats.total}`)
-    onQuit()
-  }
-
-  if (questions.length === 0) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -251,7 +74,15 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     )
   }
 
-  const currentQuestion = questions[currentIndex]
+  if (!currentQuestion) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-gray-600">No questions available</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-4xl mx-auto h-screen flex flex-col py-4">
@@ -260,122 +91,104 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           <div className="text-sm text-gray-600">
             Question {currentIndex + 1} of {questions.length}
           </div>
-          <div className="flex items-center space-x-4 text-sm">
-            <span className="text-gray-600">Time: {formatTime(sessionStats.timeSpent)}</span>
-            <span className="text-green-600 font-semibold">
-              {sessionStats.correct}/{sessionStats.total} Correct
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-600">
+              Time: {formatTime(sessionStats.timeSpent)}
+            </div>
+            <div className="text-sm text-gray-600">
+              Score: {sessionStats.correct}/{sessionStats.total}
+            </div>
             <button
               onClick={handleQuit}
-              className="px-3 py-1.5 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors text-sm"
+              className="px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors"
             >
               Quit
             </button>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col min-h-0">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex-shrink-0">{currentQuestion.question}</h3>
-
-          <div className="text-xs text-gray-500 mb-3 flex-shrink-0">
-            💡 Tip: Use keyboard shortcuts 1-4 or A-D to answer, Enter/Space for next question
-          </div>
-
-          <div className="space-y-2 flex-1 overflow-y-auto">
-            {currentQuestion.options.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleAnswer(index)}
-                disabled={showExplanation}
-                className={cn(
-                  'w-full text-left p-3 rounded-lg border-2 transition-all',
-                  showExplanation && index === currentQuestion.correctAnswer
-                    ? 'border-green-500 bg-green-50'
-                    : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
-                    ? 'border-red-500 bg-red-50'
-                    : selectedAnswer === index
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                )}
-              >
-                <div className="flex items-center">
-                  <span className="font-semibold mr-3">
-                    {String.fromCharCode(65 + index)}.
-                    <span className="text-xs text-gray-500">({index + 1})</span>
-                  </span>
-                  <span>{option}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+        <div className="bg-gray-50 rounded-lg p-6 mb-6 flex-shrink-0">
+          <h2 className="text-xl font-semibold text-gray-900 leading-relaxed">
+            {currentQuestion.question}
+          </h2>
         </div>
 
-        <div className="flex-shrink-0 space-y-3 mt-4">
-          {/* Inline Feedback Section - Show first */}
-          {currentAnswerData && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 animate-slide-up">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-3">
+        <div className="flex-1 space-y-3 overflow-y-auto">
+          {currentQuestion.options.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleAnswer(index)}
+              disabled={showExplanation}
+              className={cn(
+                'w-full text-left p-4 rounded-lg border-2 transition-all',
+                showExplanation && index === currentQuestion.correctAnswer
+                  ? 'border-green-500 bg-green-50 text-green-800'
+                  : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
+                  ? 'border-red-500 bg-red-50 text-red-800'
+                  : selectedAnswer === index
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+              )}
+            >
+              <div className="flex items-center">
+                <span className="font-semibold mr-3 flex-shrink-0 text-gray-600">
+                  {String.fromCharCode(65 + index)}.
+                </span>
+                <span>{option}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {currentAnswerData && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg flex-shrink-0">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-4">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
                   {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                 </span>
-                <span className="text-gray-600 text-sm">
+                <span className="text-gray-600">
                   {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </span>
-                <span className="text-gray-600 text-sm">
-                  Score: {sessionStats.correct}/{sessionStats.total}
-                </span>
-                <span className="font-medium text-blue-600 text-sm">
-                  {Quality[currentAnswerData.suggestedGrade]}
+                <span className="font-medium text-blue-600">
+                  Suggested: {Quality[currentAnswerData.suggestedGrade]}
                 </span>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
-                  className="text-xs px-2 py-1 text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:border-gray-400 transition-colors"
+                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:border-gray-400 transition-colors"
                 >
-                  Adjust
+                  Adjust Grade
                 </button>
-              </div>
-
-              <div>
-                {showExplanation && (
-                  <button
-                    onClick={nextQuestion}
-                    className="px-3 py-1 bg-primary-600 text-white rounded font-medium hover:bg-primary-700 transition-colors text-sm"
-                  >
-                    {currentIndex + 1 >= questions.length ? 'Finish' : 'Next'}
-                  </button>
-                )}
               </div>
             </div>
 
-            {/* Grade Selector (only shown when user clicks Adjust) */}
             {showGradeSelector && (
-              <div className="border-t border-gray-200 pt-2 mt-2">
-                <p className="text-xs text-gray-600 mb-2">Override suggested grade:</p>
-                <div className="grid grid-cols-4 gap-2">
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <p className="text-sm text-gray-600 mb-3">Override suggested grade:</p>
+                <div className="flex space-x-3">
                   <button
                     onClick={() => submitAnswer(Quality.Again)}
-                    className="px-2 py-1 text-xs rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                    className="px-4 py-2 rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
                   >
-                    Again
+                    Again (A)
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Hard)}
-                    className="px-2 py-1 text-xs rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                    className="px-4 py-2 rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
                   >
-                    Hard
+                    Hard (H)
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Good)}
-                    className="px-2 py-1 text-xs rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                    className="px-4 py-2 rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
                   >
-                    Good
+                    Good (G)
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Easy)}
-                    className="px-2 py-1 text-xs rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                    className="px-4 py-2 rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
                   >
-                    Easy
+                    Easy (E)
                   </button>
                 </div>
               </div>
@@ -383,63 +196,63 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         )}
 
-          {/* Explanation - Show after feedback */}
-          {showExplanation && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 animate-slide-up">
-              <h4 className="font-semibold text-blue-900 mb-1 text-sm">Explanation</h4>
-              <p className="text-blue-800 text-sm">{currentQuestion.explanation}</p>
-            </div>
-          )}
-        </div>
+        {showExplanation && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0">
+            <h4 className="font-semibold text-blue-900 mb-2">Explanation</h4>
+            <p className="text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+          </div>
+        )}
+
+        {showExplanation && (
+          <div className="flex justify-end mt-4 flex-shrink-0">
+            <button
+              onClick={nextQuestion}
+              className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            >
+              {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question (Enter)'}
+            </button>
+          </div>
+        )}
       </div>
 
-
-      {/* Quit Confirmation Modal */}
       {showQuitModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 animate-slide-up">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">End Study Session?</h3>
 
             <div className="mb-6">
               <p className="text-gray-600 mb-4">
-                Are you sure you want to end your current study session? Your progress will be saved.
+                Your progress will be saved.
               </p>
 
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Session Summary</h4>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Questions Answered:</span>
+                    <span className="text-gray-600">Questions:</span>
                     <span className="font-medium">{sessionStats.total}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Correct Answers:</span>
+                    <span className="text-gray-600">Correct:</span>
                     <span className="font-medium text-green-600">{sessionStats.correct}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Accuracy:</span>
-                    <span className="font-medium">
-                      {sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Time Spent:</span>
+                    <span className="text-gray-600">Time:</span>
                     <span className="font-medium">{formatTime(sessionStats.timeSpent)}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex space-x-3 justify-end">
+            <div className="flex space-x-3">
               <button
                 onClick={() => setShowQuitModal(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="flex-1 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors border border-gray-300 rounded-lg font-medium"
               >
-                Continue Studying
+                Continue
               </button>
               <button
                 onClick={confirmQuit}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               >
                 End Session
               </button>
