@@ -67,11 +67,11 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
     relearning: 'Relearning',
   }
 
-  const masteryData = Object.entries(stats.masteryLevels).map(([key, value]) => ({
+  const masteryData = stats?.masteryLevels ? Object.entries(stats.masteryLevels).map(([key, value]) => ({
     name: masteryLabels[key as keyof typeof masteryLabels],
     value: value as number,
     color: masteryColors[key as keyof typeof masteryColors]
-  })).filter(item => item.value > 0)
+  })).filter(item => item.value > 0) : []
 
   return (
     <div className="space-y-6">
@@ -84,13 +84,13 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
             onClick={onStartStudy}
             className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
           >
-            {stats.dueForReview > 0 ? `Review ${stats.dueForReview} Cards` : 'Start Study Session'}
+            {(stats?.dueForReview || 0) > 0 ? `Review ${stats?.dueForReview || 0} Cards` : 'Start Study Session'}
           </button>
           
           <div className="text-right">
             <div className="text-sm text-gray-600">Overall Progress</div>
-            <div className="text-2xl font-bold text-primary-600">{stats.progressPercentage}%</div>
-            <div className="text-xs text-gray-500">{stats.reviewedQuestions} of {stats.totalQuestions} questions</div>
+            <div className="text-2xl font-bold text-primary-600">{stats?.progressPercentage || 0}%</div>
+            <div className="text-xs text-gray-500">{stats?.reviewedQuestions || 0} of {stats?.totalQuestions || 0} questions</div>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Study Streak</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.studyStreak}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0}</p>
               <p className="text-sm text-gray-500">days</p>
             </div>
             <div className="text-4xl">🔥</div>
@@ -111,7 +111,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Mastery Level</p>
-              <p className="text-3xl font-bold text-green-600">{stats.masteryPercentage}%</p>
+              <p className="text-3xl font-bold text-green-600">{stats?.masteryPercentage || 0}%</p>
               <p className="text-sm text-gray-500">mature + young</p>
             </div>
             <div className="text-4xl">🎯</div>
@@ -122,7 +122,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Accuracy</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.accuracy}%</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.accuracy || 0}%</p>
               <p className="text-sm text-gray-500">correct</p>
             </div>
             <div className="text-4xl">📊</div>
@@ -133,7 +133,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Today&apos;s Study Time</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.todayMinutes}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.todayMinutes || 0}</p>
               <p className="text-sm text-gray-500">minutes</p>
             </div>
             <div className="text-4xl">⏱️</div>
@@ -167,11 +167,11 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
               </ResponsiveContainer>
             </div>
             <div className="ml-6 space-y-2">
-              {Object.entries(stats.masteryLevels).map(([key, value]) => (
+              {stats?.masteryLevels ? Object.entries(stats.masteryLevels).map(([key, value]) => (
                 value > 0 && (
                   <div key={key} className="flex items-center">
-                    <div 
-                      className="w-4 h-4 rounded mr-2" 
+                    <div
+                      className="w-4 h-4 rounded mr-2"
                       style={{ backgroundColor: masteryColors[key as keyof typeof masteryColors] }}
                     />
                     <span className="text-sm">
@@ -179,7 +179,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
                     </span>
                   </div>
                 )
-              ))}
+              )) : null}
             </div>
           </div>
           
@@ -198,21 +198,40 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
 
         {/* Weekly Progress */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Weekly Progress</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Weekly Learning Progress</h3>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={stats.weeklyProgress}>
+            <BarChart data={stats?.weeklyProgress || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" />
               <YAxis />
-              <Tooltip formatter={(value) => [`${value} cards`, 'Cards Studied']} />
-              <Bar dataKey="questions" fill="#3b82f6" />
+              <Tooltip
+                formatter={(value, name) => [
+                  `${value} questions`,
+                  name === 'learned' ? 'Newly Learned' : name === 'mastered' ? 'Reached Mastery' : 'Total'
+                ]}
+              />
+              <Bar dataKey="learned" stackId="a" fill="#3b82f6" name="learned" />
+              <Bar dataKey="mastered" stackId="a" fill="#10b981" name="mastered" />
             </BarChart>
           </ResponsiveContainer>
+          <div className="mt-2 flex justify-center space-x-4 text-sm">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
+              <span className="text-gray-600">New Questions Learned</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded mr-1"></div>
+              <span className="text-gray-600">Questions Mastered</span>
+            </div>
+          </div>
+          <p className="text-center text-xs text-gray-500 mt-2">
+            Total: {stats?.weeklyProgress?.reduce((sum: number, day: any) => sum + (day.total || 0), 0) || 0} questions learned this week
+          </p>
         </div>
       </div>
 
       {/* Topic Progress */}
-      {Object.keys(stats.topicProgress).length > 0 && (
+      {stats?.topicProgress && Object.keys(stats.topicProgress).length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Progress by Topic</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

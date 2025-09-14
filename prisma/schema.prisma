@@ -10,9 +10,10 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  isGuest   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   sessions      Session[]
   questionStats QuestionStat[]
   studySessions StudySession[]
@@ -27,8 +28,9 @@ model Topic {
 }
 
 model Question {
-  id           String         @id @default(cuid())
+  id           Int            @id @default(autoincrement())
   topicId      String
+  refId        Int?           // Reference ID from original PDF (1-100, repeats across topics)
   questionText String
   optionA      String
   optionB      String
@@ -37,7 +39,9 @@ model Question {
   correctAnswer String
   explanation  String
   difficulty   Int            @default(1)
-  
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime?      @updatedAt
+
   topic        Topic          @relation(fields: [topicId], references: [id])
   stats        QuestionStat[]
   sessionItems SessionItem[]
@@ -46,7 +50,7 @@ model Question {
 model QuestionStat {
   id             String   @id @default(cuid())
   userId         String
-  questionId     String
+  questionId     Int
   timesAnswered  Int      @default(0)
   timesCorrect   Int      @default(0)
   lastAnswered   DateTime?
@@ -85,7 +89,7 @@ model StudySession {
 model SessionItem {
   id            String       @id @default(cuid())
   sessionId     String
-  questionId    String
+  questionId    Int
   userAnswer    String?
   isCorrect     Boolean?
   answeredAt    DateTime?
@@ -98,7 +102,7 @@ model SessionItem {
 model Note {
   id         String   @id @default(cuid())
   userId     String
-  questionId String
+  questionId Int
   content    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

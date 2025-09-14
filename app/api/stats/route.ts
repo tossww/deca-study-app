@@ -144,30 +144,49 @@ export async function GET(request: NextRequest) {
       return total
     }, 0)
 
-    // Generate weekly progress data (cards studied per day)
+    // Generate weekly progress data (questions learned per day)
     const weeklyProgress = []
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date()
       date.setDate(date.getDate() - i)
       date.setHours(0, 0, 0, 0)
       const nextDate = new Date(date)
       nextDate.setDate(nextDate.getDate() + 1)
-      
-      const dayQuestions = await prisma.questionStat.count({
+
+      // Count questions that moved from 'new' to 'learning' or beyond on this day
+      // This means questions with timesAnswered = 1 and lastAnswered on this day
+      const newlyLearned = await prisma.questionStat.count({
         where: {
           userId,
+          timesAnswered: 1,
           lastAnswered: {
             gte: date,
             lt: nextDate
           }
         }
       }).catch(() => 0)
-      
+
+      // Also count questions that reached 'mature' status on this day
+      const reachedMature = await prisma.questionStat.count({
+        where: {
+          userId,
+          repetitions: { gte: 3 },
+          easeFactor: { gte: 2.3 },
+          interval: { gte: 21 },
+          lastAnswered: {
+            gte: date,
+            lt: nextDate
+          }
+        }
+      }).catch(() => 0)
+
       weeklyProgress.push({
         day: dayNames[date.getDay()],
-        questions: dayQuestions
+        learned: newlyLearned,
+        mastered: reachedMature,
+        total: newlyLearned + reachedMature
       })
     }
 

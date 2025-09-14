@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
+    const { email, isGuest } = await request.json()
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
@@ -18,7 +18,10 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       user = await prisma.user.create({
-        data: { email },
+        data: {
+          email,
+          isGuest: isGuest || false
+        },
       })
     }
 
@@ -34,11 +37,17 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-      user: { id: user.id, email: user.email },
+      user: {
+        id: user.id,
+        email: user.email,
+        isGuest: user.isGuest || false
+      },
       token,
     })
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }

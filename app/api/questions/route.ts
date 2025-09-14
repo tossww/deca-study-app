@@ -44,14 +44,20 @@ export async function GET(request: NextRequest) {
     })
 
     // Transform questions to match frontend format
-    const questions = dbQuestions.map(q => ({
-      id: q.id,
-      question: q.questionText,
-      options: [q.optionA, q.optionB, q.optionC, q.optionD],
-      correctAnswer: parseInt(q.correctAnswer),
-      explanation: q.explanation,
-      topic: q.topic.name
-    }))
+    const questions = dbQuestions.map(q => {
+      // Convert letter answer (A, B, C, D) to index (0, 1, 2, 3)
+      const letterToIndex = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
+      const correctAnswer = letterToIndex[q.correctAnswer as keyof typeof letterToIndex] ?? 0
+
+      return {
+        id: q.id,
+        question: q.questionText,
+        options: [q.optionA, q.optionB, q.optionC, q.optionD],
+        correctAnswer,
+        explanation: q.explanation,
+        topic: q.topic.name
+      }
+    })
 
     // Shuffle questions
     const shuffledQuestions = questions.sort(() => Math.random() - 0.5)

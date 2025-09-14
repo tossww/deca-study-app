@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import { TopicSelector } from '@/components/TopicSelector'
 import { StudySession } from '@/components/StudySession'
 import { Dashboard } from '@/components/Dashboard'
+import { Browse } from '@/components/Browse'
+// import { InfoHelp } from '@/components/InfoHelp'"
 import { LoginForm } from '@/components/LoginForm'
 import { useStore } from '@/lib/store'
 
 export default function Home() {
   const { user, isLoading } = useStore()
-  const [currentView, setCurrentView] = useState<'dashboard' | 'study' | 'login'>('login')
+  const [currentView, setCurrentView] = useState<'dashboard' | 'study' | 'browse' | 'info' | 'login'>('login')
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
 
   useEffect(() => {
@@ -58,6 +60,26 @@ export default function Home() {
                 Study
               </button>
               <button
+                onClick={() => setCurrentView('browse')}
+                className={`px-4 py-2 rounded-lg ${
+                  currentView === 'browse'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Browse
+              </button>
+              <button
+                onClick={() => setCurrentView('info')}
+                className={`px-4 py-2 rounded-lg ${
+                  currentView === 'info'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Info
+              </button>
+              <button
                 onClick={() => {
                   useStore.getState().logout()
                   setCurrentView('login')
@@ -75,25 +97,41 @@ export default function Home() {
         {currentView === 'dashboard' && (
           <Dashboard onStartStudy={() => setCurrentView('study')} />
         )}
-        
+
         {currentView === 'study' && (
-          <>
+          <div className="max-w-7xl mx-auto">
             {selectedTopics.length === 0 ? (
-              <TopicSelector
-                onTopicsSelected={(topics) => {
-                  setSelectedTopics(topics)
-                }}
-              />
+              <div className="bg-white rounded-xl shadow-lg">
+                <TopicSelector
+                  onTopicsSelected={(topics) => {
+                    setSelectedTopics(topics)
+                  }}
+                />
+              </div>
             ) : (
               <StudySession
                 topics={selectedTopics}
                 onComplete={() => {
                   setSelectedTopics([])
+                  useStore.getState().setSelectedTopics([])
+                  setCurrentView('dashboard')
+                }}
+                onQuit={() => {
+                  setSelectedTopics([])
+                  useStore.getState().setSelectedTopics([])
                   setCurrentView('dashboard')
                 }}
               />
             )}
-          </>
+          </div>
+        )}
+
+        {currentView === 'browse' && (
+          <Browse />
+        )}
+
+        {currentView === 'info' && (
+          <div className="p-6 bg-white rounded-lg">Info section coming soon...</div>
         )}
       </main>
     </div>

@@ -15,23 +15,23 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!email || !email.includes('@')) {
       toast.error('Please enter a valid email address')
       return
     }
 
     setIsLoading(true)
-    
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      
+
       const data = await response.json()
-      
+
       if (response.ok) {
         setUser(data.user)
         setSessionToken(data.token)
@@ -39,6 +39,33 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         onLogin()
       } else {
         toast.error(data.error || 'Login failed')
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGuestLogin = async () => {
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'guest@deca-study.local', isGuest: true }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        setSessionToken(data.token)
+        toast.success('Welcome, Guest!')
+        onLogin()
+      } else {
+        toast.error(data.error || 'Guest login failed')
       }
     } catch (error) {
       toast.error('Network error. Please try again.')
@@ -79,9 +106,23 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             {isLoading ? 'Signing in...' : 'Continue with Email'}
           </button>
         </form>
-        
+
+        <div className="mt-4 flex items-center">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="px-3 text-sm text-gray-500">or</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        <button
+          onClick={handleGuestLogin}
+          disabled={isLoading}
+          className="w-full mt-4 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
+        >
+          {isLoading ? 'Signing in...' : 'Continue as Guest'}
+        </button>
+
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>No password required! We&apos;ll save your progress using your email.</p>
+          <p>No password required! Use email to save personal progress, or continue as guest for shared access.</p>
         </div>
       </div>
     </div>
