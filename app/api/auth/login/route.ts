@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
-
-const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
     console.log('🔐 Login attempt started')
+    console.log('🔗 DATABASE_URL exists:', !!process.env.DATABASE_URL)
+    console.log('🔗 DATABASE_URL length:', process.env.DATABASE_URL?.length || 0)
 
     // Test database connection first
     try {
