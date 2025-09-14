@@ -23,6 +23,9 @@ export default function Home() {
     }
   }, [user])
 
+  // Determine if we're in active study mode (mobile with topics selected)
+  const isInMobileStudyMode = isMobile && currentView === 'study' && selectedTopics.length > 0
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -37,7 +40,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
+      <header className={`bg-white shadow-sm border-b ${isInMobileStudyMode ? 'hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <h1 className="text-3xl font-bold text-gray-900">DECA Study App</h1>
@@ -96,7 +99,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isInMobileStudyMode ? 'py-0' : 'py-8'}`}>
         {currentView === 'dashboard' && (
           <Dashboard onStartStudy={() => setCurrentView('study')} />
         )}

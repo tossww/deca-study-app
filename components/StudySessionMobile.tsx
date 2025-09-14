@@ -94,37 +94,40 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Minimal Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center flex-shrink-0">
-        <span className="text-sm font-medium text-gray-700">
-          Question {currentIndex + 1}/{questions.length}
-        </span>
+      {/* Ultra-Minimal Header - Only essential info */}
+      <div className="bg-white px-4 py-2 flex justify-between items-center flex-shrink-0 border-b border-gray-100">
         <button
           onClick={handleQuit}
-          className="px-3 py-1.5 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors text-sm"
+          className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors py-1"
         >
-          Quit
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="text-sm font-medium">Back</span>
         </button>
+        <span className="text-xs font-medium text-gray-500">
+          {currentIndex + 1}/{questions.length}
+        </span>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col p-4">
-        {/* Question */}
-        <div className="bg-white rounded-lg p-6 mb-4 shadow-sm flex-shrink-0">
+      {/* Main Content Area - Optimized spacing */}
+      <div className="flex-1 flex flex-col px-4 py-3">
+        {/* Question - Optimized for mobile */}
+        <div className="bg-white rounded-lg p-5 mb-3 shadow-sm flex-shrink-0">
           <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
         </div>
 
-        {/* Answer Options */}
-        <div className="space-y-3 flex-1">
+        {/* Answer Options - Enhanced mobile touch targets */}
+        <div className="space-y-2 flex-1">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(index)}
               disabled={showExplanation}
               className={cn(
-                'w-full text-left p-4 rounded-lg border-2 transition-all touch-manipulation min-h-[56px] flex items-center',
+                'w-full text-left p-4 rounded-lg border-2 transition-all touch-manipulation min-h-[60px] flex items-center active:scale-[0.98]',
                 showExplanation && index === currentQuestion.correctAnswer
                   ? 'border-green-500 bg-green-50 text-green-800'
                   : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
@@ -144,9 +147,9 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           ))}
         </div>
 
-        {/* Feedback Section */}
+        {/* Feedback Section - Compact mobile design */}
         {currentAnswerData && (
-          <div className="bg-white rounded-lg p-4 mt-4 shadow-sm flex-shrink-0">
+          <div className="bg-white rounded-lg p-3 mt-3 shadow-sm flex-shrink-0">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3 text-sm">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
@@ -205,27 +208,28 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           </div>
         )}
 
-        {/* Explanation */}
+        {/* Explanation - Compact for mobile */}
         {showExplanation && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 shadow-sm flex-shrink-0">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3 shadow-sm flex-shrink-0">
             <h4 className="font-semibold text-blue-900 mb-2 text-sm">Explanation</h4>
             <p className="text-blue-800 text-sm leading-relaxed">{currentQuestion.explanation}</p>
           </div>
         )}
       </div>
 
-      {/* Bottom Action Bar */}
-      <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
+      {/* Bottom Action Bar - Enhanced for mobile */}
+      <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0 safe-area-bottom">
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            Time: {formatTime(sessionStats.timeSpent)}
+          <div className="text-xs text-gray-500 flex flex-col">
+            <span>Time: {formatTime(sessionStats.timeSpent)}</span>
+            <span>Score: {sessionStats.correct}/{sessionStats.total}</span>
           </div>
           {showExplanation && (
             <button
               onClick={nextQuestion}
-              className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-md min-h-[48px] touch-manipulation"
+              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-lg min-h-[52px] touch-manipulation active:scale-95"
             >
-              {currentIndex + 1 >= questions.length ? 'Finish' : 'Next Question →'}
+              {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
             </button>
           )}
         </div>
