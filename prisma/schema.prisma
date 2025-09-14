@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  sessions      Session[]
+  questionStats QuestionStat[]
+  studySessions StudySession[]
+  notes         Note[]
+}
+
+model Topic {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  questions   Question[]
+}
+
+model Question {
+  id           String         @id @default(cuid())
+  topicId      String
+  questionText String
+  optionA      String
+  optionB      String
+  optionC      String
+  optionD      String
+  correctAnswer String
+  explanation  String
+  difficulty   Int            @default(1)
+  
+  topic        Topic          @relation(fields: [topicId], references: [id])
+  stats        QuestionStat[]
+  sessionItems SessionItem[]
+}
+
+model QuestionStat {
+  id             String   @id @default(cuid())
+  userId         String
+  questionId     String
+  timesAnswered  Int      @default(0)
+  timesCorrect   Int      @default(0)
+  lastAnswered   DateTime?
+  nextReview     DateTime?
+  easeFactor     Float    @default(2.5)
+  interval       Int      @default(1)
+  repetitions    Int      @default(0)
+  
+  user     User     @relation(fields: [userId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+  
+  @@unique([userId, questionId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id])
+}
+
+model StudySession {
+  id          String        @id @default(cuid())
+  userId      String
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  score       Float?
+  
+  user  User          @relation(fields: [userId], references: [id])
+  items SessionItem[]
+}
+
+model SessionItem {
+  id            String       @id @default(cuid())
+  sessionId     String
+  questionId    String
+  userAnswer    String?
+  isCorrect     Boolean?
+  answeredAt    DateTime?
+  timeSpent     Int?
+  
+  session  StudySession @relation(fields: [sessionId], references: [id])
+  question Question     @relation(fields: [questionId], references: [id])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  userId     String
+  questionId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id])
+}

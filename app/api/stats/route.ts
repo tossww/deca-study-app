@@ -1,0 +1,215 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+import { calculateStreak } from '@/lib/utils'
+import { getUserFromRequest } from '@/lib/auth'
+
+const prisma = new PrismaClient()
+
+export async function GET(request: NextRequest) {
+  try {
+    // Get user ID from session token
+    const userId = await getUserFromRequest(request)
+    
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    // Get total questions count
+    const totalQuestions = await prisma.question.count()
+    
+    // Get user's question statistics with topic information
+    const questionStats = await prisma.questionStat.findMany({
+      where: { userId },
+      include: {
+        question: {
+          include: {
+            topic: true
+          }
+        }
+      }
+    })
+
+    // Calculate mastery levels based on spaced repetition criteria
+    const masteryLevels = {
+      new: 0,        // Never seen (not in questionStats)
+      learning: 0,   // Seen but repetitions < 3 or ease factor < 2.3
+      young: 0,      // 3+ repetitions, ease factor >= 2.3, interval < 21 days
+      mature: 0,     // 3+ repetitions, ease factor >= 2.3, interval >= 21 days
+      relearning: 0, // Failed recently (needs review)
+    }
+
+    const topicProgress: { [key: string]: typeof masteryLevels } = {}
+    
+    // Initialize topic progress
+    const topics = await prisma.topic.findMany()
+    topics.forEach(topic => {
+      topicProgress[topic.name] = { ...masteryLevels }
+    })
+
+    // Count questions by mastery level
+    const now = new Date()
+    const reviewedQuestionIds = new Set(questionStats.map(stat => stat.questionId))
+
+    // Process reviewed questions
+    questionStats.forEach(stat => {
+      const topicName = stat.question.topic.name
+      
+      if (stat.nextReview && stat.nextReview < now) {
+        // Needs review (overdue)
+        masteryLevels.relearning++
+        topicProgress[topicName].relearning++
+      } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
+        // Mature cards
+        masteryLevels.mature++
+        topicProgress[topicName].mature++
+      } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3) {
+        // Young cards
+        masteryLevels.young++
+        topicProgress[topicName].young++
+      } else {
+        // Still learning
+        masteryLevels.learning++
+        topicProgress[topicName].learning++
+      }
+    })
+
+    // Count new (unseen) questions by topic
+    for (const topic of topics) {
+      const topicQuestions = await prisma.question.count({
+        where: { topicId: topic.id }
+      })
+      
+      const topicReviewed = questionStats.filter(
+        stat => stat.question.topicId === topic.id
+      ).length
+      
+      const newInTopic = topicQuestions - topicReviewed
+      masteryLevels.new += newInTopic
+      topicProgress[topic.name].new = newInTopic
+    }
+
+    // Calculate overall progress percentage
+    const totalReviewed = questionStats.length
+    const progressPercentage = Math.round((totalReviewed / totalQuestions) * 100)
+    
+    // Calculate mastery percentage (mature + young cards)
+    const masteredQuestions = masteryLevels.mature + masteryLevels.young
+    const masteryPercentage = totalQuestions > 0 ? Math.round((masteredQuestions / totalQuestions) * 100) : 0
+
+    // Get user's study sessions from the last 7 days for streak calculation
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    
+    const recentSessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startedAt: {
+          gte: sevenDaysAgo
+        }
+      },
+      include: {
+        items: true
+      }
+    }).catch(() => [])
+
+    // Calculate study streak
+    const sessionDates = recentSessions
+      .filter(session => session.completedAt)
+      .map(session => session.startedAt)
+    
+    const studyStreak = calculateStreak(sessionDates)
+
+    // Calculate today's study time
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const todaySessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startedAt: {
+          gte: today,
+          lt: tomorrow
+        },
+        completedAt: { not: null }
+      }
+    }).catch(() => [])
+
+    const todayMinutes = todaySessions.reduce((total, session) => {
+      if (session.completedAt && session.startedAt) {
+        const diff = session.completedAt.getTime() - session.startedAt.getTime()
+        return total + Math.floor(diff / (1000 * 60))
+      }
+      return total
+    }, 0)
+
+    // Generate weekly progress data (cards studied per day)
+    const weeklyProgress = []
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      date.setHours(0, 0, 0, 0)
+      const nextDate = new Date(date)
+      nextDate.setDate(nextDate.getDate() + 1)
+      
+      const dayQuestions = await prisma.questionStat.count({
+        where: {
+          userId,
+          lastAnswered: {
+            gte: date,
+            lt: nextDate
+          }
+        }
+      }).catch(() => 0)
+      
+      weeklyProgress.push({
+        day: dayNames[date.getDay()],
+        questions: dayQuestions
+      })
+    }
+
+    // Calculate cards due for review
+    const dueForReview = await prisma.questionStat.count({
+      where: {
+        userId,
+        nextReview: {
+          lte: now
+        }
+      }
+    })
+
+    const stats = {
+      // Overall progress
+      totalQuestions,
+      reviewedQuestions: totalReviewed,
+      progressPercentage,
+      masteryPercentage,
+      
+      // Mastery breakdown
+      masteryLevels,
+      
+      // Topic-wise progress
+      topicProgress,
+      
+      // Traditional stats
+      correctAnswers: questionStats.reduce((sum, stat) => sum + stat.timesCorrect, 0),
+      accuracy: totalReviewed > 0 ? Math.round((questionStats.reduce((sum, stat) => sum + stat.timesCorrect, 0) / questionStats.reduce((sum, stat) => sum + stat.timesAnswered, 0)) * 100) : 0,
+      
+      // Spaced repetition specific
+      dueForReview,
+      
+      // Activity stats
+      studyStreak,
+      todayMinutes,
+      weeklyProgress,
+    }
+
+    return NextResponse.json(stats)
+  } catch (error) {
+    console.error('Stats fetch error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
