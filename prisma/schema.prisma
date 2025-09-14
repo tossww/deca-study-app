@@ -58,10 +58,16 @@ model QuestionStat {
   easeFactor     Float    @default(2.5)
   interval       Int      @default(1)
   repetitions    Int      @default(0)
-  
+
+  // Anki Algorithm Fields
+  state          String   @default("new") // new, learning, review, relearning, suspended
+  currentStep    Int      @default(0)     // Current position in learning/relearning steps
+  lapses         Int      @default(0)     // Number of times this card has failed
+  lastReviewDate DateTime?               // When card was last reviewed (different from lastAnswered)
+
   user     User     @relation(fields: [userId], references: [id])
   question Question @relation(fields: [questionId], references: [id])
-  
+
   @@unique([userId, questionId])
 }
 

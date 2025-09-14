@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { cn, formatTime } from '@/lib/utils'
-import { Quality } from '@/lib/spaced-repetition'
+import { Quality, suggestGradeFromTime } from '@/lib/spaced-repetition'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 
@@ -34,6 +34,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   const [showQuitModal, setShowQuitModal] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionStartTime] = useState(Date.now())
+  const [showGradeModal, setShowGradeModal] = useState(false)
+  const [currentAnswerData, setCurrentAnswerData] = useState<{
+    answerIndex: number
+    isCorrect: boolean
+    responseTimeMs: number
+    suggestedGrade: Quality
+  } | null>(null)
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -102,13 +109,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [showExplanation, currentIndex, questions])
 
-  const handleAnswer = async (answerIndex: number) => {
+  const handleAnswer = (answerIndex: number) => {
     if (showExplanation) return
 
     setSelectedAnswer(answerIndex)
     setShowExplanation(true)
 
-    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000)
+    const responseTimeMs = Date.now() - questionStartTime
     const isCorrect = answerIndex === questions[currentIndex].correctAnswer
 
     setSessionStats((prev) => ({
@@ -117,7 +124,25 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
       total: prev.total + 1,
     }))
 
-    const quality = isCorrect ? Quality.Good : Quality.Again
+    // Get suggested grade based on response time
+    const suggestedGrade = suggestGradeFromTime(responseTimeMs, isCorrect)
+
+    // Store answer data for grade selection
+    setCurrentAnswerData({
+      answerIndex,
+      isCorrect,
+      responseTimeMs,
+      suggestedGrade,
+    })
+
+    // Show grade selection modal
+    setShowGradeModal(true)
+  }
+
+  const submitAnswer = async (selectedGrade: Quality) => {
+    if (!currentAnswerData) return
+
+    const { answerIndex, isCorrect, responseTimeMs } = currentAnswerData
 
     try {
       const { sessionToken } = useStore.getState()
@@ -131,13 +156,22 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           questionId: questions[currentIndex].id,
           userAnswer: answerIndex,
           isCorrect,
-          timeSpent,
-          quality,
+          timeSpent: Math.floor(responseTimeMs / 1000),
+          quality: selectedGrade,
         }),
       })
     } catch (error) {
       console.error('Failed to save answer:', error)
     }
+
+    // Close grade modal and clear answer data
+    setShowGradeModal(false)
+    setCurrentAnswerData(null)
+
+    // Auto-proceed to next question after a short delay
+    setTimeout(() => {
+      nextQuestion()
+    }, 500)
   }
 
   const completeSession = async () => {
@@ -164,6 +198,9 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   }
 
   const nextQuestion = async () => {
+    // Only proceed if grade modal is not showing
+    if (showGradeModal) return
+
     if (currentIndex + 1 >= questions.length) {
       await completeSession()
       toast.success(`Session complete! Score: ${sessionStats.correct}/${sessionStats.total}`)
@@ -272,6 +309,123 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           )}
         </div>
       </div>
+
+      {/* Grade Selection Modal */}
+      {showGradeModal && currentAnswerData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg mx-4 animate-slide-up">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">How well did you know this answer?</h3>
+
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg text-sm">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-600">Response time:</span>
+                <span className="font-medium">{(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-600">Result:</span>
+                <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
+                  {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Suggested:</span>
+                <span className="font-medium text-blue-600">
+                  {Quality[currentAnswerData.suggestedGrade]}
+                  <span className="text-xs text-gray-500 ml-1">
+                    (based on response time)
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => submitAnswer(Quality.Again)}
+                className={cn(
+                  "w-full p-3 rounded-lg border-2 text-left transition-all",
+                  currentAnswerData.suggestedGrade === Quality.Again
+                    ? "border-red-500 bg-red-50 ring-2 ring-red-200"
+                    : "border-gray-200 hover:border-red-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-red-700">Again</span>
+                    <p className="text-xs text-gray-600">I got it wrong or struggled significantly</p>
+                  </div>
+                  {currentAnswerData.suggestedGrade === Quality.Again && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
+                  )}
+                </div>
+              </button>
+
+              <button
+                onClick={() => submitAnswer(Quality.Hard)}
+                className={cn(
+                  "w-full p-3 rounded-lg border-2 text-left transition-all",
+                  currentAnswerData.suggestedGrade === Quality.Hard
+                    ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200"
+                    : "border-gray-200 hover:border-orange-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-orange-700">Hard</span>
+                    <p className="text-xs text-gray-600">I got it right but it was difficult</p>
+                  </div>
+                  {currentAnswerData.suggestedGrade === Quality.Hard && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
+                  )}
+                </div>
+              </button>
+
+              <button
+                onClick={() => submitAnswer(Quality.Good)}
+                className={cn(
+                  "w-full p-3 rounded-lg border-2 text-left transition-all",
+                  currentAnswerData.suggestedGrade === Quality.Good
+                    ? "border-green-500 bg-green-50 ring-2 ring-green-200"
+                    : "border-gray-200 hover:border-green-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-green-700">Good</span>
+                    <p className="text-xs text-gray-600">I got it right with normal effort</p>
+                  </div>
+                  {currentAnswerData.suggestedGrade === Quality.Good && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
+                  )}
+                </div>
+              </button>
+
+              <button
+                onClick={() => submitAnswer(Quality.Easy)}
+                className={cn(
+                  "w-full p-3 rounded-lg border-2 text-left transition-all",
+                  currentAnswerData.suggestedGrade === Quality.Easy
+                    ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
+                    : "border-gray-200 hover:border-blue-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-blue-700">Easy</span>
+                    <p className="text-xs text-gray-600">I knew it instantly and confidently</p>
+                  </div>
+                  {currentAnswerData.suggestedGrade === Quality.Easy && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
+                  )}
+                </div>
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-4 text-center">
+              The suggested grade is based on your response time. You can always choose a different grade.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Quit Confirmation Modal */}
       {showQuitModal && (

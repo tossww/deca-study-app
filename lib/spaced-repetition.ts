@@ -1,15 +1,20 @@
+// Legacy SM-2 Interface (kept for backwards compatibility)
 export interface ReviewData {
   easeFactor: number
   interval: number
   repetitions: number
 }
 
-export enum Quality {
-  Again = 0,
-  Hard = 1,
-  Good = 2,
-  Easy = 3,
-}
+// Re-export Quality from anki-config for consistency
+export { Quality } from './anki-config'
+
+// Import Anki types and scheduler
+export type { CardData, SchedulingResult } from './anki-algorithm'
+export { AnkiScheduler } from './anki-algorithm'
+export { CardState, DEFAULT_ANKI_CONFIG, suggestGradeFromTime } from './anki-config'
+
+// Import Quality for the legacy function
+import { Quality } from './anki-config'
 
 export function calculateNextReview(
   current: ReviewData,
