@@ -127,6 +127,19 @@ export function InfoHelp() {
           </div>
         </div>
       </div>
+
+      {/* Version Info */}
+      <div className="bg-gray-50 rounded-xl p-4 text-center">
+        <p className="text-xs text-gray-500">
+          Version updated: {new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </p>
+      </div>
     </div>
   )
 }
