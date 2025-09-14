@@ -19,12 +19,12 @@ interface AppState {
 
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
-      isLoading: false,
+      isLoading: true,
       sessionToken: null,
       selectedTopics: [],
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ user, isLoading: false }),
       setSessionToken: (token) => set({ sessionToken: token }),
       setSelectedTopics: (topics) => set({ selectedTopics: topics }),
       logout: () => set({ user: null, sessionToken: null }),
@@ -36,6 +36,16 @@ export const useStore = create<AppState>()(
         sessionToken: state.sessionToken,
         selectedTopics: state.selectedTopics
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // If we have a user and token after rehydration, stop loading
+          if (state.user && state.sessionToken) {
+            state.isLoading = false
+          } else {
+            state.isLoading = false
+          }
+        }
+      },
     }
   )
 )

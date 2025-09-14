@@ -5,7 +5,7 @@ import { TopicSelector } from '@/components/TopicSelector'
 import { StudySession } from '@/components/StudySession'
 import { Dashboard } from '@/components/Dashboard'
 import { Browse } from '@/components/Browse'
-// import { InfoHelp } from '@/components/InfoHelp'"
+import { InfoHelp } from '@/components/InfoHelp'
 import { LoginForm } from '@/components/LoginForm'
 import { useStore } from '@/lib/store'
 
@@ -131,7 +131,7 @@ export default function Home() {
         )}
 
         {currentView === 'info' && (
-          <div className="p-6 bg-white rounded-lg">Info section coming soon...</div>
+          <InfoHelp />
         )}
       </main>
     </div>

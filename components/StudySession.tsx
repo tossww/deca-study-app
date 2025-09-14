@@ -32,6 +32,8 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   })
   const [questionStartTime, setQuestionStartTime] = useState(Date.now())
   const [showQuitModal, setShowQuitModal] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionStartTime] = useState(Date.now())
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -39,6 +41,23 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         const response = await fetch('/api/questions?' + new URLSearchParams({ topics: topics.join(',') }))
         const data = await response.json()
         setQuestions(data.questions || [])
+
+        // Create study session in database
+        if (data.questions && data.questions.length > 0) {
+          const { sessionToken } = useStore.getState()
+          const sessionResponse = await fetch('/api/study-sessions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Session-Token': sessionToken || '',
+            },
+            body: JSON.stringify({
+              startedAt: sessionStartTime,
+            }),
+          })
+          const sessionData = await sessionResponse.json()
+          setSessionId(sessionData.sessionId)
+        }
       } catch (error) {
         toast.error('Failed to load questions')
       }
@@ -52,7 +71,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
       }
     }, 1000)
     return () => clearInterval(interval)
-  }, [topics, showQuitModal])
+  }, [topics, showQuitModal, sessionStartTime])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -121,8 +140,32 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     }
   }
 
-  const nextQuestion = () => {
+  const completeSession = async () => {
+    if (sessionId) {
+      try {
+        const { sessionToken } = useStore.getState()
+        await fetch('/api/study-sessions', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Session-Token': sessionToken || '',
+          },
+          body: JSON.stringify({
+            sessionId,
+            completedAt: Date.now(),
+            totalAnswers: sessionStats.total,
+            correctAnswers: sessionStats.correct,
+          }),
+        })
+      } catch (error) {
+        console.error('Failed to complete session:', error)
+      }
+    }
+  }
+
+  const nextQuestion = async () => {
     if (currentIndex + 1 >= questions.length) {
+      await completeSession()
       toast.success(`Session complete! Score: ${sessionStats.correct}/${sessionStats.total}`)
       onComplete()
       return
@@ -138,7 +181,8 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     setShowQuitModal(true)
   }
 
-  const confirmQuit = () => {
+  const confirmQuit = async () => {
+    await completeSession()
     toast.success(`Study session ended. Score: ${sessionStats.correct}/${sessionStats.total}`)
     onQuit()
   }
