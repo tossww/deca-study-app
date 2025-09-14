@@ -23,8 +23,8 @@ export default function Home() {
     }
   }, [user])
 
-  // Determine if we're in active study mode (mobile with topics selected)
-  const isInMobileStudyMode = isMobile && currentView === 'study' && selectedTopics.length > 0
+  // Determine if we're in active study mode (hide header for both mobile and desktop)
+  const isInStudyMode = currentView === 'study' && selectedTopics.length > 0
 
   if (isLoading) {
     return (
@@ -40,66 +40,76 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className={`bg-white shadow-sm border-b ${isInMobileStudyMode ? 'hidden' : ''}`}>
+      <header className={`bg-white shadow-sm border-b ${isInStudyMode ? 'hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">DECA Study App</h1>
-            <nav className="flex space-x-4">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">D</span>
+              </div>
+              <span className="text-xl font-semibold text-gray-900">DECA</span>
+            </div>
+
+            <nav className="flex items-center space-x-6">
               <button
                 onClick={() => setCurrentView('dashboard')}
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   currentView === 'dashboard'
                     ? 'bg-primary-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 Dashboard
               </button>
               <button
                 onClick={() => setCurrentView('study')}
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   currentView === 'study'
                     ? 'bg-primary-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 Study
               </button>
-              <button
-                onClick={() => setCurrentView('browse')}
-                className={`px-4 py-2 rounded-lg ${
-                  currentView === 'browse'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Browse
-              </button>
-              <button
-                onClick={() => setCurrentView('info')}
-                className={`px-4 py-2 rounded-lg ${
-                  currentView === 'info'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Info
-              </button>
-              <button
-                onClick={() => {
-                  useStore.getState().logout()
-                  setCurrentView('login')
-                }}
-                className="px-4 py-2 text-red-600 hover:text-red-800"
-              >
-                Logout
-              </button>
+
+              <div className="relative group">
+                <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <button
+                    onClick={() => setCurrentView('browse')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Browse Questions
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('info')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Help & Info
+                  </button>
+                  <hr className="my-2 border-gray-100" />
+                  <button
+                    onClick={() => {
+                      useStore.getState().logout()
+                      setCurrentView('login')
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </nav>
           </div>
         </div>
       </header>
 
-      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isInMobileStudyMode ? 'py-0' : 'py-8'}`}>
+      <main className={`${isInStudyMode ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
         {currentView === 'dashboard' && (
           <Dashboard onStartStudy={() => setCurrentView('study')} />
         )}

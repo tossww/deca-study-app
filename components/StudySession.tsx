@@ -85,35 +85,35 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   }
 
   return (
-    <div className="max-w-4xl mx-auto h-screen flex flex-col py-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 flex-1 flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center mb-4 flex-shrink-0">
-          <div className="text-sm text-gray-600">
-            Question {currentIndex + 1} of {questions.length}
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
-              Time: {formatTime(sessionStats.timeSpent)}
-            </div>
-            <div className="text-sm text-gray-600">
-              Score: {sessionStats.correct}/{sessionStats.total}
-            </div>
-            <button
-              onClick={handleQuit}
-              className="px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors"
-            >
-              Quit
-            </button>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+        <div className="text-sm text-gray-600">
+          Question {currentIndex + 1} of {questions.length}
         </div>
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-600">
+            Time: {formatTime(sessionStats.timeSpent)}
+          </div>
+          <div className="text-sm text-gray-600">
+            Score: {sessionStats.correct}/{sessionStats.total}
+          </div>
+          <button
+            onClick={handleQuit}
+            className="px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors"
+          >
+            Quit
+          </button>
+        </div>
+      </div>
 
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 flex-shrink-0">
-          <h2 className="text-xl font-semibold text-gray-900 leading-relaxed">
+      <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-6 py-8">
+        <div className="bg-gray-50 rounded-lg p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
         </div>
 
-        <div className="flex-1 space-y-3 overflow-y-auto">
+        <div className="space-y-4">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
@@ -141,7 +141,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
 
         {currentAnswerData && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg flex-shrink-0">
+          <div className="mt-6 p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-4">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
@@ -197,23 +197,24 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         )}
 
         {showExplanation && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0">
-            <h4 className="font-semibold text-blue-900 mb-2">Explanation</h4>
+          <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="font-semibold text-blue-900 mb-3">Explanation</h4>
             <p className="text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
           </div>
         )}
 
         {showExplanation && (
-          <div className="flex justify-end mt-4 flex-shrink-0">
+          <div className="flex justify-center mt-8">
             <button
               onClick={nextQuestion}
-              className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-lg"
             >
               {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question (Enter)'}
             </button>
           </div>
         )}
       </div>
+    </div>
 
       {showQuitModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
