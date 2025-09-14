@@ -34,13 +34,14 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   const [showQuitModal, setShowQuitModal] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionStartTime] = useState(Date.now())
-  const [showGradeModal, setShowGradeModal] = useState(false)
+  const [showGradeSelector, setShowGradeSelector] = useState(false)
   const [currentAnswerData, setCurrentAnswerData] = useState<{
     answerIndex: number
     isCorrect: boolean
     responseTimeMs: number
     suggestedGrade: Quality
   } | null>(null)
+  const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -135,8 +136,11 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
       suggestedGrade,
     })
 
-    // Show grade selection modal
-    setShowGradeModal(true)
+    // Auto-apply suggested grade after 4 seconds unless user intervenes
+    const timer = setTimeout(() => {
+      submitAnswer(suggestedGrade)
+    }, 4000)
+    setAutoGradeTimer(timer)
   }
 
   const submitAnswer = async (selectedGrade: Quality) => {
@@ -164,8 +168,12 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
       console.error('Failed to save answer:', error)
     }
 
-    // Close grade modal and clear answer data
-    setShowGradeModal(false)
+    // Clear auto-grade timer and answer data
+    if (autoGradeTimer) {
+      clearTimeout(autoGradeTimer)
+      setAutoGradeTimer(null)
+    }
+    setShowGradeSelector(false)
     setCurrentAnswerData(null)
 
     // Auto-proceed to next question after a short delay
@@ -198,8 +206,15 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   }
 
   const nextQuestion = async () => {
-    // Only proceed if grade modal is not showing
-    if (showGradeModal) return
+    // Clear any pending auto-grade timer
+    if (autoGradeTimer) {
+      clearTimeout(autoGradeTimer)
+      setAutoGradeTimer(null)
+    }
+
+    // Clear answer data
+    setCurrentAnswerData(null)
+    setShowGradeSelector(false)
 
     if (currentIndex + 1 >= questions.length) {
       await completeSession()
@@ -298,6 +313,70 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         )}
 
+        {/* Inline Feedback Section */}
+        {currentAnswerData && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 animate-slide-up">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-4">
+                <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
+                  {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                </span>
+                <span className="text-gray-600 text-sm">
+                  {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
+                </span>
+                <span className="text-gray-600 text-sm">
+                  Score: {sessionStats.correct}/{sessionStats.total}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">
+                  Auto-applying: <span className="font-medium text-blue-600">{Quality[currentAnswerData.suggestedGrade]}</span>
+                </span>
+                <button
+                  onClick={() => setShowGradeSelector(!showGradeSelector)}
+                  className="text-xs px-2 py-1 text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:border-gray-400 transition-colors"
+                >
+                  Adjust
+                </button>
+              </div>
+            </div>
+
+            {/* Grade Selector (only shown when user clicks Adjust) */}
+            {showGradeSelector && (
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <p className="text-xs text-gray-600 mb-2">Override suggested grade:</p>
+                <div className="grid grid-cols-4 gap-2">
+                  <button
+                    onClick={() => submitAnswer(Quality.Again)}
+                    className="px-2 py-1 text-xs rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                  >
+                    Again
+                  </button>
+                  <button
+                    onClick={() => submitAnswer(Quality.Hard)}
+                    className="px-2 py-1 text-xs rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                  >
+                    Hard
+                  </button>
+                  <button
+                    onClick={() => submitAnswer(Quality.Good)}
+                    className="px-2 py-1 text-xs rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                  >
+                    Good
+                  </button>
+                  <button
+                    onClick={() => submitAnswer(Quality.Easy)}
+                    className="px-2 py-1 text-xs rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                  >
+                    Easy
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex justify-end">
           {showExplanation && (
             <button
@@ -310,122 +389,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
       </div>
 
-      {/* Grade Selection Modal */}
-      {showGradeModal && currentAnswerData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg mx-4 animate-slide-up">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">How well did you know this answer?</h3>
-
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg text-sm">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">Response time:</span>
-                <span className="font-medium">{(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">Result:</span>
-                <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
-                  {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Suggested:</span>
-                <span className="font-medium text-blue-600">
-                  {Quality[currentAnswerData.suggestedGrade]}
-                  <span className="text-xs text-gray-500 ml-1">
-                    (based on response time)
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => submitAnswer(Quality.Again)}
-                className={cn(
-                  "w-full p-3 rounded-lg border-2 text-left transition-all",
-                  currentAnswerData.suggestedGrade === Quality.Again
-                    ? "border-red-500 bg-red-50 ring-2 ring-red-200"
-                    : "border-gray-200 hover:border-red-300"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-semibold text-red-700">Again</span>
-                    <p className="text-xs text-gray-600">I got it wrong or struggled significantly</p>
-                  </div>
-                  {currentAnswerData.suggestedGrade === Quality.Again && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
-                  )}
-                </div>
-              </button>
-
-              <button
-                onClick={() => submitAnswer(Quality.Hard)}
-                className={cn(
-                  "w-full p-3 rounded-lg border-2 text-left transition-all",
-                  currentAnswerData.suggestedGrade === Quality.Hard
-                    ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200"
-                    : "border-gray-200 hover:border-orange-300"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-semibold text-orange-700">Hard</span>
-                    <p className="text-xs text-gray-600">I got it right but it was difficult</p>
-                  </div>
-                  {currentAnswerData.suggestedGrade === Quality.Hard && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
-                  )}
-                </div>
-              </button>
-
-              <button
-                onClick={() => submitAnswer(Quality.Good)}
-                className={cn(
-                  "w-full p-3 rounded-lg border-2 text-left transition-all",
-                  currentAnswerData.suggestedGrade === Quality.Good
-                    ? "border-green-500 bg-green-50 ring-2 ring-green-200"
-                    : "border-gray-200 hover:border-green-300"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-semibold text-green-700">Good</span>
-                    <p className="text-xs text-gray-600">I got it right with normal effort</p>
-                  </div>
-                  {currentAnswerData.suggestedGrade === Quality.Good && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
-                  )}
-                </div>
-              </button>
-
-              <button
-                onClick={() => submitAnswer(Quality.Easy)}
-                className={cn(
-                  "w-full p-3 rounded-lg border-2 text-left transition-all",
-                  currentAnswerData.suggestedGrade === Quality.Easy
-                    ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
-                    : "border-gray-200 hover:border-blue-300"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-semibold text-blue-700">Easy</span>
-                    <p className="text-xs text-gray-600">I knew it instantly and confidently</p>
-                  </div>
-                  {currentAnswerData.suggestedGrade === Quality.Easy && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Suggested</span>
-                  )}
-                </div>
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-4 text-center">
-              The suggested grade is based on your response time. You can always choose a different grade.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Quit Confirmation Modal */}
       {showQuitModal && (
