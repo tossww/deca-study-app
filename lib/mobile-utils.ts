@@ -3,11 +3,25 @@ import { useState, useEffect } from 'react'
 export function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false
 
-  return (
-    window.innerWidth < 768 ||
-    ('ontouchstart' in window) ||
-    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-  )
+  // Check for actual mobile devices first (most reliable)
+  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    return true
+  }
+
+  // Only consider small screens as mobile if they also have touch AND are likely mobile
+  // This prevents desktop browsers from being detected as mobile just because they're narrow
+  const hasTouch = 'ontouchstart' in window
+  const isSmallScreen = window.innerWidth < 768
+  const isVerySmallScreen = window.innerWidth < 480 // Definitely mobile size
+
+  // If very small screen, definitely mobile
+  if (isVerySmallScreen) return true
+
+  // If small screen AND touch, likely mobile (but not definitive for tablets/hybrids)
+  if (isSmallScreen && hasTouch) return true
+
+  // Otherwise, assume desktop
+  return false
 }
 
 export function useMobileDetection() {
