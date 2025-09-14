@@ -267,9 +267,9 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
             </span>
             <button
               onClick={handleQuit}
-              className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg font-semibold transition-colors text-sm shadow-md hover:shadow-lg border-2 border-red-600 hover:border-red-700"
+              className="px-3 py-1.5 bg-gray-500 text-white hover:bg-gray-600 rounded font-medium transition-colors text-sm"
             >
-              🚪 Quit
+              Quit
             </button>
           </div>
         </div>
@@ -315,7 +315,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           {currentAnswerData && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 animate-slide-up">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
                   {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                 </span>
@@ -325,11 +325,8 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 <span className="text-gray-600 text-sm">
                   Score: {sessionStats.correct}/{sessionStats.total}
                 </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">
-                  Auto-applying: <span className="font-medium text-blue-600">{Quality[currentAnswerData.suggestedGrade]}</span>
+                <span className="font-medium text-blue-600 text-sm">
+                  {Quality[currentAnswerData.suggestedGrade]}
                 </span>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
@@ -337,10 +334,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 >
                   Adjust
                 </button>
+              </div>
+
+              <div>
                 {showExplanation && (
                   <button
                     onClick={nextQuestion}
-                    className="px-3 py-1 bg-primary-600 text-white rounded font-medium hover:bg-primary-700 transition-colors text-sm ml-2"
+                    className="px-3 py-1 bg-primary-600 text-white rounded font-medium hover:bg-primary-700 transition-colors text-sm"
                   >
                     {currentIndex + 1 >= questions.length ? 'Finish' : 'Next'}
                   </button>
