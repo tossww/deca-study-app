@@ -8,7 +8,7 @@ export function InfoHelp() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">🎯 DECA Study App</h2>
         <p className="text-gray-700 leading-relaxed">
           This app uses scientifically-proven spaced repetition to help you master DECA exam questions efficiently.
-          Instead of cramming, you'll review questions at optimal intervals to build long-term retention.
+          Instead of cramming, you&apos;ll review questions at optimal intervals to build long-term retention.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export function InfoHelp() {
             <h4 className="font-semibold text-green-900">Adaptive Learning</h4>
             <p className="text-gray-700 text-sm">
               Questions you struggle with appear more frequently, while questions you master are shown less often.
-              This focuses your study time where it's needed most.
+              This focuses your study time where it&apos;s needed most.
             </p>
           </div>
         </div>
@@ -44,7 +44,7 @@ export function InfoHelp() {
               <h4 className="font-semibold text-blue-900">New</h4>
             </div>
             <p className="text-gray-700 text-sm">
-              Questions you've never studied. These will appear frequently until you learn them.
+              Questions you&apos;ve never studied. These will appear frequently until you learn them.
             </p>
           </div>
 
@@ -54,7 +54,7 @@ export function InfoHelp() {
               <h4 className="font-semibold text-yellow-900">Learning</h4>
             </div>
             <p className="text-gray-700 text-sm">
-              Questions you're actively memorizing. Review intervals are short (minutes to days).
+              Questions you&apos;re actively memorizing. Review intervals are short (minutes to days).
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export function InfoHelp() {
             <div className="flex items-start">
               <span className="text-xl mr-3">❌</span>
               <div>
-                <p className="font-semibold text-gray-900">Don't Skip Hard Questions</p>
+                <p className="font-semibold text-gray-900">Don&apos;t Skip Hard Questions</p>
                 <p className="text-gray-700 text-sm">Difficult questions need more repetitions to stick.</p>
               </div>
             </div>
