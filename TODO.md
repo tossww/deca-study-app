@@ -11,7 +11,18 @@
 - [x] Add info/help section explaining app logic and mastery system
 - [x] Add dedicated quit button in study mode with summary popup
 
-## Larger Features (4+ hours)
+## Anki Algorithm Implementation (21-31 hours)
+
+### High Priority - Spaced Repetition Enhancement
+- [ ] **Replace SM-2 with Anki Algorithm** - Implement proper learning states, relearning system, and more scientific scheduling
+- [ ] **Add Time-Based Answer Grading** - Suggest Easy/Good/Hard based on response time (10/20/40/120 second thresholds)
+- [ ] **Database Schema Updates** - Add state, currentStep, lapses fields to QuestionStat model
+- [ ] **Learning Steps System** - Implement configurable short-term steps before cards become mature
+- [ ] **Enhanced Answer Processing** - Specific ease factor adjustments per answer type (-20pp, -15pp, +15pp)
+
+*See ANKI_ALGORITHM_PROPOSAL.md for detailed specifications*
+
+## Other Features (4+ hours)
 - [ ] Create review mode for missed questions
 - [ ] Add search/filter functionality in Browse mode
 - [ ] Create practice test mode with full 100-question exams

@@ -112,13 +112,13 @@ export default function Home() {
               <StudySession
                 topics={selectedTopics}
                 onComplete={() => {
-                  setSelectedTopics([])
-                  useStore.getState().setSelectedTopics([])
+                  setSelectedTopics([]) // Clear local state to return to topic selector
+                  // Keep store.selectedTopics to remember for next session
                   setCurrentView('dashboard')
                 }}
                 onQuit={() => {
-                  setSelectedTopics([])
-                  useStore.getState().setSelectedTopics([])
+                  setSelectedTopics([]) // Clear local state to return to topic selector
+                  // Keep store.selectedTopics to remember for next session
                   setCurrentView('dashboard')
                 }}
               />

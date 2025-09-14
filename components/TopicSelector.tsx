@@ -54,7 +54,7 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
         return topicObj?.id || topic
       }))
     }
-  }, [])
+  }, [savedTopics])
 
   const toggleTopic = (topicId: string) => {
     setSelectedTopics((prev) =>
@@ -81,9 +81,9 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
             : 'Choose one or more topics to begin your study session'
           }
         </p>
-        {selectedTopics.length > 0 && (
-          <div className="mt-2 text-xs text-blue-600">
-            💡 Your previous selection is remembered. Click any topic to add/remove it.
+        {savedTopics && savedTopics.length > 0 && selectedTopics.length > 0 && (
+          <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block">
+            ✨ Restored your previous topic selection
           </div>
         )}
       </div>
