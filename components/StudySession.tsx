@@ -307,14 +307,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
 
         <div className="flex-shrink-0 space-y-3 mt-4">
-          {showExplanation && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 animate-slide-up">
-              <h4 className="font-semibold text-blue-900 mb-1 text-sm">Explanation</h4>
-              <p className="text-blue-800 text-sm">{currentQuestion.explanation}</p>
-            </div>
-          )}
-
-          {/* Inline Feedback Section */}
+          {/* Inline Feedback Section - Show first */}
           {currentAnswerData && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 animate-slide-up">
             <div className="flex items-center justify-between mb-2">
@@ -340,6 +333,14 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 >
                   Adjust
                 </button>
+                {showExplanation && (
+                  <button
+                    onClick={nextQuestion}
+                    className="px-3 py-1 bg-primary-600 text-white rounded font-medium hover:bg-primary-700 transition-colors text-sm ml-2"
+                  >
+                    {currentIndex + 1 >= questions.length ? 'Finish' : 'Next'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -378,16 +379,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           </div>
         )}
 
-          <div className="flex justify-end">
-            {showExplanation && (
-              <button
-                onClick={nextQuestion}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm"
-              >
-                {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question'}
-              </button>
-            )}
-          </div>
+          {/* Explanation - Show after feedback */}
+          {showExplanation && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 animate-slide-up">
+              <h4 className="font-semibold text-blue-900 mb-1 text-sm">Explanation</h4>
+              <p className="text-blue-800 text-sm">{currentQuestion.explanation}</p>
+            </div>
+          )}
         </div>
       </div>
 
