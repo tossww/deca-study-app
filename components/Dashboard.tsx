@@ -275,7 +275,6 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
               <p className="text-gray-600 text-sm">{currentTip.content}</p>
             </div>
           </div>
-          <div className="mt-4 text-xs text-gray-400 text-right">Tip refreshes every 10 seconds</div>
         </div>
       )}
 

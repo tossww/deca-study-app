@@ -13,7 +13,8 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionMobileProps) {
-  const [showQuickTip, setShowQuickTip] = useState(true)
+  const [showQuickTip, setShowQuickTip] = useState(false)
+  const [showQuitTip, setShowQuitTip] = useState(false)
 
   const {
     currentQuestion,
@@ -276,7 +277,10 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
                 Continue
               </button>
               <button
-                onClick={confirmQuit}
+                onClick={() => {
+                  setShowQuitModal(false)
+                  setShowQuitTip(true)
+                }}
                 className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium min-h-[48px]"
               >
                 End Session
@@ -284,6 +288,16 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
             </div>
           </div>
         </div>
+      )}
+
+      {showQuitTip && (
+        <QuickTip
+          duration={3000}
+          onComplete={() => {
+            setShowQuitTip(false)
+            confirmQuit()
+          }}
+        />
       )}
     </div>
   )

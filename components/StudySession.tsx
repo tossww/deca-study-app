@@ -13,7 +13,8 @@ interface StudySessionProps {
 }
 
 export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) {
-  const [showQuickTip, setShowQuickTip] = useState(true)
+  const [showQuickTip, setShowQuickTip] = useState(false)
+  const [showQuitTip, setShowQuitTip] = useState(false)
 
   const {
     currentQuestion,
@@ -254,7 +255,10 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 Continue
               </button>
               <button
-                onClick={confirmQuit}
+                onClick={() => {
+                  setShowQuitModal(false)
+                  setShowQuitTip(true)
+                }}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               >
                 End Session
@@ -262,6 +266,16 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
             </div>
           </div>
         </div>
+      )}
+
+      {showQuitTip && (
+        <QuickTip
+          duration={3000}
+          onComplete={() => {
+            setShowQuitTip(false)
+            confirmQuit()
+          }}
+        />
       )}
     </div>
   )

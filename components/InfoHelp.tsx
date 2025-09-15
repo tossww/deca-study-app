@@ -35,7 +35,7 @@ export function InfoHelp() {
       </div>
 
       {/* Your Learning Journey - Enhanced Progression Explanation */}
-      <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl shadow-lg p-6">
+      <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-6">🚀 Your Learning Journey</h3>
 
         {/* Visual Progress Bar */}
@@ -107,7 +107,7 @@ export function InfoHelp() {
         </div>
 
         {/* How to Progress Box */}
-        <div className="mt-6 bg-white rounded-lg p-4 border border-blue-200">
+        <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h5 className="font-semibold text-gray-900 mb-2 flex items-center">
             <span className="text-lg mr-2">📈</span>
             How Questions Become Mature
@@ -119,6 +119,17 @@ export function InfoHelp() {
             <li>After 21 days of successful reviews → Becomes <span className="font-medium text-green-700">Mature</span></li>
             <li>If you fail a mature card → Goes to <span className="font-medium text-red-700">Relearning</span> (starts over)</li>
           </ol>
+
+          <div className="mt-4 pt-3 border-t border-gray-200">
+            <h6 className="font-medium text-gray-800 mb-2">⚡ How Difficulty Rating Affects Progress:</h6>
+            <ul className="text-xs text-gray-600 space-y-1">
+              <li><span className="font-medium text-green-700">Easy:</span> Advances faster - next review in 4× the current interval</li>
+              <li><span className="font-medium text-blue-700">Good:</span> Normal progression - next review in 2.5× the current interval</li>
+              <li><span className="font-medium text-orange-700">Hard:</span> Slower progression - next review in 1.2× the current interval</li>
+              <li><span className="font-medium text-red-700">Again:</span> Resets progress - starts learning phase over</li>
+            </ul>
+            <p className="text-xs text-gray-500 mt-2 italic">Example: A "Good" card at 1 day becomes 2.5 days, an "Easy" card jumps to 4 days!</p>
+          </div>
         </div>
       </div>
 
