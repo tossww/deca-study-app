@@ -92,9 +92,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-600">
-            Time: {formatTime(sessionStats.timeSpent)}
-          </div>
-          <div className="text-sm text-gray-600">
             Score: {sessionStats.correct}/{sessionStats.total}
           </div>
           <button
@@ -106,14 +103,14 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
       </div>
 
-      <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
-        <div className="bg-gray-50 rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 leading-relaxed">
+      <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-6">
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
@@ -141,7 +138,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
 
         {currentAnswerData && (
-          <div className="mt-6 p-3 bg-white rounded-lg border border-gray-200">
+          <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
