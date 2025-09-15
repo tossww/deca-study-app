@@ -158,14 +158,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 )}>
                   {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
                 </span>
-                <span className={cn("text-sm font-medium",
-                  currentAnswerData.suggestedGrade === Quality.Again ? "text-red-600" :
-                  currentAnswerData.suggestedGrade === Quality.Hard ? "text-orange-600" :
-                  currentAnswerData.suggestedGrade === Quality.Good ? "text-blue-600" :
-                  "text-green-600"
-                )}>
-                  {Quality[currentAnswerData.suggestedGrade]}
-                </span>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
                   className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:border-gray-400 transition-colors"
