@@ -1,5 +1,7 @@
 'use client'
 
+import { STUDY_TIPS } from '@/lib/study-tips'
+
 export function InfoHelp() {
   return (
     <div className="space-y-6">
@@ -12,29 +14,7 @@ export function InfoHelp() {
         </p>
       </div>
 
-      {/* How Spaced Repetition Works */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">🧠 How Spaced Repetition Works</h3>
-        <div className="space-y-4">
-          <div className="border-l-4 border-blue-500 pl-4">
-            <h4 className="font-semibold text-blue-900">The Science</h4>
-            <p className="text-gray-700 text-sm">
-              Research shows that reviewing information at increasing intervals dramatically improves retention.
-              This app automatically schedules your reviews based on how well you know each question.
-            </p>
-          </div>
-
-          <div className="border-l-4 border-green-500 pl-4">
-            <h4 className="font-semibold text-green-900">Adaptive Learning</h4>
-            <p className="text-gray-700 text-sm">
-              Questions you struggle with appear more frequently, while questions you master are shown less often.
-              This focuses your study time where it&apos;s needed most.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Your Learning Journey - Enhanced Progression Explanation */}
+      {/* Your Learning Journey */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-6">🚀 Your Learning Journey</h3>
 
@@ -77,7 +57,7 @@ export function InfoHelp() {
               <span className="text-2xl">⚔️</span>
             </div>
             <h4 className="font-semibold text-yellow-900">Apprentice</h4>
-            <p className="text-xs text-gray-600 mt-1">Building memory</p>
+            <p className="text-xs text-gray-600 mt-1">Building memory (< 3 reviews)</p>
             <div className="mt-2 bg-yellow-50 rounded px-2 py-1">
               <p className="text-xs font-medium text-yellow-700">Reviews: Minutes → Hours → Days</p>
             </div>
@@ -88,7 +68,7 @@ export function InfoHelp() {
               <span className="text-2xl">🧙</span>
             </div>
             <h4 className="font-semibold text-blue-900">Guru</h4>
-            <p className="text-xs text-gray-600 mt-1">Solidifying knowledge (&lt;21 days)</p>
+            <p className="text-xs text-gray-600 mt-1">3+ successful reviews, &lt;21 days</p>
             <div className="mt-2 bg-blue-50 rounded px-2 py-1">
               <p className="text-xs font-medium text-blue-700">Reviews: Every few days</p>
             </div>
@@ -110,77 +90,67 @@ export function InfoHelp() {
         <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h5 className="font-semibold text-gray-900 mb-2 flex items-center">
             <span className="text-lg mr-2">📈</span>
-            How Questions Become Mature
+            Progression Path & Difficulty Impact
           </h5>
-          <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+          <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside mb-3">
             <li>Answer a new question correctly → Becomes <span className="font-medium text-yellow-700">Apprentice</span></li>
-            <li>Review it successfully multiple times → Graduates to <span className="font-medium text-blue-700">Guru</span></li>
+            <li>Review it successfully 3+ times with good ease → Graduates to <span className="font-medium text-blue-700">Guru</span></li>
             <li>After 21 days of successful reviews → Achieves <span className="font-medium text-green-700">Master</span> status</li>
             <li>If you fail any card → Interval drops by 4× (not full reset)</li>
           </ol>
 
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <h6 className="font-medium text-gray-800 mb-2">⚡ How Difficulty Rating Affects Progress:</h6>
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <h6 className="font-medium text-gray-800 mb-2">⚡ Your Answer Speed Determines Difficulty:</h6>
             <ul className="text-xs text-gray-600 space-y-1">
-              <li><span className="font-medium text-green-700">Easy:</span> Advances faster - next review in 4× the current interval</li>
-              <li><span className="font-medium text-blue-700">Good:</span> Normal progression - next review in 2.5× the current interval</li>
-              <li><span className="font-medium text-orange-700">Hard:</span> Slower progression - next review in 1.2× the current interval</li>
-              <li><span className="font-medium text-red-700">Again:</span> Drops interval by 4× - doesn&apos;t fully reset</li>
+              <li><span className="font-medium text-green-700">Easy (&lt;15s):</span> Advances 4× faster - confident recall means less frequent reviews</li>
+              <li><span className="font-medium text-blue-700">Good (15-40s):</span> Normal 2.5× progression - standard spacing intervals</li>
+              <li><span className="font-medium text-orange-700">Hard (40-120s):</span> Slower 1.2× progression - needs more practice</li>
+              <li><span className="font-medium text-red-700">Again (>120s or wrong):</span> Interval drops by 4× - review again soon</li>
             </ul>
             <p className="text-xs text-gray-500 mt-2 italic">Example: A &quot;Good&quot; card at 1 day becomes 2.5 days, an &quot;Easy&quot; card jumps to 4 days!</p>
           </div>
         </div>
       </div>
 
-      {/* Difficulty Rating Based on Time */}
+      {/* How Spaced Repetition Works */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">⏱️ Automatic Difficulty Rating</h3>
-        <p className="text-gray-700 text-sm mb-4">
-          Your answer speed helps determine question difficulty. You can adjust the rating before moving to the next question.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded mr-2">Easy</span>
-              <span className="text-gray-600 text-sm">&lt; 15 seconds</span>
-            </div>
-            <p className="text-gray-700 text-xs">
-              Quick confident recall. Question will be reviewed less frequently.
+        <h3 className="text-xl font-bold text-gray-900 mb-4">🧠 How Spaced Repetition Works</h3>
+        <div className="space-y-4">
+          <div className="border-l-4 border-blue-500 pl-4">
+            <h4 className="font-semibold text-blue-900">The Science</h4>
+            <p className="text-gray-700 text-sm">
+              Research shows that reviewing information at increasing intervals dramatically improves retention.
+              This app automatically schedules your reviews based on how well you know each question.
             </p>
           </div>
 
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded mr-2">Good</span>
-              <span className="text-gray-600 text-sm">15-40 seconds</span>
-            </div>
-            <p className="text-gray-700 text-xs">
-              Normal thinking time. Standard review intervals apply.
-            </p>
-          </div>
-
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="inline-block px-2 py-1 bg-orange-100 text-orange-800 text-sm font-semibold rounded mr-2">Hard</span>
-              <span className="text-gray-600 text-sm">40-120 seconds</span>
-            </div>
-            <p className="text-gray-700 text-xs">
-              Slow or uncertain. Question will appear more frequently.
-            </p>
-          </div>
-
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="inline-block px-2 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded mr-2">Again</span>
-              <span className="text-gray-600 text-sm">&gt; 120 seconds</span>
-            </div>
-            <p className="text-gray-700 text-xs">
-              Very slow or incorrect. Question will be reset and shown soon.
+          <div className="border-l-4 border-green-500 pl-4">
+            <h4 className="font-semibold text-green-900">Adaptive Learning</h4>
+            <p className="text-gray-700 text-sm">
+              Questions you struggle with appear more frequently, while questions you master are shown less often.
+              This focuses your study time where it&apos;s needed most.
             </p>
           </div>
         </div>
       </div>
 
+      {/* Study Tips */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">💡 Study Tips & Strategies</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {STUDY_TIPS.map((tip) => (
+            <div key={tip.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3 flex-shrink-0">{tip.icon}</span>
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">{tip.title}</h4>
+                  <p className="text-gray-600 text-xs">{tip.content}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Version Info */}
       <div className="bg-gray-50 rounded-xl p-4 text-center">
