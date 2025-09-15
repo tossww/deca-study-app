@@ -9,47 +9,19 @@ export interface StudyTip {
 export const STUDY_TIPS: StudyTip[] = [
   // Strategy Tips
   {
-    id: 'focus-due',
-    icon: '🎯',
-    title: 'Focus on Due Cards',
-    content: 'Review overdue cards first to prevent forgetting. The algorithm knows when you need to see each card.',
-    category: 'strategy'
-  },
-  {
     id: 'daily-practice',
     icon: '📈',
     title: 'Study Daily',
     content: '15-30 minutes daily is more effective than long weekend cramming sessions.',
     category: 'strategy'
   },
-  {
-    id: 'dont-skip',
-    icon: '💪',
-    title: "Don't Skip Hard Questions",
-    content: 'Difficult questions need more repetitions. Mark them as "Hard" instead of skipping.',
-    category: 'strategy'
-  },
-  {
-    id: 'trust-algorithm',
-    icon: '🧠',
-    title: 'Trust the Algorithm',
-    content: 'The spaced repetition algorithm optimizes your review schedule automatically.',
-    category: 'strategy'
-  },
 
   // Keyboard Shortcuts
   {
-    id: 'quick-answer',
-    icon: '⚡',
-    title: 'Quick Answering',
-    content: 'Press 1-4 or A-D to answer questions instantly without clicking.',
-    category: 'keyboard'
-  },
-  {
-    id: 'navigation',
+    id: 'keyboard-shortcuts',
     icon: '⌨️',
-    title: 'Fast Navigation',
-    content: 'Press Enter or Space to move to the next question quickly.',
+    title: 'Keyboard Shortcuts',
+    content: 'Press 1-4 or A-D to answer. Use Enter or Space to advance to the next question.',
     category: 'keyboard'
   },
 
@@ -66,13 +38,6 @@ export const STUDY_TIPS: StudyTip[] = [
     icon: '⏱️',
     title: 'Response Time Matters',
     content: 'Answer in <15s for Easy, 15-40s for Good, 40-120s for Hard. The app auto-suggests based on your speed.',
-    category: 'progress'
-  },
-  {
-    id: 'streak-power',
-    icon: '🔥',
-    title: 'Build Your Streak',
-    content: 'Study every day to build a streak. Consistency is the key to mastery.',
     category: 'progress'
   },
 
@@ -99,35 +64,6 @@ export const STUDY_TIPS: StudyTip[] = [
     category: 'motivation'
   },
 
-  // Feature Tips
-  {
-    id: 'browse-questions',
-    icon: '🔍',
-    title: 'Browse All Questions',
-    content: 'Use the Browse tab to search and review any question, even if not due.',
-    category: 'feature'
-  },
-  {
-    id: 'topic-selection',
-    icon: '📚',
-    title: 'Study by Topic',
-    content: 'Select specific topics to focus your study session on areas you need most.',
-    category: 'feature'
-  },
-  {
-    id: 'explanation-learn',
-    icon: '💡',
-    title: 'Read Explanations',
-    content: 'Always read the explanation after answering to understand the concept better.',
-    category: 'feature'
-  },
-  {
-    id: 'deca-focus',
-    icon: '🎯',
-    title: 'DECA Exam Prep',
-    content: 'Focus on business concepts and case studies that frequently appear in DECA competitions.',
-    category: 'feature'
-  }
 ]
 
 export function getRandomTip(category?: StudyTip['category']): StudyTip {
