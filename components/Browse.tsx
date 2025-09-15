@@ -28,7 +28,7 @@ export function Browse() {
 
   useEffect(() => {
     fetchQuestions()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchQuestions = async () => {
     try {

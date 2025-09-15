@@ -86,7 +86,7 @@ export function InfoHelp() {
           <div className="border-t pt-4">
             <h4 className="font-semibold text-gray-900 mb-2">Test Mode</h4>
             <p className="text-sm text-gray-600 mb-3">
-              When enabled, the correct answer's number will not have a period, making it easier to identify during practice.
+              When enabled, the correct answer&apos;s number will not have a period, making it easier to identify during practice.
             </p>
             
             <label className="flex items-center cursor-pointer">
@@ -101,7 +101,7 @@ export function InfoHelp() {
             
             {testMode && (
               <div className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
-                ⚠️ Test mode is ON - correct answers show without period (e.g., "1" instead of "1.")
+                ⚠️ Test mode is ON - correct answers show without period (e.g., &quot;1&quot; instead of &quot;1.&quot;)
               </div>
             )}
           </div>

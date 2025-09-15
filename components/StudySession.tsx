@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
+import { useStore } from '@/lib/store'
 
 interface StudySessionProps {
   topics: string[]
