@@ -126,7 +126,7 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           )}
         >
-          Start Study ({selectedTopics.length})
+          Start Study
         </button>
       </div>
     </div>

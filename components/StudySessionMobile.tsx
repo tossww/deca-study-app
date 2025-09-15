@@ -98,9 +98,9 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Ultra-Minimal Header - Only essential info */}
-      <div className="bg-white px-4 py-2 flex justify-between items-center flex-shrink-0 border-b border-gray-100">
+    <div className="h-screen bg-gray-50 flex flex-col">
+      {/* Fixed Header */}
+      <div className="bg-white px-4 py-2 flex justify-between items-center border-b border-gray-100 fixed top-0 left-0 right-0 z-10">
         <button
           onClick={handleQuit}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors py-1"
@@ -116,8 +116,9 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
         </div>
       </div>
 
-      {/* Main Content Area - Optimized spacing */}
-      <div className="flex-1 flex flex-col px-3 py-2">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto pt-12 pb-16">
+        <div className="px-3 py-2">
         {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
           <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
@@ -153,106 +154,107 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           ))}
         </div>
 
-        {/* Feedback Section - Streamlined design */}
-        {currentAnswerData && (
-          <div className="space-y-3 mt-3">
-            {/* Compact Result Bar */}
-            <div className="bg-white rounded-lg px-4 py-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className={cn(
-                    "text-lg font-semibold",
-                    currentAnswerData.isCorrect ? "text-green-600" : "text-red-600"
-                  )}>
-                    {currentAnswerData.isCorrect ? "✓" : "✗"}
-                  </span>
-                  <span className={cn(
-                    "font-semibold",
-                    currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
-                    currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
-                    currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
-                    currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
-                  )}>
-                    {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
-                  </span>
-                  <button
-                    onClick={() => setShowGradeSelector(!showGradeSelector)}
-                    className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:border-gray-400 transition-colors"
-                  >
-                    Adjust
-                  </button>
-                </div>
-                {showExplanation && (
-                  <button
-                    onClick={nextQuestion}
-                    className="px-4 py-1.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm shadow-sm active:scale-[0.98]"
-                  >
-                    {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
-                  </button>
-                )}
-              </div>
 
-              {/* Grade Selector with Timer */}
-              {showGradeSelector && (
-                <div className="border-t border-gray-200 pt-3 mt-3 relative">
-                  <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
-                    <span>Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
-                    <span>Override grade:</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <button
-                      onClick={() => submitAnswer(Quality.Again)}
-                      className="px-2 py-2 text-sm rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
-                    >
-                      Again
-                    </button>
-                    <button
-                      onClick={() => submitAnswer(Quality.Hard)}
-                      className="px-2 py-2 text-sm rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
-                    >
-                      Hard
-                    </button>
-                    <button
-                      onClick={() => submitAnswer(Quality.Good)}
-                      className="px-2 py-2 text-sm rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
-                    >
-                      Good
-                    </button>
-                    <button
-                      onClick={() => submitAnswer(Quality.Easy)}
-                      className="px-2 py-2 text-sm rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
-                    >
-                      Easy
-                    </button>
-                  </div>
-                  {gradeNotification && (
-                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 animate-fade-in-up">
-                      <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
-                        {gradeNotification}
-                      </span>
-                    </div>
-                  )}
+          {/* Explanation with metadata */}
+          {showExplanation && (
+            <div className="bg-blue-50 rounded-lg p-3 shadow-sm mt-3 mb-4">
+              <h4 className="font-semibold text-blue-900 mb-1.5 text-sm">Explanation</h4>
+              <p className="text-blue-800 text-sm leading-relaxed mb-3">{currentQuestion.explanation}</p>
+              {(currentQuestion.topic || currentQuestion.refId) && (
+                <div className="text-xs text-blue-600 border-t border-blue-200 pt-2">
+                  {currentQuestion.topic}
+                  {currentQuestion.topic && currentQuestion.refId && ' • '}
+                  {currentQuestion.refId && `Question #${currentQuestion.refId}`}
                 </div>
               )}
             </div>
-
-            {/* Explanation with metadata */}
-            {showExplanation && (
-              <div className="bg-blue-50 rounded-lg p-3 shadow-sm">
-                <h4 className="font-semibold text-blue-900 mb-1.5 text-sm">Explanation</h4>
-                <p className="text-blue-800 text-sm leading-relaxed mb-3">{currentQuestion.explanation}</p>
-                {(currentQuestion.topic || currentQuestion.refId) && (
-                  <div className="text-xs text-blue-600 border-t border-blue-200 pt-2">
-                    {currentQuestion.topic}
-                    {currentQuestion.topic && currentQuestion.refId && ' • '}
-                    {currentQuestion.refId && `Question #${currentQuestion.refId}`}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Fixed Bottom Navigation Bar */}
+      {currentAnswerData && (
+        <>
+          {/* Grade Selector Overlay */}
+          {showGradeSelector && (
+            <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20">
+              <div className="text-xs text-gray-500 mb-2">Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</div>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  onClick={() => submitAnswer(Quality.Again)}
+                  className="px-2 py-3 text-sm rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors font-medium"
+                >
+                  Again
+                </button>
+                <button
+                  onClick={() => submitAnswer(Quality.Hard)}
+                  className="px-2 py-3 text-sm rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors font-medium"
+                >
+                  Hard
+                </button>
+                <button
+                  onClick={() => submitAnswer(Quality.Good)}
+                  className="px-2 py-3 text-sm rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors font-medium"
+                >
+                  Good
+                </button>
+                <button
+                  onClick={() => submitAnswer(Quality.Easy)}
+                  className="px-2 py-3 text-sm rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors font-medium"
+                >
+                  Easy
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Main Bottom Bar */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className={cn(
+                  "text-lg font-semibold",
+                  currentAnswerData.isCorrect ? "text-green-600" : "text-red-600"
+                )}>
+                  {currentAnswerData.isCorrect ? "✓" : "✗"}
+                </span>
+                <span className={cn(
+                  "font-semibold",
+                  currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
+                  currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
+                  currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
+                  currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
+                )}>
+                  {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
+                </span>
+                <button
+                  onClick={() => setShowGradeSelector(!showGradeSelector)}
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
+                >
+                  Adjust
+                </button>
+              </div>
+              {showExplanation && (
+                <button
+                  onClick={nextQuestion}
+                  className="px-5 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-sm shadow-sm active:scale-[0.98]"
+                >
+                  {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Grade Notification */}
+          {gradeNotification && (
+            <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 animate-fade-in-up z-30">
+              <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
+                {gradeNotification}
+              </span>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Quit Confirmation Modal */}
       {showQuitModal && (
