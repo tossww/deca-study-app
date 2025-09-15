@@ -105,3 +105,41 @@
 ### Phase 5 – Enhancements
 - [ ] Add basic rate limiting to auth/answer routes
 - [ ] Add "due selection" endpoint using scheduler
+
+## 🚨 Critical Fix: Implement True Spaced Repetition Sessions
+
+### Current Issue
+The app currently loads ALL questions from selected topics (100+) instead of using spaced repetition scheduling. This defeats the purpose of the algorithm.
+
+### Phase 1 – Due Question API (2-3 hours)
+- [ ] Create `/api/questions/due` endpoint that filters by `nextReview <= today`
+- [ ] Include new questions (repetitions = 0) with configurable limit
+- [ ] Implement priority ordering: Overdue > Due Today > New
+- [ ] Add session size limits (default 30-50 questions max)
+- [ ] Return mix of review (70%) and new (30%) questions
+
+### Phase 2 – Session Builder Service (2-3 hours)
+- [ ] Create `lib/session-builder.ts` with smart question selection
+- [ ] Implement daily limits for new cards (default 20)
+- [ ] Implement daily limits for reviews (default 100)
+- [ ] Handle edge cases (no due cards, all cards mastered)
+- [ ] Add forecast calculation for upcoming reviews
+
+### Phase 3 – Update Study Components (2-3 hours)
+- [ ] Modify `useStudySession` to use new due endpoint
+- [ ] Show session type indicators (review/new/mixed)
+- [ ] Display meaningful completion stats ("15 reviews, 5 new cards")
+- [ ] Add "Study More" option when session completes
+- [ ] Show next review times in completion summary
+
+### Phase 4 – User Settings (1-2 hours)
+- [ ] Add settings UI for daily limits configuration
+- [ ] Store preferences in user profile or localStorage
+- [ ] Add "Practice Mode" toggle for full deck access (current behavior)
+- [ ] Add session length preferences (short/medium/long)
+
+### Phase 5 – Dashboard Updates (1 hour)
+- [ ] Show "Cards due today" count
+- [ ] Display review forecast graph
+- [ ] Add "Start Review" vs "Learn New" buttons
+- [ ] Show daily progress towards limits
