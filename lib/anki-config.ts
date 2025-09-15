@@ -87,16 +87,16 @@ export enum Quality {
 
 // Time-based grading thresholds (in seconds)
 export interface TimeBasedGrading {
-  fastThreshold: number    // < 10 seconds = Easy suggestion
-  normalThreshold: number  // 10-20 seconds = Good suggestion
-  slowThreshold: number    // 20-40 seconds = Hard suggestion
-  verySlowThreshold: number // > 40 seconds = Again suggestion (up to 120s timeout)
+  fastThreshold: number    // < 15 seconds = Easy suggestion
+  normalThreshold: number  // 15-40 seconds = Good suggestion
+  slowThreshold: number    // 40-120 seconds = Hard suggestion
+  verySlowThreshold: number // > 120 seconds = Again suggestion (up to 120s timeout)
 }
 
 export const DEFAULT_TIME_THRESHOLDS: TimeBasedGrading = {
-  fastThreshold: 10,
-  normalThreshold: 20,
-  slowThreshold: 40,
+  fastThreshold: 15,
+  normalThreshold: 40,
+  slowThreshold: 120,
   verySlowThreshold: 120
 }
 

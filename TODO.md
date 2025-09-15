@@ -7,10 +7,6 @@
 - **Time-Based Grading** - Auto-suggestion based on response time
 - **Advanced UI/UX** - No-scroll study page, mobile header hiding, gesture support
 
-🔄 **HIGH-PRIORITY REMAINING:**
-- **PWA Implementation** - Service worker, offline mode, mobile app installation
-- **Enhanced Gestures** - Left swipe, long-press interactions
-
 ## Quick Wins (1-2 hours each)
 - [x] Remove difficulty column and replace with learning status (new/learning/mature)
 - [x] Add keyboard shortcuts for answering questions (1-4 or A-D)
@@ -25,11 +21,8 @@
 - [x] Add info/help section explaining app logic and mastery system
 - [x] Add dedicated quit button in study mode with summary popup
 - [x] **Mobile UX optimization** - Touch targets, spacing, thumb zone design
-- [ ] **Progressive Web App (PWA)** - Add service worker and app manifest for mobile installation
-- [ ] **Offline mode** - Cache questions for study without internet connection
 
 ## Completed Highlights
-
 - Full Anki algorithm and time-based grading
 - Mobile-first study experience and gestures (partial)
 - Keyboard shortcuts and topic selection persistence

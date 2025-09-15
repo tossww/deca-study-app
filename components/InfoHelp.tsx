@@ -70,6 +70,55 @@ export function InfoHelp() {
         </div>
       </div>
 
+      {/* Difficulty Rating Based on Time */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">⏱️ Automatic Difficulty Rating</h3>
+        <p className="text-gray-700 text-sm mb-4">
+          Your answer speed helps determine question difficulty. You can adjust the rating before moving to the next question.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded mr-2">Easy</span>
+              <span className="text-gray-600 text-sm">&lt; 15 seconds</span>
+            </div>
+            <p className="text-gray-700 text-xs">
+              Quick confident recall. Question will be reviewed less frequently.
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded mr-2">Good</span>
+              <span className="text-gray-600 text-sm">15-40 seconds</span>
+            </div>
+            <p className="text-gray-700 text-xs">
+              Normal thinking time. Standard review intervals apply.
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <span className="inline-block px-2 py-1 bg-orange-100 text-orange-800 text-sm font-semibold rounded mr-2">Hard</span>
+              <span className="text-gray-600 text-sm">40-120 seconds</span>
+            </div>
+            <p className="text-gray-700 text-xs">
+              Slow or uncertain. Question will appear more frequently.
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <span className="inline-block px-2 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded mr-2">Again</span>
+              <span className="text-gray-600 text-sm">&gt; 120 seconds</span>
+            </div>
+            <p className="text-gray-700 text-xs">
+              Very slow or incorrect. Question will be reset and shown soon.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Study Tips */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-4">💡 Study Tips for Success</h3>
