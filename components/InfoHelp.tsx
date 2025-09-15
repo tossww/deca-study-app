@@ -34,39 +34,91 @@ export function InfoHelp() {
         </div>
       </div>
 
-      {/* Learning Status Explained */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">📊 Learning Status Explained</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-              <h4 className="font-semibold text-blue-900">New</h4>
+      {/* Your Learning Journey - Enhanced Progression Explanation */}
+      <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">🚀 Your Learning Journey</h3>
+
+        {/* Visual Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-600">First Time</span>
+            <span className="text-xs font-medium text-gray-600">Building Memory</span>
+            <span className="text-xs font-medium text-gray-600">Almost There</span>
+            <span className="text-xs font-medium text-gray-600">Mastered!</span>
+          </div>
+          <div className="relative">
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-gray-400 via-yellow-400 via-blue-400 to-green-400 rounded-full"></div>
             </div>
-            <p className="text-gray-700 text-sm">
-              Questions you&apos;ve never studied. These will appear frequently until you learn them.
-            </p>
+            <div className="absolute flex justify-between w-full -mt-1">
+              <div className="w-4 h-4 bg-gray-400 rounded-full border-2 border-white"></div>
+              <div className="w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
+              <div className="w-4 h-4 bg-blue-400 rounded-full border-2 border-white"></div>
+              <div className="w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Stage Explanations */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">🆕</span>
+            </div>
+            <h4 className="font-semibold text-gray-900">New</h4>
+            <p className="text-xs text-gray-600 mt-1">Never seen before</p>
+            <div className="mt-2 bg-gray-50 rounded px-2 py-1">
+              <p className="text-xs font-medium text-gray-700">Next: Immediately</p>
+            </div>
           </div>
 
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-              <h4 className="font-semibold text-yellow-900">Learning</h4>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">📚</span>
             </div>
-            <p className="text-gray-700 text-sm">
-              Questions you&apos;re actively memorizing. Review intervals are short (minutes to days).
-            </p>
+            <h4 className="font-semibold text-yellow-900">Learning</h4>
+            <p className="text-xs text-gray-600 mt-1">Building memory</p>
+            <div className="mt-2 bg-yellow-50 rounded px-2 py-1">
+              <p className="text-xs font-medium text-yellow-700">Reviews: 1min → 10min → 1day</p>
+            </div>
           </div>
 
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-              <h4 className="font-semibold text-green-900">Mature</h4>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">🔵</span>
             </div>
-            <p className="text-gray-700 text-sm">
-              Questions you know well. Reviews are spaced weeks or months apart.
-            </p>
+            <h4 className="font-semibold text-blue-900">Young</h4>
+            <p className="text-xs text-gray-600 mt-1">Recently learned (&lt;21 days)</p>
+            <div className="mt-2 bg-blue-50 rounded px-2 py-1">
+              <p className="text-xs font-medium text-blue-700">Reviews: Every few days</p>
+            </div>
           </div>
+
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">✅</span>
+            </div>
+            <h4 className="font-semibold text-green-900">Mature</h4>
+            <p className="text-xs text-gray-600 mt-1">Long-term memory (≥21 days)</p>
+            <div className="mt-2 bg-green-50 rounded px-2 py-1">
+              <p className="text-xs font-medium text-green-700">Reviews: Weeks/months apart</p>
+            </div>
+          </div>
+        </div>
+
+        {/* How to Progress Box */}
+        <div className="mt-6 bg-white rounded-lg p-4 border border-blue-200">
+          <h5 className="font-semibold text-gray-900 mb-2 flex items-center">
+            <span className="text-lg mr-2">📈</span>
+            How Questions Become Mature
+          </h5>
+          <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+            <li>Answer a new question correctly → Enters <span className="font-medium text-yellow-700">Learning</span> phase</li>
+            <li>Review it successfully at 1 minute, 10 minutes, then 1 day intervals</li>
+            <li>Graduate to <span className="font-medium text-blue-700">Young</span> status with longer intervals</li>
+            <li>After 21 days of successful reviews → Becomes <span className="font-medium text-green-700">Mature</span></li>
+            <li>If you fail a mature card → Goes to <span className="font-medium text-red-700">Relearning</span> (starts over)</li>
+          </ol>
         </div>
       </div>
 
@@ -119,63 +171,6 @@ export function InfoHelp() {
         </div>
       </div>
 
-      {/* Study Tips */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">💡 Study Tips for Success</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <span className="text-xl mr-3">📅</span>
-              <div>
-                <p className="font-semibold text-gray-900">Study Daily</p>
-                <p className="text-gray-700 text-sm">Consistency beats intensity. 15-30 minutes daily is better than long weekend sessions.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <span className="text-xl mr-3">🎯</span>
-              <div>
-                <p className="font-semibold text-gray-900">Focus on Due Cards</p>
-                <p className="text-gray-700 text-sm">Always review due questions first to prevent forgetting.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <span className="text-xl mr-3">❌</span>
-              <div>
-                <p className="font-semibold text-gray-900">Don&apos;t Skip Hard Questions</p>
-                <p className="text-gray-700 text-sm">Difficult questions need more repetitions to stick.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <span className="text-xl mr-3">⚡</span>
-              <div>
-                <p className="font-semibold text-gray-900">Use Keyboard Shortcuts</p>
-                <p className="text-gray-700 text-sm">Press 1-4 or A-D to answer quickly. Enter/Space for next question.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <span className="text-xl mr-3">📈</span>
-              <div>
-                <p className="font-semibold text-gray-900">Track Your Progress</p>
-                <p className="text-gray-700 text-sm">Watch your mastery percentage grow as questions move from new to mature.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <span className="text-xl mr-3">🧘</span>
-              <div>
-                <p className="font-semibold text-gray-900">Trust the Process</p>
-                <p className="text-gray-700 text-sm">The algorithm knows when to show you each question for optimal retention.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Version Info */}
       <div className="bg-gray-50 rounded-xl p-4 text-center">

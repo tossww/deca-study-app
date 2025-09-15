@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
+import { LoadingTip, QuickTip } from '@/components/LoadingTip'
 
 interface StudySessionMobileProps {
   topics: string[]
@@ -12,6 +13,8 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionMobileProps) {
+  const [showQuickTip, setShowQuickTip] = useState(true)
+
   const {
     currentQuestion,
     currentIndex,
@@ -74,12 +77,13 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
     }
   }, [showExplanation, showGradeSelector, nextQuestion])
 
+  // Show quick tip on first load
+  if (showQuickTip && !isLoading) {
+    return <QuickTip duration={3000} onComplete={() => setShowQuickTip(false)} />
+  }
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
+    return <LoadingTip message="Loading questions..." category="strategy" />
   }
 
   if (!currentQuestion) {
