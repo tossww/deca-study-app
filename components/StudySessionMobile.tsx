@@ -98,7 +98,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
       <div className="bg-white px-4 py-2 flex justify-between items-center border-b border-gray-100 fixed top-0 left-0 right-0 z-10">
         <button
@@ -116,8 +116,8 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
         </div>
       </div>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto pt-12 pb-24">
+      {/* Content Area with proper spacing for fixed elements */}
+      <div className="pt-12" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom) + 20px)' }}>
         <div className="px-3 py-2">
         {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
@@ -176,7 +176,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       {currentAnswerData && (
         <>
           {/* Background overlay to prevent bleed-through */}
-          <div className="fixed left-0 right-0 bg-white z-5" style={{ height: '100px', bottom: '0' }}></div>
+          <div className="fixed left-0 right-0 bg-gray-50 z-5" style={{ height: '120px', bottom: '0' }}></div>
 
           {/* Grade Selector Overlay */}
           {showGradeSelector && (
