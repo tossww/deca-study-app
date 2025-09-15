@@ -367,3 +367,118 @@ datasource db {
 - ✅ **Infrastructure Ready**: All components configured for production
 
 *Database migration completed - ready for Vercel Postgres deployment*
+
+## Session 2025-09-15-001 (Two Study Modes Implementation)
+
+### Session Context
+- **Started**: 2025-09-15
+- **Task**: Implement Critical Fix - Two Study Modes (Test vs Review)
+- **Issue**: App currently loads ALL questions without spaced repetition option
+- **Goal**: Add Test All vs Study (25) modes to Topic Selector
+
+### Current Plan
+Implementing 4-phase approach per TODO:
+1. **Phase 1**: Update Topic Selector UI with dual buttons ✅
+2. **Phase 2**: Add session settings to InfoHelp component ✅
+3. **Phase 3**: Update API and session logic for study modes ✅
+4. **Phase 4**: Polish with mode indicators and completion feedback ✅
+
+### Actions Taken
+
+#### Phase 1: Topic Selector UI
+- ✅ Updated TopicSelector to show two buttons: "Test All" and "Study (25)"
+- ✅ Added mode parameter to onTopicsSelected callback
+- ✅ Updated store to track studySessionSize and lastStudyMode
+- ✅ Added visual separation with "or" text between buttons
+- ✅ Added help text explaining the difference between modes
+
+#### Phase 2: Session Settings in InfoHelp
+- ✅ Added Session Settings section with study session size control
+- ✅ Added number input with 5-100 range validation
+- ✅ Added preset buttons for quick selection (10, 25, 50, 100)
+- ✅ Added clear explanation of Test All vs Study modes
+- ✅ Settings persist via localStorage through Zustand store
+
+#### Phase 3: API and Session Logic
+- ✅ Updated /api/questions to accept mode and limit parameters
+- ✅ Implemented spaced repetition filtering for Study mode:
+  - Prioritizes overdue questions first
+  - Then due today questions
+  - Finally new questions to fill remaining slots
+- ✅ Updated useStudySession hook to pass mode and limit
+- ✅ Updated StudySession and StudySessionMobile components to accept mode/limit props
+- ✅ Fixed TypeScript null check for nextReview date
+
+#### Phase 4: Polish and Feedback
+- ✅ Added mode indicators in study session headers (both desktop and mobile)
+- ✅ Different colors: blue for Test All, primary color for Study
+- ✅ Customized completion messages based on mode:
+  - Test: "Test complete! Score: X/Y (Z%)"
+  - Study: "Study session complete! Reviewed X questions (Y% correct)"
+- ✅ Mode indicator shows throughout session for clarity
+
+### Technical Implementation Details
+
+#### Store Updates
+- Added studySessionSize (default: 25)
+- Added lastStudyMode to remember user preference
+- Both values persist via localStorage
+
+#### API Enhancement
+- Mode parameter: 'test' or 'study'
+- Limit parameter: number of questions for study mode
+- Study mode uses getUserFromRequest for user-specific filtering
+- Efficient prioritization algorithm for spaced repetition
+
+#### Component Updates
+- TopicSelector: Dual button UI with dynamic session size display
+- StudySession/Mobile: Mode prop flows through to display and logic
+- InfoHelp: New settings section with intuitive controls
+- useStudySession: Handles mode-specific API calls and messages
+
+### Testing Results
+- ✅ Build successful with no TypeScript errors
+- ✅ All components properly typed
+- ✅ Mode selection works correctly
+- ✅ Session size preference persists
+- ✅ API correctly filters questions in Study mode
+
+### Current Status
+- ✅ **Critical Fix Complete**: Two study modes fully implemented
+- ✅ **User Experience Enhanced**: Clear mode distinction and controls
+- ✅ **Spaced Repetition Active**: Study mode prioritizes review schedule
+- ✅ **Settings Accessible**: Easy configuration in Info panel
+
+## Session 2025-09-15-002 (Documentation Updates)
+
+### Session Start
+- **Date**: September 15, 2025
+- **Task**: Update rules.md to include TODO.md file requirements
+
+### Changes Made
+1. **Updated rules.md (v1.0 → v1.1)**:
+   - Added TODO.md to all documentation requirements alongside TodoWrite
+   - Specified that TODO.md and TodoWrite must always be synchronized
+   - Added TODO.md update requirements for:
+     - Feature requests (with PRD.md)
+     - Bug reports
+     - Before starting work
+     - During development
+     - After completing work
+   - Added TODO.md documentation standards section
+   - Updated file organization to include TODO.md and TODO.archive.md
+   - Modified session continuity steps to check TODO.md first
+
+### Key Requirements Added
+- TODO.md must use checkbox format (- [ ] for pending, - [x] for completed)
+- Tasks should be organized by priority sections (🚨 Critical, 🚧 In Progress, etc.)
+- Time estimates should be included for major tasks
+- Completed features can be archived to TODO.archive.md
+- TODO.md and TodoWrite must always reflect the same tasks and status
+
+### Result
+✅ Rules now properly enforce updating both TODO.md file and TodoWrite tool
+✅ Clear guidelines for maintaining synchronization between the two
+✅ Version bumped to 1.1 with updated date
+
+*Documentation workflow improved to ensure TODO.md is always maintained*

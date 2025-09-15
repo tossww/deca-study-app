@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { useStore } from '@/lib/store'
 
 interface TopicSelectorProps {
-  onTopicsSelected: (topics: string[]) => void
+  onTopicsSelected: (topics: string[], mode: 'test' | 'study') => void
 }
 
 const TOPICS = [
@@ -37,7 +37,13 @@ const TOPICS = [
 ]
 
 export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
-  const { selectedTopics: savedTopics, setSelectedTopics: saveTopics } = useStore()
+  const { 
+    selectedTopics: savedTopics, 
+    setSelectedTopics: saveTopics,
+    studySessionSize,
+    lastStudyMode,
+    setLastStudyMode 
+  } = useStore()
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
 
   useEffect(() => {
@@ -59,10 +65,11 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
     )
   }
 
-  const handleStart = () => {
+  const handleStart = (mode: 'test' | 'study') => {
     if (selectedTopics.length > 0) {
       saveTopics(selectedTopics) // Save topic IDs to store
-      onTopicsSelected(selectedTopics) // Pass topic IDs to parent
+      setLastStudyMode(mode) // Save the selected mode
+      onTopicsSelected(selectedTopics, mode) // Pass topic IDs and mode to parent
     }
   }
 
@@ -103,31 +110,64 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
         ))}
       </div>
 
-      <div className="flex justify-center space-x-2 sm:space-x-3">
-        <button
-          onClick={() => setSelectedTopics(TOPICS.map(t => t.id))}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-        >
-          All
-        </button>
-        <button
-          onClick={() => setSelectedTopics([])}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-        >
-          None
-        </button>
-        <button
-          onClick={handleStart}
-          disabled={selectedTopics.length === 0}
-          className={cn(
-            'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
-            selectedTopics.length > 0
-              ? 'bg-primary-600 text-white hover:bg-primary-700'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          )}
-        >
-          Start Study
-        </button>
+      <div className="space-y-3">
+        {/* Selection controls */}
+        <div className="flex justify-center space-x-2 sm:space-x-3">
+          <button
+            onClick={() => setSelectedTopics(TOPICS.map(t => t.id))}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          >
+            All
+          </button>
+          <button
+            onClick={() => setSelectedTopics([])}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          >
+            None
+          </button>
+        </div>
+
+        {/* Study mode buttons */}
+        <div className="flex justify-center items-center space-x-3">
+          <button
+            onClick={() => handleStart('test')}
+            disabled={selectedTopics.length === 0}
+            className={cn(
+              'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
+              selectedTopics.length > 0
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            )}
+          >
+            Test All
+          </button>
+          <div className="text-gray-400">or</div>
+          <button
+            onClick={() => handleStart('study')}
+            disabled={selectedTopics.length === 0}
+            className={cn(
+              'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
+              selectedTopics.length > 0
+                ? 'bg-primary-600 text-white hover:bg-primary-700'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            )}
+          >
+            Study ({studySessionSize})
+          </button>
+        </div>
+
+        {/* Help text */}
+        {selectedTopics.length === 0 && (
+          <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
+            Select at least one topic to start
+          </p>
+        )}
+        {selectedTopics.length > 0 && (
+          <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
+            <span className="font-medium">Test All:</span> Practice all questions • 
+            <span className="font-medium ml-1">Study:</span> Spaced repetition review
+          </p>
+        )}
       </div>
     </div>
   )

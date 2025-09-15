@@ -15,6 +15,8 @@ interface Question {
 
 interface StudySessionProps {
   topics: string[]
+  mode: 'test' | 'study'
+  limit?: number
   onComplete: () => void
   onQuit: () => void
 }
@@ -26,7 +28,7 @@ interface AnswerData {
   suggestedGrade: Quality
 }
 
-export function useStudySession({ topics, onComplete, onQuit }: StudySessionProps) {
+export function useStudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -48,7 +50,14 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const response = await fetch('/api/questions?' + new URLSearchParams({ topics: topics.join(',') }))
+        const params = new URLSearchParams({ 
+          topics: topics.join(','),
+          mode: mode
+        })
+        if (limit) {
+          params.append('limit', limit.toString())
+        }
+        const response = await fetch('/api/questions?' + params)
         const data = await response.json()
         setQuestions(data.questions || [])
 
@@ -74,7 +83,7 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
     }
 
     loadQuestions()
-  }, [topics, sessionStartTime])
+  }, [topics, mode, limit, sessionStartTime])
 
   // Timer effect - separate to avoid reloading questions
   useEffect(() => {
@@ -213,7 +222,14 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
 
     if (currentIndex + 1 >= questions.length) {
       await completeSession()
-      toast.success(`Session complete! Score: ${sessionStats.correct}/${sessionStats.total}`)
+      const accuracy = sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0
+      
+      if (mode === 'test') {
+        toast.success(`Test complete! Score: ${sessionStats.correct}/${sessionStats.total} (${accuracy}%)`)
+      } else {
+        toast.success(`Study session complete! Reviewed ${sessionStats.total} questions (${accuracy}% correct)`)
+      }
+      
       onComplete()
       return
     }

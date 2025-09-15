@@ -125,7 +125,37 @@ To eliminate cramming and improve long-term retention of DECA exam material thro
 - Entrepreneurship
 - Hospitality & Tourism
 
-#### 3.3.2 Question Delivery
+#### 3.3.2 Study Modes
+**Status**: ✅ Implemented
+
+**Modes**:
+1. **Test All Mode**:
+   - Loads ALL questions from selected topics (100+ questions)
+   - No spaced repetition filtering
+   - Complete topic coverage testing
+   - Progress tracking but no review scheduling
+
+2. **Study Mode (Configurable Size)**:
+   - Default: 25 questions per session
+   - Uses spaced repetition algorithm
+   - Priority order: overdue > due today > new questions
+   - Configurable session size (5-100 questions)
+   - Saves preference to localStorage
+
+**UI Requirements**:
+- Replace single "Start Study" button with two options
+- "Test All" button - loads all questions
+- "Study (25)" button - limited session with count displayed
+- Button label updates dynamically based on saved preference
+- Pass study mode ('test' or 'study') to session component
+
+**Settings Integration**:
+- Add "Session Settings" to InfoHelp component
+- Number input for study session size (min: 5, max: 100, default: 25)
+- Explanation of difference between Test and Study modes
+- Settings persist via localStorage
+
+#### 3.3.3 Question Delivery
 **Status**: ✅ Implemented
 
 **Question Format**:

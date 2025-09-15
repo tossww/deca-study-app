@@ -7,11 +7,13 @@ import { useStudySession } from '@/hooks/useStudySession'
 
 interface StudySessionProps {
   topics: string[]
+  mode: 'test' | 'study'
+  limit?: number
   onComplete: () => void
   onQuit: () => void
 }
 
-export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) {
+export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
 
   const {
     currentQuestion,
@@ -31,7 +33,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     handleQuit,
     confirmQuit,
     isLoading,
-  } = useStudySession({ topics, onComplete, onQuit })
+  } = useStudySession({ topics, mode, limit, onComplete, onQuit })
 
   // Keyboard shortcuts for desktop version
   useEffect(() => {
@@ -91,8 +93,16 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          Question {currentIndex + 1} of {questions.length}
+        <div className="flex items-center space-x-4">
+          <div className={cn(
+            "text-xs font-medium px-2 py-1 rounded",
+            mode === 'test' ? 'bg-blue-100 text-blue-700' : 'bg-primary-100 text-primary-700'
+          )}>
+            {mode === 'test' ? 'Test All' : 'Study Mode'}
+          </div>
+          <div className="text-sm text-gray-600">
+            Question {currentIndex + 1} of {questions.length}
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-600">

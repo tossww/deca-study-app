@@ -1,8 +1,23 @@
 'use client'
 
 import { STUDY_TIPS } from '@/lib/study-tips'
+import { useStore } from '@/lib/store'
+import { useState, useEffect } from 'react'
 
 export function InfoHelp() {
+  const { studySessionSize, setStudySessionSize } = useStore()
+  const [sessionSize, setSessionSize] = useState(studySessionSize)
+
+  useEffect(() => {
+    setSessionSize(studySessionSize)
+  }, [studySessionSize])
+
+  const handleSizeChange = (newSize: number) => {
+    const clampedSize = Math.max(5, Math.min(100, newSize))
+    setSessionSize(clampedSize)
+    setStudySessionSize(clampedSize)
+  }
+
   return (
     <div className="space-y-6">
       {/* App Overview */}
@@ -12,6 +27,85 @@ export function InfoHelp() {
           This app uses scientifically-proven spaced repetition to help you master DECA exam questions efficiently.
           Instead of cramming, you&apos;ll review questions at optimal intervals to build long-term retention.
         </p>
+      </div>
+
+      {/* Session Settings */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Session Settings</h3>
+        
+        <div className="space-y-4">
+          {/* Study Session Size */}
+          <div>
+            <h4 className="font-semibold text-gray-900 mb-2">Study Session Size</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              Choose how many questions you want to review in each study session. This only affects Study mode, not Test All mode.
+            </p>
+            
+            <div className="flex items-center space-x-4">
+              <input
+                type="number"
+                value={sessionSize}
+                onChange={(e) => handleSizeChange(Number(e.target.value))}
+                min="5"
+                max="100"
+                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+              <span className="text-sm text-gray-500">questions per session (5-100)</span>
+            </div>
+
+            {/* Preset buttons */}
+            <div className="flex space-x-2 mt-3">
+              <button
+                onClick={() => handleSizeChange(10)}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              >
+                10
+              </button>
+              <button
+                onClick={() => handleSizeChange(25)}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              >
+                25
+              </button>
+              <button
+                onClick={() => handleSizeChange(50)}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              >
+                50
+              </button>
+              <button
+                onClick={() => handleSizeChange(100)}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              >
+                100
+              </button>
+            </div>
+          </div>
+
+          {/* Study Modes Explanation */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-gray-900 mb-3">Study Modes</h4>
+            
+            <div className="space-y-3">
+              <div className="flex items-start">
+                <div className="w-20 text-sm font-medium text-blue-700 flex-shrink-0">Test All</div>
+                <div className="text-sm text-gray-600">
+                  Practice all questions from your selected topics. Great for comprehensive review or 
+                  initial learning. No spaced repetition scheduling - just complete topic coverage.
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="w-20 text-sm font-medium text-primary-700 flex-shrink-0">Study</div>
+                <div className="text-sm text-gray-600">
+                  Uses spaced repetition to show you questions when they&apos;re due for review. 
+                  Prioritizes overdue questions, then due today, then new questions. Limited to 
+                  your session size setting above.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Your Learning Journey */}

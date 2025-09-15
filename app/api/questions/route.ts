@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getUserFromRequest } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const topicsParam = searchParams.get('topics')
+    const mode = searchParams.get('mode') || 'test' // 'test' or 'study'
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 25
     
     if (!topicsParam) {
       return NextResponse.json({ error: 'Topics parameter required' }, { status: 400 })
@@ -27,19 +30,86 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No valid topics found' }, { status: 400 })
     }
 
-    // Fetch questions from database
-    const dbQuestions = await prisma.question.findMany({
-      where: {
-        topic: {
-          name: {
-            in: topicNames
+    // Get user ID for study mode
+    const userId = mode === 'study' ? await getUserFromRequest(request) : null
+
+    let dbQuestions
+
+    if (mode === 'study' && userId) {
+      // Study mode: Use spaced repetition filtering
+      const now = new Date()
+      
+      // Get all questions for selected topics with user stats
+      const questionsWithStats = await prisma.question.findMany({
+        where: {
+          topic: {
+            name: {
+              in: topicNames
+            }
+          }
+        },
+        include: {
+          topic: true,
+          stats: {
+            where: {
+              userId: userId
+            }
           }
         }
-      },
-      include: {
-        topic: true
+      })
+
+      // Separate questions into categories
+      const overdueQuestions = []
+      const dueQuestions = []
+      const newQuestions = []
+
+      for (const q of questionsWithStats) {
+        if (q.stats.length === 0) {
+          // New question (never answered)
+          newQuestions.push(q)
+        } else {
+          const stat = q.stats[0]
+          if (stat.nextReview && stat.nextReview <= now) {
+            if (stat.nextReview < new Date(now.getTime() - 24 * 60 * 60 * 1000)) {
+              // Overdue (more than 1 day late)
+              overdueQuestions.push(q)
+            } else {
+              // Due today
+              dueQuestions.push(q)
+            }
+          }
+        }
       }
-    })
+
+      // Combine in priority order: overdue > due > new
+      const prioritizedQuestions = [
+        ...overdueQuestions,
+        ...dueQuestions,
+        ...newQuestions
+      ]
+
+      // Take only the requested limit
+      dbQuestions = prioritizedQuestions.slice(0, limit)
+      
+      console.log(`📚 Study mode: ${overdueQuestions.length} overdue, ${dueQuestions.length} due, ${newQuestions.length} new`)
+      console.log(`📚 Returning ${dbQuestions.length} questions (limit: ${limit})`)
+    } else {
+      // Test mode: Get all questions for topics
+      dbQuestions = await prisma.question.findMany({
+        where: {
+          topic: {
+            name: {
+              in: topicNames
+            }
+          }
+        },
+        include: {
+          topic: true
+        }
+      })
+      
+      console.log(`📝 Test mode: Found ${dbQuestions.length} total questions`)
+    }
 
     // Transform questions to match frontend format
     const questions = dbQuestions.map(q => {
@@ -61,7 +131,7 @@ export async function GET(request: NextRequest) {
     // Shuffle questions
     const shuffledQuestions = questions.sort(() => Math.random() - 0.5)
 
-    console.log(`🎯 Serving ${shuffledQuestions.length} questions for topics: ${topicNames.join(', ')}`)
+    console.log(`🎯 Serving ${shuffledQuestions.length} questions in ${mode} mode for topics: ${topicNames.join(', ')}`)
 
     return NextResponse.json({ questions: shuffledQuestions })
   } catch (error) {

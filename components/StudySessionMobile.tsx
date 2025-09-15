@@ -7,11 +7,13 @@ import { useStudySession } from '@/hooks/useStudySession'
 
 interface StudySessionMobileProps {
   topics: string[]
+  mode: 'test' | 'study'
+  limit?: number
   onComplete: () => void
   onQuit: () => void
 }
 
-export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionMobileProps) {
+export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
 
   const {
     currentQuestion,
@@ -31,7 +33,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
     handleQuit,
     confirmQuit,
     isLoading,
-  } = useStudySession({ topics, onComplete, onQuit })
+  } = useStudySession({ topics, mode, limit, onComplete, onQuit })
 
   // Mobile-specific touch gestures
   useEffect(() => {
@@ -110,6 +112,12 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           <span className="text-sm font-medium">Back</span>
         </button>
         <div className="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <div className={cn(
+            "px-2 py-0.5 rounded",
+            mode === 'test' ? 'bg-blue-100 text-blue-700' : 'bg-primary-100 text-primary-700'
+          )}>
+            {mode === 'test' ? 'Test' : 'Study'}
+          </div>
           <span>Score: {sessionStats.correct}/{sessionStats.total}</span>
           <span>{currentIndex + 1}/{questions.length}</span>
         </div>

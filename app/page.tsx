@@ -12,9 +12,10 @@ import { useStore } from '@/lib/store'
 import { useMobileDetection } from '@/lib/mobile-utils'
 
 export default function Home() {
-  const { user, isLoading } = useStore()
+  const { user, isLoading, studySessionSize } = useStore()
   const [currentView, setCurrentView] = useState<'dashboard' | 'study' | 'browse' | 'info' | 'login'>('login')
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
+  const [studyMode, setStudyMode] = useState<'test' | 'study'>('study')
   const isMobile = useMobileDetection()
 
   useEffect(() => {
@@ -132,8 +133,9 @@ export default function Home() {
             {selectedTopics.length === 0 ? (
               <div className="bg-white rounded-xl shadow-lg">
                 <TopicSelector
-                  onTopicsSelected={(topics) => {
+                  onTopicsSelected={(topics, mode) => {
                     setSelectedTopics(topics)
+                    setStudyMode(mode)
                   }}
                 />
               </div>
@@ -141,6 +143,8 @@ export default function Home() {
               isMobile ? (
                 <StudySessionMobile
                   topics={selectedTopics}
+                  mode={studyMode}
+                  limit={studyMode === 'study' ? studySessionSize : undefined}
                   onComplete={() => {
                     setSelectedTopics([]) // Clear local state to return to topic selector
                     // Keep store.selectedTopics to remember for next session
@@ -155,6 +159,8 @@ export default function Home() {
               ) : (
                 <StudySession
                   topics={selectedTopics}
+                  mode={studyMode}
+                  limit={studyMode === 'study' ? studySessionSize : undefined}
                   onComplete={() => {
                     setSelectedTopics([]) // Clear local state to return to topic selector
                     // Keep store.selectedTopics to remember for next session
