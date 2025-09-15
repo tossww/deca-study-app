@@ -28,27 +28,12 @@
 - [ ] **Progressive Web App (PWA)** - Add service worker and app manifest for mobile installation
 - [ ] **Offline mode** - Cache questions for study without internet connection
 
-## Anki Algorithm Implementation (21-31 hours)
+## Completed Highlights
 
-### High Priority - Spaced Repetition Enhancement ✅ COMPLETED
-- [x] **Replace SM-2 with Anki Algorithm** - ✅ Implemented proper learning states, relearning system, and scientific scheduling
-- [x] **Add Time-Based Answer Grading** - ✅ Suggest Easy/Good/Hard based on response time (10/20/40/120 second thresholds)
-- [x] **Learning Steps System** - ✅ Configurable short-term steps before cards become mature
-- [x] **Enhanced Answer Processing** - ✅ Specific ease factor adjustments per answer type (-20pp, -15pp, +15pp)
-- [x] **Database Schema Updates** - Verified fields: `state`, `currentStep`, `lapses`, `lastReviewDate`
-
-*See ANKI_ALGORITHM_PROPOSAL.md for detailed specifications*
-
-## Other Features (4+ hours)
-- [ ] Create review mode for missed questions
-- [ ] Add search/filter functionality in Browse mode
-- [ ] Create practice test mode with full 100-question exams
-- [ ] **Dark mode** - System-aware dark theme with OLED optimization
-- [x] **Gesture enhancements (partial)** - ✅ Right swipe for next question navigation implemented
-  - [ ] **Additional gestures** - Add left swipe for previous question, long-press for grade adjustment
-- [ ] **Study analytics** - Detailed performance tracking and learning insights
-- [ ] **Voice control** - Accessibility feature for hands-free study
-- [ ] **Study reminders** - Push notifications for due reviews
+- Full Anki algorithm and time-based grading
+- Mobile-first study experience and gestures (partial)
+- Keyboard shortcuts and topic selection persistence
+- Browse, Dashboard, Info implemented per PRD
 
 ## Current Progress
 
@@ -101,7 +86,7 @@
 - **Modern architecture** - Shared hooks, responsive detection, supports PWA/offline features
 - **Individual card tracking** - Each question has its own learning state and review schedule
 
-## Phased Implementation Plan
+## Cleanup Phases (active)
 
 ### Phase 1 – Immediate hygiene (DONE)
 - [x] Standardize Prisma usage via `lib/prisma` in all API routes
@@ -110,9 +95,9 @@
 - [x] Create `docs/DEPLOYMENT.md` (note: original deployment guide will be consolidated under docs)
 
 ### Phase 2 – Docs consolidation
-- [ ] Move product docs to `/docs/` and link from README
-- [ ] Create `rules/README.md` and archive detailed doctrine files
-- [ ] Move UI/UX and cleanup proposals into `/docs`
+- [x] Move product docs to `/docs/` and link from README
+- [x] Create `rules/README.md` and archive detailed doctrine files
+- [x] Move UI/UX and cleanup proposals into `/docs`
 
 ### Phase 3 – Algorithm module consolidation and performance
 - [ ] Create `lib/anki/index.ts` and update imports

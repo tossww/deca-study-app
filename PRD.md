@@ -201,8 +201,8 @@ To eliminate cramming and improve long-term retention of DECA exam material thro
 #### 3.6.1 Main Navigation
 **Status**: ✅ Implemented
 
-**Navigation Items**:
-- **Dashboard**: Home screen with overview and statistics
+**Navigation Items (current)**:
+- **Dashboard**: Overview and quick start
 - **Study**: Topic selection and study sessions
 - **Browse**: Question database exploration
 - **Info**: Help and documentation
@@ -307,76 +307,6 @@ To eliminate cramming and improve long-term retention of DECA exam material thro
 - **Mobile Optimized**: Touch-friendly interfaces
 - **Desktop Enhanced**: Keyboard shortcuts and larger displays
 - **Adaptive Layouts**: Flexible grid systems
-
-## 7. Performance Requirements
-
-### 7.1 Response Times
-- **Question Loading**: < 200ms for question retrieval
-- **Answer Submission**: < 100ms for progress updates
-- **Dashboard Loading**: < 500ms for statistics compilation
-- **Page Transitions**: < 100ms for navigation
-
-### 7.2 Scalability
-- **Question Database**: Support for 10,000+ questions
-- **Concurrent Users**: 100+ simultaneous study sessions
-- **Data Storage**: Efficient progress tracking without performance degradation
-
-## 8. Future Roadmap
-
-### 8.1 Planned Features
-
-
-#### 8.1.1 Study Session Quit Feature
-**Priority**: High
-**Status**: ✅ Implemented
-**Description**:
-- **Quit Button**: Prominent exit option during study sessions
-- **Session Summary**: Display study results (questions answered, accuracy, time spent)
-- **Topic Reset**: Clear stored topic selection when session is quit
-- **Fresh Start**: Next study session begins with topic selection screen
-- **Progress Preservation**: Answered questions maintain spaced repetition progress
-
-**User Flow**:
-1. User clicks "Quit Study" button during session
-2. System displays session summary modal
-3. User confirms quit action
-4. localStorage topic selection is cleared
-5. User redirected to Dashboard
-6. Next "Study" navigation shows topic selection screen
-
-#### 8.1.2 Study Session Timer Enhancement
-**Priority**: Low
-**Description**: Timer options, session customization, additional quit confirmation modals
-
-## 9. Success Metrics
-
-### 9.1 Learning Effectiveness
-- **Knowledge Retention**: Percentage of questions maintained in mature status
-- **Study Efficiency**: Time to reach mastery per question
-- **Long-term Retention**: Mature question success rates over time
-
-### 9.2 User Engagement
-- **Study Streak**: Consecutive days of app usage
-- **Session Duration**: Average time spent per study session
-- **Question Volume**: Total questions studied per user
-- **Topic Coverage**: Breadth of subject matter engagement
-
-### 9.3 System Performance
-- **Response Times**: API endpoint performance metrics
-- **Error Rates**: System reliability measurements
-- **User Satisfaction**: Qualitative feedback and usability metrics
-
-## 10. Risk Assessment
-
-### 10.1 Technical Risks
-- **Algorithm Accuracy**: Spaced repetition implementation effectiveness
-- **Data Integrity**: Progress tracking accuracy and consistency
-- **Performance Scaling**: System response under increased load
-
-### 10.2 Mitigation Strategies
-- **Algorithm Testing**: Validation against established spaced repetition research
-- **Data Validation**: Comprehensive testing of progress tracking logic
-- **Performance Monitoring**: Real-time system performance tracking
 
 ## 11. Conclusion
 
