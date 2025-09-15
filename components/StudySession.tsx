@@ -132,7 +132,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
             >
               <div className="flex items-center">
                 <span className="font-semibold mr-3 flex-shrink-0 text-gray-600">
-                  {String.fromCharCode(65 + index)}.
+                  {index + 1}.
                 </span>
                 <span>{option}</span>
               </div>
