@@ -52,27 +52,13 @@ export const STUDY_TIPS: StudyTip[] = [
     content: 'Press Enter or Space to move to the next question quickly.',
     category: 'keyboard'
   },
-  {
-    id: 'adjust-grade',
-    icon: '🎚️',
-    title: 'Adjust Difficulty',
-    content: 'Click "Adjust" after answering to change the difficulty rating if needed.',
-    category: 'keyboard'
-  },
 
   // Progress Tips
   {
-    id: 'mature-cards',
-    icon: '🟢',
-    title: 'Reaching Maturity',
-    content: 'Questions become "Mature" after 21 days of successful reviews, indicating long-term retention.',
-    category: 'progress'
-  },
-  {
-    id: 'learning-stages',
-    icon: '📊',
-    title: 'Learning Stages',
-    content: 'New → Learning (building memory) → Young (<21 days) → Mature (≥21 days)',
+    id: 'master-cards',
+    icon: '♛',
+    title: 'Achieving Mastery',
+    content: 'Questions become "Master" after 21 days of successful reviews, indicating long-term retention.',
     category: 'progress'
   },
   {
@@ -95,7 +81,7 @@ export const STUDY_TIPS: StudyTip[] = [
     id: 'progress-visible',
     icon: '📊',
     title: 'Track Your Progress',
-    content: 'Watch your mastery percentage grow as more questions become mature.',
+    content: 'Watch your mastery percentage grow as questions progress through Apprentice → Guru → Master.',
     category: 'motivation'
   },
   {
@@ -136,10 +122,10 @@ export const STUDY_TIPS: StudyTip[] = [
     category: 'feature'
   },
   {
-    id: 'anki-algorithm',
-    icon: '🔬',
-    title: 'Science-Based Learning',
-    content: 'Using the proven Anki SM-2 algorithm for optimal memory retention.',
+    id: 'deca-focus',
+    icon: '🎯',
+    title: 'DECA Exam Prep',
+    content: 'Focus on business concepts and case studies that frequently appear in DECA competitions.',
     category: 'feature'
   }
 ]
