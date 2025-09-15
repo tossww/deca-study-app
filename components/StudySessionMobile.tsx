@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { cn, formatTime } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
 
@@ -109,9 +109,10 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           </svg>
           <span className="text-sm font-medium">Back</span>
         </button>
-        <span className="text-xs font-medium text-gray-500">
-          {currentIndex + 1}/{questions.length}
-        </span>
+        <div className="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <span>Score: {sessionStats.correct}/{sessionStats.total}</span>
+          <span>{currentIndex + 1}/{questions.length}</span>
+        </div>
       </div>
 
       {/* Main Content Area - Optimized spacing */}
@@ -229,22 +230,16 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       </div>
 
       {/* Bottom Action Bar - Enhanced for mobile */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0 safe-area-bottom">
-        <div className="flex justify-between items-center">
-          <div className="text-xs text-gray-500 flex flex-col">
-            <span>Time: {formatTime(sessionStats.timeSpent)}</span>
-            <span>Score: {sessionStats.correct}/{sessionStats.total}</span>
-          </div>
-          {showExplanation && (
-            <button
-              onClick={nextQuestion}
-              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-lg min-h-[52px] touch-manipulation active:scale-95"
-            >
-              {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
-            </button>
-          )}
+      {showExplanation && (
+        <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0 safe-area-bottom">
+          <button
+            onClick={nextQuestion}
+            className="w-full px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-lg min-h-[52px] touch-manipulation active:scale-95"
+          >
+            {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
+          </button>
         </div>
-      </div>
+      )}
 
       {/* Quit Confirmation Modal */}
       {showQuitModal && (
@@ -266,10 +261,6 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
                   <div className="flex justify-between">
                     <span className="text-gray-600">Correct:</span>
                     <span className="font-medium text-green-600">{sessionStats.correct}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Time:</span>
-                    <span className="font-medium">{formatTime(sessionStats.timeSpent)}</span>
                   </div>
                 </div>
               </div>
