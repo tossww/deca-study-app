@@ -44,6 +44,8 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
         }
       })
       const data = await response.json()
+      console.log('📊 Stats data received:', data)
+      console.log('📊 Mastery levels:', data.masteryLevels)
       setStats(data)
     } catch (error) {
       console.error('Failed to load stats:', error)

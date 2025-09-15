@@ -156,22 +156,34 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
 
     try {
       const { sessionToken } = useStore.getState()
-      await fetch('/api/questions/answer', {
+      const payload = {
+        questionId: questions[currentIndex].id,
+        userAnswer: answerIndex,
+        isCorrect: treatAsCorrect, // Use the adjusted correctness
+        timeSpent: Math.floor(responseTimeMs / 1000),
+        quality: selectedGrade,
+      }
+
+      console.log('📤 Submitting answer:', payload)
+
+      const response = await fetch('/api/questions/answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Session-Token': sessionToken || '',
         },
-        body: JSON.stringify({
-          questionId: questions[currentIndex].id,
-          userAnswer: answerIndex,
-          isCorrect: treatAsCorrect, // Use the adjusted correctness
-          timeSpent: Math.floor(responseTimeMs / 1000),
-          quality: selectedGrade,
-        }),
+        body: JSON.stringify(payload),
       })
+
+      const result = await response.json()
+      console.log('📥 Answer response:', result)
+
+      if (!response.ok) {
+        throw new Error(`API error: ${result.error || 'Unknown error'}`)
+      }
     } catch (error) {
       console.error('Failed to save answer:', error)
+      toast.error('Failed to save answer')
     }
 
     // Clear auto-grade timer and answer data
