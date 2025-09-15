@@ -175,9 +175,6 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       {/* Fixed Bottom Navigation Bar */}
       {currentAnswerData && (
         <>
-          {/* Background overlay to prevent bleed-through */}
-          <div className="fixed left-0 right-0 bg-gray-50 z-5" style={{ height: '120px', bottom: '0' }}></div>
-
           {/* Grade Selector Overlay */}
           {showGradeSelector && (
             <div className="fixed left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 12px)' }}>
