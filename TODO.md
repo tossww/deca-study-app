@@ -106,40 +106,38 @@
 - [ ] Add basic rate limiting to auth/answer routes
 - [ ] Add "due selection" endpoint using scheduler
 
-## 🚨 Critical Fix: Implement True Spaced Repetition Sessions
+## 🚨 Critical Fix: Implement Two Study Modes (Test vs Review)
 
 ### Current Issue
-The app currently loads ALL questions from selected topics (100+) instead of using spaced repetition scheduling. This defeats the purpose of the algorithm.
+The app currently loads ALL questions from selected topics (100+) without option for shorter review sessions using spaced repetition.
 
-### Phase 1 – Due Question API (2-3 hours)
-- [ ] Create `/api/questions/due` endpoint that filters by `nextReview <= today`
-- [ ] Include new questions (repetitions = 0) with configurable limit
-- [ ] Implement priority ordering: Overdue > Due Today > New
-- [ ] Add session size limits (default 30-50 questions max)
-- [ ] Return mix of review (70%) and new (30%) questions
+### Phase 1 – Topic Selector UI Update (1-2 hours)
+- [ ] Replace single "Start Study" button with two options:
+  - [ ] "Test All" - Current behavior, all questions from topics
+  - [ ] "Study (25)" - Limited session with SRS selection
+- [ ] Pass study mode ('test' or 'study') to session component
+- [ ] Show configurable count on Study button
+- [ ] Store last selected mode in localStorage
 
-### Phase 2 – Session Builder Service (2-3 hours)
-- [ ] Create `lib/session-builder.ts` with smart question selection
-- [ ] Implement daily limits for new cards (default 20)
-- [ ] Implement daily limits for reviews (default 100)
-- [ ] Handle edge cases (no due cards, all cards mastered)
-- [ ] Add forecast calculation for upcoming reviews
+### Phase 2 – Settings in Info Panel (1 hour)
+- [ ] Add "Session Settings" section to InfoHelp component
+- [ ] Add number input for study session size (min: 5, max: 100, default: 25)
+- [ ] Save preference to localStorage via store
+- [ ] Update Study button label dynamically with saved preference
+- [ ] Add explanation of difference between Test and Study modes
 
-### Phase 3 – Update Study Components (2-3 hours)
-- [ ] Modify `useStudySession` to use new due endpoint
-- [ ] Show session type indicators (review/new/mixed)
-- [ ] Display meaningful completion stats ("15 reviews, 5 new cards")
-- [ ] Add "Study More" option when session completes
-- [ ] Show next review times in completion summary
+### Phase 3 – API & Session Logic (2 hours)
+- [ ] Update `/api/questions` endpoint to accept `mode` and `limit` parameters
+- [ ] Test mode: return all questions (current behavior)
+- [ ] Study mode:
+  - [ ] Filter by nextReview <= today for reviews
+  - [ ] Include new questions (repetitions = 0)
+  - [ ] Priority: overdue > due > new
+  - [ ] Limit to requested session size
+- [ ] Update useStudySession hook to pass mode and limit
 
-### Phase 4 – User Settings (1-2 hours)
-- [ ] Add settings UI for daily limits configuration
-- [ ] Store preferences in user profile or localStorage
-- [ ] Add "Practice Mode" toggle for full deck access (current behavior)
-- [ ] Add session length preferences (short/medium/long)
-
-### Phase 5 – Dashboard Updates (1 hour)
-- [ ] Show "Cards due today" count
-- [ ] Display review forecast graph
-- [ ] Add "Start Review" vs "Learn New" buttons
-- [ ] Show daily progress towards limits
+### Phase 4 – Polish & Feedback (1 hour)
+- [ ] Show mode indicator in study session header
+- [ ] Different completion messages for Test vs Study
+- [ ] Add "Continue Studying" option after Study mode completion
+- [ ] Track separate stats for Test vs Study sessions
