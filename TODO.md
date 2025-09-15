@@ -46,6 +46,24 @@ The app now offers two distinct study modes:
 - ✅ Different completion messages for Test vs Study
 - ✅ Mode indicators on both desktop and mobile interfaces
 
+## ✅ COMPLETED: Test Mode Feature - September 15, 2025
+
+### Feature Overview
+Added a "Test Mode" option that removes the period from the correct answer's number to make it easier to identify during practice sessions.
+
+### Implementation Details
+- ✅ Added `testMode` boolean state to the global store
+- ✅ Added test mode toggle in the InfoHelp component's Session Settings section
+- ✅ Updated StudySession component to conditionally hide period for correct answer when test mode is enabled
+- ✅ Updated StudySessionMobile component to conditionally hide period for correct answer when test mode is enabled
+- ✅ Test mode state persists across sessions via localStorage
+
+### How It Works
+- When test mode is OFF: All answer options show as "1.", "2.", "3.", "4."
+- When test mode is ON: The correct answer shows without period (e.g., "1" instead of "1.")
+- Toggle is available in the Info/Help panel under Session Settings
+- Warning message displays when test mode is active
+
 ## 🚧 In Progress
 - None currently
 

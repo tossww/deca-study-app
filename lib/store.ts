@@ -13,11 +13,13 @@ interface AppState {
   selectedTopics: string[]
   studySessionSize: number
   lastStudyMode: 'test' | 'study'
+  testMode: boolean
   setUser: (user: User | null) => void
   setSessionToken: (token: string | null) => void
   setSelectedTopics: (topics: string[]) => void
   setStudySessionSize: (size: number) => void
   setLastStudyMode: (mode: 'test' | 'study') => void
+  setTestMode: (enabled: boolean) => void
   logout: () => void
 }
 
@@ -30,11 +32,13 @@ export const useStore = create<AppState>()(
       selectedTopics: [],
       studySessionSize: 25,
       lastStudyMode: 'study' as const,
+      testMode: false,
       setUser: (user) => set({ user, isLoading: false }),
       setSessionToken: (token) => set({ sessionToken: token }),
       setSelectedTopics: (topics) => set({ selectedTopics: topics }),
       setStudySessionSize: (size) => set({ studySessionSize: size }),
       setLastStudyMode: (mode) => set({ lastStudyMode: mode }),
+      setTestMode: (enabled) => set({ testMode: enabled }),
       logout: () => set({ user: null, sessionToken: null }),
     }),
     {
@@ -44,7 +48,8 @@ export const useStore = create<AppState>()(
         sessionToken: state.sessionToken,
         selectedTopics: state.selectedTopics,
         studySessionSize: state.studySessionSize,
-        lastStudyMode: state.lastStudyMode
+        lastStudyMode: state.lastStudyMode,
+        testMode: state.testMode
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

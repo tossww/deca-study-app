@@ -14,7 +14,8 @@ interface StudySessionProps {
 }
 
 export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
-
+  const { testMode } = useStore()
+  
   const {
     currentQuestion,
     currentIndex,
@@ -143,7 +144,7 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
             >
               <div className="flex items-center">
                 <span className="font-semibold mr-3 flex-shrink-0 text-gray-600">
-                  {index + 1}.
+                  {index + 1}{testMode && index === currentQuestion.correctAnswer ? '' : '.'}
                 </span>
                 <span>{option}</span>
               </div>

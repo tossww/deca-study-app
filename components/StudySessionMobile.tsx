@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
+import { useStore } from '@/lib/store'
 
 interface StudySessionMobileProps {
   topics: string[]
@@ -14,7 +15,8 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
-
+  const { testMode } = useStore()
+  
   const {
     currentQuestion,
     currentIndex,
@@ -153,7 +155,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
             >
               <div className="flex items-center w-full">
                 <span className="font-semibold mr-3 flex-shrink-0 text-gray-600">
-                  {index + 1}.
+                  {index + 1}{testMode && index === currentQuestion.correctAnswer ? '' : '.'}
                 </span>
                 <span className="text-base">{option}</span>
               </div>

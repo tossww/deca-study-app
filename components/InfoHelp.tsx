@@ -5,7 +5,7 @@ import { useStore } from '@/lib/store'
 import { useState, useEffect } from 'react'
 
 export function InfoHelp() {
-  const { studySessionSize, setStudySessionSize } = useStore()
+  const { studySessionSize, setStudySessionSize, testMode, setTestMode } = useStore()
   const [sessionSize, setSessionSize] = useState(studySessionSize)
 
   useEffect(() => {
@@ -80,6 +80,30 @@ export function InfoHelp() {
                 100
               </button>
             </div>
+          </div>
+
+          {/* Test Mode Toggle */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-gray-900 mb-2">Test Mode</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              When enabled, the correct answer's number will not have a period, making it easier to identify during practice.
+            </p>
+            
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={testMode}
+                onChange={(e) => setTestMode(e.target.checked)}
+                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">Enable Test Mode</span>
+            </label>
+            
+            {testMode && (
+              <div className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                ⚠️ Test mode is ON - correct answers show without period (e.g., "1" instead of "1.")
+              </div>
+            )}
           </div>
 
           {/* Study Modes Explanation */}
