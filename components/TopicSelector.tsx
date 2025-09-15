@@ -83,29 +83,27 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
             key={topic.id}
             onClick={() => toggleTopic(topic.id)}
             className={cn(
-              'relative p-3 rounded-lg border-2 cursor-pointer transition-all',
+              'relative p-2 sm:p-3 rounded-lg border-2 cursor-pointer transition-all min-h-[48px] flex items-center',
               selectedTopics.includes(topic.id)
                 ? 'border-primary-500 bg-primary-50'
                 : 'border-gray-200 bg-white'
             )}
           >
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectedTopics.includes(topic.id)}
-                onChange={() => {}}
-                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 mr-3"
-              />
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900">{topic.name}</h3>
-              </div>
-              <div
-                className={cn(
-                  'w-3 h-3 rounded-full ml-2 flex-shrink-0',
-                  topic.color
-                )}
-              />
+            <input
+              type="checkbox"
+              checked={selectedTopics.includes(topic.id)}
+              onChange={() => {}}
+              className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 mr-2 sm:mr-3 flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-900 leading-tight">{topic.name}</h3>
             </div>
+            <div
+              className={cn(
+                'w-3 h-3 rounded-full ml-2 flex-shrink-0',
+                topic.color
+              )}
+            />
           </div>
         ))}
       </div>
