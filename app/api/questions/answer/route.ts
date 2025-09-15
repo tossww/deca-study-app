@@ -102,6 +102,12 @@ export async function POST(request: NextRequest) {
       // Use Anki scheduler to process the answer (mutates initialCardData)
       const schedulingResult = ankiScheduler.schedule(initialCardData, quality as Quality, timeSpent)
 
+      console.log(`📊 After scheduling NEW card with quality ${quality}:`)
+      console.log(`   State: ${initialCardData.state}`)
+      console.log(`   Repetitions: ${initialCardData.repetitions}`)
+      console.log(`   Ease Factor: ${initialCardData.easeFactor}`)
+      console.log(`   Interval: ${initialCardData.interval}`)
+
       questionStat = await prisma.questionStat.create({
         data: {
           userId,
@@ -111,6 +117,9 @@ export async function POST(request: NextRequest) {
       })
 
       console.log(`✅ Created question stat: ${questionStat.id} - State: ${schedulingResult.toState}`)
+      console.log(`   Saved repetitions: ${questionStat.repetitions}`)
+      console.log(`   Saved easeFactor: ${questionStat.easeFactor}`)
+      console.log(`   Saved interval: ${questionStat.interval}`)
     } else {
       // Update existing question stat using Anki algorithm
       console.log(`🔄 Updating existing question stat: ${questionStat.id}`)

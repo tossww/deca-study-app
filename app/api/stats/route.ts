@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { calculateStreak } from '@/lib/utils'
 import { getUserFromRequest } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { CardState } from '@/lib/spaced-repetition'
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,8 +49,10 @@ export async function GET(request: NextRequest) {
     const reviewedQuestionIds = new Set(questionStats.map(stat => stat.questionId))
 
     // Process reviewed questions
+    console.log(`Processing ${questionStats.length} question stats for user ${userId}`)
     questionStats.forEach(stat => {
       const topicName = stat.question.topic.name
+      console.log(`Question ${stat.questionId}: reps=${stat.repetitions}, ease=${stat.easeFactor}, interval=${stat.interval}, state=${stat.state}`)
 
       if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
         // Master cards

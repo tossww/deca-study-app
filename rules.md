@@ -70,11 +70,18 @@
 3. ✅ Move completed items to archive if major feature
 4. ✅ Update PRD.md status if applicable
 5. ✅ Log completion and results in log.md
-4. ✅ **Test the changes thoroughly**
-5. ✅ Run lint/typecheck if available
-6. ✅ **NEVER ask user to test - always test yourself first**
-7. ✅ **ALWAYS commit and push changes to GitHub immediately**
-8. ✅ **Inform user that changes are pushed and ready to test**
+6. ✅ **Test the changes thoroughly**
+7. ✅ Run lint/typecheck if available
+8. ✅ **NEVER ask user to test - always test yourself first**
+9. ✅ **ALWAYS commit and push changes to GitHub immediately**
+10. ✅ **Inform user that changes are pushed and ready to test**
+
+#### Testing & Deployment:
+- **When making changes that need user testing**: Automatically commit and push to deploy on Vercel
+- **This ensures the user can test the latest changes** without having to ask for deployment
+- **Commands to remember**:
+  - Lint: `npm run lint`
+  - Type check: `npm run typecheck`
 
 ### 4. File Organization
 
