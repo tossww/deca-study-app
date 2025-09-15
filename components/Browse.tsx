@@ -72,7 +72,7 @@ export function Browse() {
     const matchesStatus = statusFilter === 'all' || q.learningStatus === statusFilter
 
     return matchesSearch && matchesTopic && matchesStatus
-  })
+  }).sort((a, b) => a.id - b.id)
 
   const uniqueTopics = Array.from(new Set(questions.filter(q => q && q.topic).map(q => q.topic)))
 

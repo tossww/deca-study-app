@@ -43,6 +43,7 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
   const [showGradeSelector, setShowGradeSelector] = useState(false)
   const [currentAnswerData, setCurrentAnswerData] = useState<AnswerData | null>(null)
   const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
+  const [gradeNotification, setGradeNotification] = useState<string | null>(null)
 
   // Load questions effect
   useEffect(() => {
@@ -173,10 +174,22 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
     setShowGradeSelector(false)
     setCurrentAnswerData(null)
 
-    // Auto-proceed to next question after a short delay
+    // Show notification
+    const gradeLabels = {
+      [Quality.Again]: 'Again',
+      [Quality.Hard]: 'Hard',
+      [Quality.Good]: 'Good',
+      [Quality.Easy]: 'Easy'
+    }
+    setGradeNotification(`Adjusted to ${gradeLabels[selectedGrade]}`)
+
+    // Clear notification after animation
     setTimeout(() => {
-      nextQuestion()
-    }, 500)
+      setGradeNotification(null)
+    }, 2000)
+
+    // Proceed to next question immediately
+    nextQuestion()
   }, [currentAnswerData, autoGradeTimer, questions, currentIndex])
 
   const completeSession = useCallback(async () => {
@@ -252,6 +265,7 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
     setShowGradeSelector,
     currentAnswerData,
     autoGradeTimer,
+    gradeNotification,
 
     // Actions
     handleAnswer,

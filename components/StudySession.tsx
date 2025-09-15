@@ -25,6 +25,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     showGradeSelector,
     setShowGradeSelector,
     currentAnswerData,
+    gradeNotification,
     handleAnswer,
     submitAnswer,
     nextQuestion,
@@ -184,7 +185,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
             </div>
 
             {showGradeSelector && (
-              <div className="border-t border-gray-200 pt-3 mt-3">
+              <div className="border-t border-gray-200 pt-3 mt-3 relative">
                 <p className="text-sm text-gray-600 mb-3">Override suggested grade:</p>
                 <div className="flex space-x-3">
                   <button
@@ -212,6 +213,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                     Easy
                   </button>
                 </div>
+                {gradeNotification && (
+                  <div className="absolute -top-2 right-0 animate-fade-in-up">
+                    <span className="inline-block px-3 py-1 bg-primary-600 text-white text-sm rounded-full shadow-lg">
+                      {gradeNotification}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
