@@ -12,31 +12,26 @@ const TOPICS = [
   {
     id: 'business-management',
     name: 'Business Management & Administration',
-    description: 'Learn management principles, organizational structures, and business operations',
     color: 'bg-blue-500',
   },
   {
     id: 'entrepreneurship',
     name: 'Entrepreneurship',
-    description: 'Master startup strategies, innovation, and business development',
     color: 'bg-green-500',
   },
   {
     id: 'finance',
     name: 'Finance',
-    description: 'Understand financial markets, analysis, and investment strategies',
     color: 'bg-yellow-500',
   },
   {
     id: 'hospitality-tourism',
     name: 'Hospitality & Tourism',
-    description: 'Explore service industry management and tourism operations',
     color: 'bg-purple-500',
   },
   {
     id: 'marketing',
     name: 'Marketing',
-    description: 'Study marketing strategies, consumer behavior, and promotion',
     color: 'bg-red-500',
   },
 ]
@@ -72,32 +67,26 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
   }
 
   return (
-    <div className="p-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Study Topics</h2>
-        <p className="text-gray-600 text-sm">
-          {selectedTopics.length > 0
-            ? `${selectedTopics.length} topic${selectedTopics.length !== 1 ? 's' : ''} selected. Click topics to change selection.`
-            : 'Choose one or more topics to begin your study session'
-          }
-        </p>
+    <div className="p-4 sm:p-6">
+      <div className="text-center mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Select Topics</h2>
         {savedTopics && savedTopics.length > 0 && selectedTopics.length > 0 && (
           <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block">
-            ✨ Restored your previous topic selection
+            ✨ Restored previous selection
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 gap-2 mb-4">
         {TOPICS.map((topic) => (
           <div
             key={topic.id}
             onClick={() => toggleTopic(topic.id)}
             className={cn(
-              'relative p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-sm',
+              'relative p-3 rounded-lg border-2 cursor-pointer transition-all',
               selectedTopics.includes(topic.id)
-                ? 'border-primary-500 bg-primary-50 shadow-md ring-2 ring-primary-200'
-                : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 bg-white'
             )}
           >
             <div className="flex items-center">
@@ -107,9 +96,8 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
                 onChange={() => {}}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 mr-3"
               />
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900 truncate">{topic.name}</h3>
-                <p className="text-xs text-gray-600 mt-1 line-clamp-2">{topic.description}</p>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-900">{topic.name}</h3>
               </div>
               <div
                 className={cn(
@@ -122,16 +110,16 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
         ))}
       </div>
 
-      <div className="flex justify-center space-x-3">
+      <div className="flex justify-center space-x-2 sm:space-x-3">
         <button
           onClick={() => setSelectedTopics(TOPICS.map(t => t.id))}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
           All
         </button>
         <button
           onClick={() => setSelectedTopics([])}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
           None
         </button>
@@ -139,7 +127,7 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
           onClick={handleStart}
           disabled={selectedTopics.length === 0}
           className={cn(
-            'px-6 py-2 rounded-lg font-semibold text-sm transition-all',
+            'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
             selectedTopics.length > 0
               ? 'bg-primary-600 text-white hover:bg-primary-700'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'

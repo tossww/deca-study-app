@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
-import { LoadingTip, QuickTip } from '@/components/LoadingTip'
 
 interface StudySessionMobileProps {
   topics: string[]
@@ -13,8 +12,6 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionMobileProps) {
-  const [showQuickTip, setShowQuickTip] = useState(false)
-  const [showQuitTip, setShowQuitTip] = useState(false)
 
   const {
     currentQuestion,
@@ -78,13 +75,15 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
     }
   }, [showExplanation, showGradeSelector, nextQuestion])
 
-  // Show quick tip on first load
-  if (showQuickTip && !isLoading) {
-    return <QuickTip duration={3000} onComplete={() => setShowQuickTip(false)} />
-  }
-
   if (isLoading) {
-    return <LoadingTip message="Loading questions..." category="strategy" />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading questions...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!currentQuestion) {
@@ -290,15 +289,6 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
         </div>
       )}
 
-      {showQuitTip && (
-        <QuickTip
-          duration={3000}
-          onComplete={() => {
-            setShowQuitTip(false)
-            confirmQuit()
-          }}
-        />
-      )}
     </div>
   )
 }

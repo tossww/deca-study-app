@@ -21,7 +21,7 @@ export const STUDY_TIPS: StudyTip[] = [
     id: 'keyboard-shortcuts',
     icon: '⌨️',
     title: 'Keyboard Shortcuts',
-    content: 'Press 1-4 or A-D to answer. Use Enter or Space to advance to the next question.',
+    content: 'Press 1-4 to answer. Use Enter or Space to advance to the next question.',
     category: 'keyboard'
   },
 

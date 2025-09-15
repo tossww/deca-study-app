@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
-import { LoadingTip, QuickTip } from '@/components/LoadingTip'
 
 interface StudySessionProps {
   topics: string[]
@@ -13,8 +12,6 @@ interface StudySessionProps {
 }
 
 export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) {
-  const [showQuickTip, setShowQuickTip] = useState(false)
-  const [showQuitTip, setShowQuitTip] = useState(false)
 
   const {
     currentQuestion,
@@ -70,13 +67,15 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [showExplanation, currentQuestion, handleAnswer, nextQuestion, submitAnswer])
 
-  // Show quick tip on first load
-  if (showQuickTip && !isLoading) {
-    return <QuickTip duration={3000} onComplete={() => setShowQuickTip(false)} />
-  }
-
   if (isLoading) {
-    return <LoadingTip message="Loading questions..." />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading questions...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!currentQuestion) {
@@ -268,15 +267,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
       )}
 
-      {showQuitTip && (
-        <QuickTip
-          duration={3000}
-          onComplete={() => {
-            setShowQuitTip(false)
-            confirmQuit()
-          }}
-        />
-      )}
     </div>
   )
 }

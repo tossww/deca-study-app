@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useStore } from '@/lib/store'
 import { calculateStreak } from '@/lib/utils'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { getRandomTip, StudyTip } from '@/lib/study-tips'
 
 interface DashboardProps {
   onStartStudy: () => void
@@ -12,7 +11,6 @@ interface DashboardProps {
 
 export function Dashboard({ onStartStudy }: DashboardProps) {
   const { user } = useStore()
-  const [currentTip, setCurrentTip] = useState<StudyTip | null>(null)
   const [stats, setStats] = useState({
     totalQuestions: 500,
     reviewedQuestions: 0,
@@ -35,12 +33,6 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
 
   useEffect(() => {
     loadStats()
-    // Set initial tip and rotate every 10 seconds
-    setCurrentTip(getRandomTip())
-    const tipInterval = setInterval(() => {
-      setCurrentTip(getRandomTip())
-    }, 10000)
-    return () => clearInterval(tipInterval)
   }, [])
 
   const loadStats = async () => {
@@ -262,19 +254,6 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
                 </div>
               )
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Daily Tip */}
-      {currentTip && (
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-6 border border-blue-100">
-          <div className="flex items-start">
-            <div className="text-3xl mr-4 flex-shrink-0">{currentTip.icon}</div>
-            <div className="flex-grow">
-              <h3 className="font-semibold text-gray-900 mb-1">{currentTip.title}</h3>
-              <p className="text-gray-600 text-sm">{currentTip.content}</p>
-            </div>
           </div>
         </div>
       )}
