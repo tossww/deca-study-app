@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useStore } from '@/lib/store'
 
@@ -70,11 +70,6 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
     <div className="p-4 sm:p-6">
       <div className="text-center mb-4">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Select Topics</h2>
-        {savedTopics && savedTopics.length > 0 && selectedTopics.length > 0 && (
-          <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block">
-            ✨ Restored previous selection
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-2 mb-4">
