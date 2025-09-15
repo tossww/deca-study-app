@@ -52,18 +52,18 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <header className={`bg-white shadow-sm border-b ${isInStudyMode ? 'hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
+          <div className="flex justify-between items-center py-3 sm:py-4 gap-2">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-base sm:text-lg">D</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">DECA</span>
+              <span className="text-lg sm:text-xl font-semibold text-gray-900">DECA</span>
             </div>
 
-            <nav className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-2 sm:space-x-4 md:space-x-6">
               <button
                 onClick={() => setCurrentView('dashboard')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-sm sm:text-base transition-colors ${
                   currentView === 'dashboard'
                     ? 'bg-primary-600 text-white'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -73,7 +73,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setCurrentView('study')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-sm sm:text-base transition-colors ${
                   currentView === 'study'
                     ? 'bg-primary-600 text-white'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
