@@ -106,14 +106,14 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-6 py-8">
-        <div className="bg-gray-50 rounded-lg p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 leading-relaxed">
+      <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
+        <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
@@ -157,7 +157,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
                   className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:border-gray-400 transition-colors"
                 >
-                  Adjust Grade
+                  Adjust
                 </button>
               </div>
             </div>
@@ -193,24 +193,24 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 </div>
               </div>
             )}
+
+            {showExplanation && (
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={nextQuestion}
+                  className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                >
+                  {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Continue →'}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {showExplanation && (
-          <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-900 mb-3">Explanation</h4>
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="font-semibold text-blue-900 mb-2">Explanation</h4>
             <p className="text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
-          </div>
-        )}
-
-        {showExplanation && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={nextQuestion}
-              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-lg"
-            >
-              {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Next Question (Enter)'}
-            </button>
           </div>
         )}
       </div>
