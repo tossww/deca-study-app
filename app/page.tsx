@@ -53,12 +53,15 @@ export default function Home() {
       <header className={`bg-white shadow-sm border-b ${isInStudyMode ? 'hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 sm:py-4 gap-2">
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className="flex items-center space-x-2 sm:space-x-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-base sm:text-lg">D</span>
               </div>
               <span className="text-lg sm:text-xl font-semibold text-gray-900">DECA</span>
-            </div>
+            </button>
 
             <nav className="flex items-center space-x-2 sm:space-x-4 md:space-x-6">
               <button
