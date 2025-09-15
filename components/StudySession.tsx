@@ -147,8 +147,8 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 <span className="text-gray-600 text-sm">
                   {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </span>
-                <span className="font-medium text-blue-600 text-sm">
-                  Suggested: {Quality[currentAnswerData.suggestedGrade]}
+                <span className="text-blue-600 text-sm">
+                  {Quality[currentAnswerData.suggestedGrade]}
                 </span>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
