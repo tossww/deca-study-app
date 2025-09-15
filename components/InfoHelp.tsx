@@ -7,7 +7,7 @@ export function InfoHelp() {
     <div className="space-y-6">
       {/* App Overview */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">🎯 DECA Study App</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">DECA Study App</h2>
         <p className="text-gray-700 leading-relaxed">
           This app uses scientifically-proven spaced repetition to help you master DECA exam questions efficiently.
           Instead of cramming, you&apos;ll review questions at optimal intervals to build long-term retention.
@@ -16,7 +16,7 @@ export function InfoHelp() {
 
       {/* Your Learning Journey */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">🚀 Your Learning Journey</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Your Learning Journey</h3>
 
         {/* Visual Progress Bar */}
         <div className="mb-8">
@@ -43,7 +43,7 @@ export function InfoHelp() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🆕</span>
+              <span className="text-2xl font-bold">NEW</span>
             </div>
             <h4 className="font-semibold text-gray-900">New</h4>
             <p className="text-xs text-gray-600 mt-1">Never seen before</p>
@@ -54,10 +54,10 @@ export function InfoHelp() {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">⚔️</span>
+              <span className="text-2xl">⚔</span>
             </div>
             <h4 className="font-semibold text-yellow-900">Apprentice</h4>
-            <p className="text-xs text-gray-600 mt-1">Building memory (< 3 reviews)</p>
+            <p className="text-xs text-gray-600 mt-1">Building memory (&lt; 3 reviews)</p>
             <div className="mt-2 bg-yellow-50 rounded px-2 py-1">
               <p className="text-xs font-medium text-yellow-700">Reviews: Minutes → Hours → Days</p>
             </div>
@@ -65,7 +65,7 @@ export function InfoHelp() {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🧙</span>
+              <span className="text-2xl">✦</span>
             </div>
             <h4 className="font-semibold text-blue-900">Guru</h4>
             <p className="text-xs text-gray-600 mt-1">3+ successful reviews, &lt;21 days</p>
@@ -76,7 +76,7 @@ export function InfoHelp() {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">👑</span>
+              <span className="text-2xl">♛</span>
             </div>
             <h4 className="font-semibold text-green-900">Master</h4>
             <p className="text-xs text-gray-600 mt-1">Long-term mastery (≥21 days)</p>
@@ -89,7 +89,7 @@ export function InfoHelp() {
         {/* How to Progress Box */}
         <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h5 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <span className="text-lg mr-2">📈</span>
+            <span className="text-lg mr-2">↗</span>
             Progression Path & Difficulty Impact
           </h5>
           <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside mb-3">
@@ -100,12 +100,12 @@ export function InfoHelp() {
           </ol>
 
           <div className="mt-3 pt-3 border-t border-gray-200">
-            <h6 className="font-medium text-gray-800 mb-2">⚡ Your Answer Speed Determines Difficulty:</h6>
+            <h6 className="font-medium text-gray-800 mb-2">Your Answer Speed Determines Difficulty:</h6>
             <ul className="text-xs text-gray-600 space-y-1">
               <li><span className="font-medium text-green-700">Easy (&lt;15s):</span> Advances 4× faster - confident recall means less frequent reviews</li>
               <li><span className="font-medium text-blue-700">Good (15-40s):</span> Normal 2.5× progression - standard spacing intervals</li>
               <li><span className="font-medium text-orange-700">Hard (40-120s):</span> Slower 1.2× progression - needs more practice</li>
-              <li><span className="font-medium text-red-700">Again (>120s or wrong):</span> Interval drops by 4× - review again soon</li>
+              <li><span className="font-medium text-red-700">Again (&gt;120s or wrong):</span> Interval drops by 4× - review again soon</li>
             </ul>
             <p className="text-xs text-gray-500 mt-2 italic">Example: A &quot;Good&quot; card at 1 day becomes 2.5 days, an &quot;Easy&quot; card jumps to 4 days!</p>
           </div>
@@ -114,7 +114,7 @@ export function InfoHelp() {
 
       {/* How Spaced Repetition Works */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">🧠 How Spaced Repetition Works</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">How Spaced Repetition Works</h3>
         <div className="space-y-4">
           <div className="border-l-4 border-blue-500 pl-4">
             <h4 className="font-semibold text-blue-900">The Science</h4>
@@ -136,7 +136,7 @@ export function InfoHelp() {
 
       {/* Study Tips */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">💡 Study Tips & Strategies</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Study Tips & Strategies</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {STUDY_TIPS.map((tip) => (
             <div key={tip.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
