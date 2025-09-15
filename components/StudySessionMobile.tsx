@@ -25,7 +25,6 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
     showGradeSelector,
     setShowGradeSelector,
     currentAnswerData,
-    gradeNotification,
     handleAnswer,
     submitAnswer,
     nextQuestion,
@@ -247,14 +246,6 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
             </div>
           </div>
 
-          {/* Grade Notification */}
-          {gradeNotification && (
-            <div className="fixed left-1/2 transform -translate-x-1/2 animate-fade-in-up z-30" style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}>
-              <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
-                {gradeNotification}
-              </span>
-            </div>
-          )}
         </>
       )}
 

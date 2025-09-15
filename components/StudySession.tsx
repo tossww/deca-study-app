@@ -25,7 +25,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
     showGradeSelector,
     setShowGradeSelector,
     currentAnswerData,
-    gradeNotification,
     handleAnswer,
     submitAnswer,
     nextQuestion,
@@ -206,13 +205,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                     Easy
                   </button>
                 </div>
-                {gradeNotification && (
-                  <div className="absolute -top-2 right-0 animate-fade-in-up">
-                    <span className="inline-block px-3 py-1 bg-primary-600 text-white text-sm rounded-full shadow-lg">
-                      {gradeNotification}
-                    </span>
-                  </div>
-                )}
               </div>
             )}
           </div>
