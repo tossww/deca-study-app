@@ -58,6 +58,8 @@
 4. ✅ **Test the changes thoroughly**
 5. ✅ Run lint/typecheck if available
 6. ✅ **NEVER ask user to test - always test yourself first**
+7. ✅ **ALWAYS commit and push changes to GitHub immediately**
+8. ✅ **Inform user that changes are pushed and ready to test**
 
 ### 4. File Organization
 
