@@ -62,7 +62,9 @@ export async function GET(request: Request) {
         learningStatus,
         masteryLevel,
         repetitions: progress?.repetitions || 0,
-        interval: progress?.interval || 0
+        interval: progress?.interval || 0,
+        timesCorrect: progress?.timesCorrect || 0,
+        timesAnswered: progress?.timesAnswered || 0
       }
     })
 

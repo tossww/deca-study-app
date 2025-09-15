@@ -124,6 +124,25 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
 
     const { answerIndex, isCorrect, responseTimeMs } = currentAnswerData
 
+    // Update score based on quality selection
+    // If user selects "Again", treat as incorrect; otherwise treat as correct
+    const treatAsCorrect = selectedGrade !== Quality.Again
+
+    // Adjust the score if grade changes the correctness
+    if (isCorrect && !treatAsCorrect) {
+      // Was correct, now treating as incorrect (user selected Again)
+      setSessionStats((prev) => ({
+        ...prev,
+        correct: prev.correct - 1,
+      }))
+    } else if (!isCorrect && treatAsCorrect) {
+      // Was incorrect, now treating as correct (user selected Hard/Good/Easy)
+      setSessionStats((prev) => ({
+        ...prev,
+        correct: prev.correct + 1,
+      }))
+    }
+
     try {
       const { sessionToken } = useStore.getState()
       await fetch('/api/questions/answer', {
@@ -135,7 +154,7 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
         body: JSON.stringify({
           questionId: questions[currentIndex].id,
           userAnswer: answerIndex,
-          isCorrect,
+          isCorrect: treatAsCorrect, // Use the adjusted correctness
           timeSpent: Math.floor(responseTimeMs / 1000),
           quality: selectedGrade,
         }),

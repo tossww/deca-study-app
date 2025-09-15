@@ -147,7 +147,12 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 <span className="text-gray-600 text-sm">
                   {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </span>
-                <span className="text-blue-600 text-sm">
+                <span className={cn("text-sm font-medium",
+                  currentAnswerData.suggestedGrade === Quality.Again ? "text-red-600" :
+                  currentAnswerData.suggestedGrade === Quality.Hard ? "text-orange-600" :
+                  currentAnswerData.suggestedGrade === Quality.Good ? "text-blue-600" :
+                  "text-green-600"
+                )}>
                   {Quality[currentAnswerData.suggestedGrade]}
                 </span>
                 <button
@@ -175,25 +180,25 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                     onClick={() => submitAnswer(Quality.Again)}
                     className="px-4 py-2 rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
                   >
-                    Again (A)
+                    Again
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Hard)}
                     className="px-4 py-2 rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
                   >
-                    Hard (H)
+                    Hard
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Good)}
-                    className="px-4 py-2 rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                    className="px-4 py-2 rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
                   >
-                    Good (G)
+                    Good
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Easy)}
-                    className="px-4 py-2 rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                    className="px-4 py-2 rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
                   >
-                    Easy (E)
+                    Easy
                   </button>
                 </div>
               </div>

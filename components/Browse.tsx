@@ -13,6 +13,8 @@ interface Question {
   masteryLevel?: number
   repetitions: number
   interval: number
+  timesCorrect: number
+  timesAnswered: number
 }
 
 export function Browse() {
@@ -151,6 +153,9 @@ export function Browse() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Score
+                </th>
                 {showAnswers && (
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Answer
@@ -179,6 +184,16 @@ export function Browse() {
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(question.learningStatus)}`}>
                       {question.learningStatus}
                     </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <span className="text-gray-900 font-medium">
+                      {question.timesCorrect}/{question.timesAnswered}
+                    </span>
+                    {question.timesAnswered > 0 && (
+                      <span className="ml-2 text-gray-500">
+                        ({Math.round((question.timesCorrect / question.timesAnswered) * 100)}%)
+                      </span>
+                    )}
                   </td>
                   {showAnswers && (
                     <td className="px-6 py-4 text-sm text-gray-900">
