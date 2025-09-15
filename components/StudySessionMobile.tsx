@@ -117,7 +117,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto pt-12 pb-16">
+      <div className="flex-1 overflow-y-auto pt-12 pb-24">
         <div className="px-3 py-2">
         {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
@@ -177,7 +177,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
         <>
           {/* Grade Selector Overlay */}
           {showGradeSelector && (
-            <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20">
+            <div className="fixed left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 12px)' }}>
               <div className="text-xs text-gray-500 mb-2">Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</div>
               <div className="grid grid-cols-4 gap-2">
                 <button
@@ -209,7 +209,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           )}
 
           {/* Main Bottom Bar */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
+          <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))', bottom: '12px' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <span className={cn(
@@ -247,7 +247,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
 
           {/* Grade Notification */}
           {gradeNotification && (
-            <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 animate-fade-in-up z-30">
+            <div className="fixed left-1/2 transform -translate-x-1/2 animate-fade-in-up z-30" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom) + 12px)' }}>
               <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
                 {gradeNotification}
               </span>
