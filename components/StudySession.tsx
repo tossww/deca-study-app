@@ -109,9 +109,21 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-6">
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
-            {currentQuestion.question}
-          </h2>
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
+                {currentQuestion.question}
+              </h2>
+            </div>
+            <div className="flex flex-col items-end text-xs text-gray-500 ml-4">
+              {currentQuestion.topic && (
+                <span className="mb-1">{currentQuestion.topic}</span>
+              )}
+              {currentQuestion.refId && (
+                <span>Ref: #{currentQuestion.refId}</span>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">

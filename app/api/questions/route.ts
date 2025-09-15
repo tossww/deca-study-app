@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
         options: [q.optionA, q.optionB, q.optionC, q.optionD],
         correctAnswer,
         explanation: q.explanation,
-        topic: q.topic.name
+        topic: q.topic.name,
+        refId: q.refId
       }
     })
 

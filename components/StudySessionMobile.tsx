@@ -118,9 +118,19 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       <div className="flex-1 flex flex-col px-4 py-3">
         {/* Question - Optimized for mobile */}
         <div className="bg-white rounded-lg p-5 mb-3 shadow-sm flex-shrink-0">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
-            {currentQuestion.question}
-          </h2>
+          <div className="flex items-start justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900 leading-relaxed flex-1">
+              {currentQuestion.question}
+            </h2>
+            <div className="flex flex-col items-end text-xs text-gray-500 ml-3 mt-1">
+              {currentQuestion.topic && (
+                <span className="mb-1">{currentQuestion.topic}</span>
+              )}
+              {currentQuestion.refId && (
+                <span>Ref: #{currentQuestion.refId}</span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Answer Options - Enhanced mobile touch targets */}

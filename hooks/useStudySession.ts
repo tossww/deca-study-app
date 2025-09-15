@@ -9,6 +9,8 @@ interface Question {
   options: string[]
   correctAnswer: number
   explanation: string
+  topic?: string
+  refId?: number | null
 }
 
 interface StudySessionProps {
