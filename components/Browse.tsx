@@ -144,9 +144,6 @@ export function Browse() {
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   ID
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ref ID
-                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Question
                 </th>
@@ -172,16 +169,20 @@ export function Browse() {
                   <td className="px-3 py-4 text-sm text-gray-900 font-medium">
                     {question.id}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-900 font-medium">
-                    {question.refId || '-'}
-                  </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="max-w-md">
                       {question.question}
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {question.topic}
+                  <td className="px-4 py-4 text-sm text-gray-900">
+                    <div className="leading-tight">
+                      {question.topic.split(' & ').map((part, index) => (
+                        <span key={index}>
+                          {part}
+                          {index < question.topic.split(' & ').length - 1 && <><br />& </>}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(question.learningStatus)}`}>
