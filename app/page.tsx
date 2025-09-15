@@ -23,6 +23,16 @@ export default function Home() {
     }
   }, [user])
 
+  // Scroll to top when view changes
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [currentView])
+
+  // Scroll to top on initial mount (page refresh)
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Determine if we're in active study mode (hide header for both mobile and desktop)
   const isInStudyMode = currentView === 'study' && selectedTopics.length > 0
 
