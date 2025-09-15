@@ -118,18 +118,11 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
 
       {/* Main Content Area - Optimized spacing */}
       <div className="flex-1 flex flex-col px-3 py-2">
-        {/* Question - Compact for mobile */}
+        {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed mb-2">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
-          {(currentQuestion.topic || currentQuestion.refId) && (
-            <div className="text-xs text-gray-400">
-              {currentQuestion.topic}
-              {currentQuestion.topic && currentQuestion.refId && ' • '}
-              {currentQuestion.refId && `#${currentQuestion.refId}`}
-            </div>
-          )}
         </div>
 
         {/* Answer Options - Enhanced mobile touch targets */}
@@ -160,41 +153,52 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           ))}
         </div>
 
-        {/* Feedback Section - Cleaner mobile design */}
+        {/* Feedback Section - Streamlined design */}
         {currentAnswerData && (
           <div className="space-y-3 mt-3">
-            {/* Result Card */}
-            <div className="bg-white rounded-lg p-4 shadow-sm">
+            {/* Compact Result Bar */}
+            <div className="bg-white rounded-lg px-4 py-3 shadow-sm">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <span className={cn("text-lg font-semibold", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
-                    {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                <div className="flex items-center space-x-3">
+                  <span className={cn(
+                    "text-lg font-semibold",
+                    currentAnswerData.isCorrect ? "text-green-600" : "text-red-600"
+                  )}>
+                    {currentAnswerData.isCorrect ? "✓" : "✗"}
                   </span>
-                  <div className="text-sm text-gray-500">
-                    <span>{(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
-                    <span className="mx-2">•</span>
-                    <span className={cn(
-                      "font-medium",
-                      currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
-                      currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
-                      currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
-                      currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
-                    )}>
-                      {Quality[currentAnswerData.suggestedGrade]}
-                    </span>
-                  </div>
+                  <span className={cn(
+                    "font-semibold",
+                    currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
+                    currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
+                    currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
+                    currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
+                  )}>
+                    {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
+                  </span>
+                  <button
+                    onClick={() => setShowGradeSelector(!showGradeSelector)}
+                    className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:border-gray-400 transition-colors"
+                  >
+                    Adjust
+                  </button>
                 </div>
-                <button
-                  onClick={() => setShowGradeSelector(!showGradeSelector)}
-                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
-                >
-                  Adjust
-                </button>
+                {showExplanation && (
+                  <button
+                    onClick={nextQuestion}
+                    className="px-4 py-1.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm shadow-sm active:scale-[0.98]"
+                  >
+                    {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
+                  </button>
+                )}
               </div>
 
-              {/* Grade Selector */}
+              {/* Grade Selector with Timer */}
               {showGradeSelector && (
                 <div className="border-t border-gray-200 pt-3 mt-3 relative">
+                  <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
+                    <span>Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
+                    <span>Override grade:</span>
+                  </div>
                   <div className="grid grid-cols-4 gap-2">
                     <button
                       onClick={() => submitAnswer(Quality.Again)}
@@ -232,21 +236,18 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
               )}
             </div>
 
-            {/* Next Button - More prominent */}
-            {showExplanation && (
-              <button
-                onClick={nextQuestion}
-                className="w-full px-6 py-3.5 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-md active:scale-[0.98]"
-              >
-                {currentIndex + 1 >= questions.length ? 'Finish' : 'Next Question →'}
-              </button>
-            )}
-
-            {/* Explanation - Below Next button */}
+            {/* Explanation with metadata */}
             {showExplanation && (
               <div className="bg-blue-50 rounded-lg p-3 shadow-sm">
                 <h4 className="font-semibold text-blue-900 mb-1.5 text-sm">Explanation</h4>
-                <p className="text-blue-800 text-sm leading-relaxed">{currentQuestion.explanation}</p>
+                <p className="text-blue-800 text-sm leading-relaxed mb-3">{currentQuestion.explanation}</p>
+                {(currentQuestion.topic || currentQuestion.refId) && (
+                  <div className="text-xs text-blue-600 border-t border-blue-200 pt-2">
+                    {currentQuestion.topic}
+                    {currentQuestion.topic && currentQuestion.refId && ' • '}
+                    {currentQuestion.refId && `Question #${currentQuestion.refId}`}
+                  </div>
+                )}
               </div>
             )}
           </div>

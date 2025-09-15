@@ -110,13 +110,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-6">
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          {(currentQuestion.topic || currentQuestion.refId) && (
-            <div className="text-xs text-gray-400 mb-2">
-              {currentQuestion.topic}
-              {currentQuestion.topic && currentQuestion.refId && ' • '}
-              {currentQuestion.refId && `#${currentQuestion.refId}`}
-            </div>
-          )}
           <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
@@ -153,10 +146,19 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
-                  {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                <span className={cn("font-medium text-lg", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
+                  {currentAnswerData.isCorrect ? "✓" : "✗"}
                 </span>
-                <span className="text-gray-600 text-sm">
+                <span className={cn(
+                  "font-semibold",
+                  currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
+                  currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
+                  currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
+                  currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
+                )}>
+                  {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
+                </span>
+                <span className="text-gray-600 text-sm hidden">
                   {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </span>
                 <span className={cn("text-sm font-medium",
@@ -229,6 +231,13 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h4 className="font-semibold text-blue-900 mb-2">Explanation</h4>
             <p className="text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+            {(currentQuestion.topic || currentQuestion.refId) && (
+              <div className="text-xs text-blue-600 border-t border-blue-200 mt-3 pt-3">
+                {currentQuestion.topic}
+                {currentQuestion.topic && currentQuestion.refId && ' • '}
+                {currentQuestion.refId && `Question #${currentQuestion.refId}`}
+              </div>
+            )}
           </div>
         )}
       </div>
