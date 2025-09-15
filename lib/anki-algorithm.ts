@@ -122,6 +122,7 @@ export class AnkiScheduler {
       card.state = CardState.LEARNING
       card.currentStep = 0
       card.interval = this.minutesToDays(this.config.learningSteps[0])
+      card.repetitions = 1  // Increment repetitions to show progress
       applied.push('entered_learning')
     } else {
       // Again - restart

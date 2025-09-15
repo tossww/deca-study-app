@@ -133,6 +133,12 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   const submitAnswer = useCallback(async (selectedGrade: Quality) => {
     if (!currentAnswerData) return
 
+    // Clear auto-grade timer immediately to prevent duplicate submissions
+    if (autoGradeTimer) {
+      clearTimeout(autoGradeTimer)
+      setAutoGradeTimer(null)
+    }
+
     const { answerIndex, isCorrect, responseTimeMs } = currentAnswerData
 
     // Update score based on quality selection
@@ -164,8 +170,6 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
         quality: selectedGrade,
       }
 
-      console.log('📤 Submitting answer:', payload)
-
       const response = await fetch('/api/questions/answer', {
         method: 'POST',
         headers: {
@@ -176,7 +180,6 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       })
 
       const result = await response.json()
-      console.log('📥 Answer response:', result)
 
       if (!response.ok) {
         throw new Error(`API error: ${result.error || 'Unknown error'}`)
@@ -184,19 +187,17 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     } catch (error) {
       console.error('Failed to save answer:', error)
       toast.error('Failed to save answer')
+      // Don't proceed to next question if save failed
+      return
     }
 
-    // Clear auto-grade timer and answer data
-    if (autoGradeTimer) {
-      clearTimeout(autoGradeTimer)
-      setAutoGradeTimer(null)
-    }
+    // Clear answer data
     setShowGradeSelector(false)
     setCurrentAnswerData(null)
 
-    // Proceed to next question immediately
+    // Proceed to next question after successful save
     nextQuestion()
-  }, [currentAnswerData, autoGradeTimer, questions, currentIndex])
+  }, [currentAnswerData, autoGradeTimer, questions, currentIndex, nextQuestion])
 
   const completeSession = useCallback(async () => {
     if (sessionId) {

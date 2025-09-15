@@ -44,18 +44,13 @@ function cardDataToUpdateData(card: CardData) {
 export async function POST(request: NextRequest) {
   try {
     const { questionId, userAnswer, isCorrect, timeSpent, quality } = await request.json()
-    
-    console.log(`📝 Answer submission: questionId=${questionId}, isCorrect=${isCorrect}`)
-    
+
     // Get user ID from session token
     const userId = await getUserFromRequest(request)
-    
+
     if (!userId) {
-      console.log('❌ Unauthorized request - no valid session token')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    console.log(`👤 User ID: ${userId}`)
 
     // Verify question exists
     const question = await prisma.question.findUnique({
@@ -63,7 +58,6 @@ export async function POST(request: NextRequest) {
     })
 
     if (!question) {
-      console.log(`❌ Question not found: ${questionId}`)
       return NextResponse.json({ error: 'Question not found' }, { status: 404 })
     }
 
@@ -79,7 +73,6 @@ export async function POST(request: NextRequest) {
 
     if (!questionStat) {
       // Create new question stat with Anki defaults
-      console.log(`➕ Creating new question stat for user ${userId}, question ${questionId}`)
 
       // Create initial card data for new card
       const initialCardData: CardData = {
@@ -102,12 +95,6 @@ export async function POST(request: NextRequest) {
       // Use Anki scheduler to process the answer (mutates initialCardData)
       const schedulingResult = ankiScheduler.schedule(initialCardData, quality as Quality, timeSpent)
 
-      console.log(`📊 After scheduling NEW card with quality ${quality}:`)
-      console.log(`   State: ${initialCardData.state}`)
-      console.log(`   Repetitions: ${initialCardData.repetitions}`)
-      console.log(`   Ease Factor: ${initialCardData.easeFactor}`)
-      console.log(`   Interval: ${initialCardData.interval}`)
-
       questionStat = await prisma.questionStat.create({
         data: {
           userId,
@@ -115,14 +102,8 @@ export async function POST(request: NextRequest) {
           ...cardDataToUpdateData(initialCardData),
         },
       })
-
-      console.log(`✅ Created question stat: ${questionStat.id} - State: ${schedulingResult.toState}`)
-      console.log(`   Saved repetitions: ${questionStat.repetitions}`)
-      console.log(`   Saved easeFactor: ${questionStat.easeFactor}`)
-      console.log(`   Saved interval: ${questionStat.interval}`)
     } else {
       // Update existing question stat using Anki algorithm
-      console.log(`🔄 Updating existing question stat: ${questionStat.id}`)
 
       // Convert to CardData format
       const cardData = questionStatToCardData(questionStat)
@@ -139,10 +120,6 @@ export async function POST(request: NextRequest) {
         },
         data: cardDataToUpdateData(cardData),
       })
-
-      console.log(`✅ Updated question stat - State: ${schedulingResult.fromState} → ${schedulingResult.toState}`)
-      console.log(`📊 Interval: ${schedulingResult.prevInterval}d → ${schedulingResult.nextInterval}d`)
-      console.log(`🎯 Applied: ${schedulingResult.details.applied.join(', ')}`)
     }
 
     return NextResponse.json({ 

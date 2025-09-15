@@ -49,21 +49,25 @@ export async function GET(request: NextRequest) {
     const reviewedQuestionIds = new Set(questionStats.map(stat => stat.questionId))
 
     // Process reviewed questions
-    console.log(`Processing ${questionStats.length} question stats for user ${userId}`)
     questionStats.forEach(stat => {
       const topicName = stat.question.topic.name
-      console.log(`Question ${stat.questionId}: reps=${stat.repetitions}, ease=${stat.easeFactor}, interval=${stat.interval}, state=${stat.state}`)
 
-      if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
-        // Master cards
+      // Use state as primary indicator, with repetitions/interval as secondary
+      if (stat.state === 'learning' || stat.state === 'relearning' ||
+          (stat.repetitions > 0 && stat.repetitions < 3)) {
+        // Apprentice: Learning cards or cards with 1-2 repetitions
+        masteryLevels.apprentice++
+        topicProgress[topicName].apprentice++
+      } else if (stat.state === 'review' && stat.interval >= 21) {
+        // Master: Review cards with 21+ day intervals
         masteryLevels.master++
         topicProgress[topicName].master++
-      } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3) {
-        // Guru cards
+      } else if (stat.state === 'review') {
+        // Guru: Review cards with < 21 day intervals
         masteryLevels.guru++
         topicProgress[topicName].guru++
       } else {
-        // Still apprentice (includes learning and relearning)
+        // Fallback to apprentice for any edge cases
         masteryLevels.apprentice++
         topicProgress[topicName].apprentice++
       }
