@@ -237,6 +237,9 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
     setSelectedAnswer(null)
     setShowExplanation(false)
     setQuestionStartTime(Date.now())
+
+    // Scroll to top for new question
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [autoGradeTimer, currentIndex, questions.length, completeSession, sessionStats, onComplete])
 
   const handleQuit = useCallback(() => {
