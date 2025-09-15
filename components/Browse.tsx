@@ -9,7 +9,7 @@ interface Question {
   question: string
   answer: string
   topic: string
-  learningStatus: 'new' | 'learning' | 'mature'
+  learningStatus: 'new' | 'apprentice' | 'guru' | 'master'
   masteryLevel?: number
   repetitions: number
   interval: number
@@ -50,10 +50,12 @@ export function Browse() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new':
-        return 'bg-blue-100 text-blue-800'
-      case 'learning':
+        return 'bg-gray-100 text-gray-800'
+      case 'apprentice':
         return 'bg-yellow-100 text-yellow-800'
-      case 'mature':
+      case 'guru':
+        return 'bg-blue-100 text-blue-800'
+      case 'master':
         return 'bg-green-100 text-green-800'
       default:
         return 'bg-gray-100 text-gray-800'
@@ -114,8 +116,9 @@ export function Browse() {
           >
             <option value="all">All Status</option>
             <option value="new">New</option>
-            <option value="learning">Learning</option>
-            <option value="mature">Mature</option>
+            <option value="apprentice">Apprentice</option>
+            <option value="guru">Guru</option>
+            <option value="master">Master</option>
           </select>
 
           <button

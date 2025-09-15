@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const questionsWithMastery = questions.map(q => {
       const progress = q.stats?.[0]
       let masteryLevel = 0
-      let learningStatus: 'new' | 'learning' | 'mature' = 'new'
+      let learningStatus: 'new' | 'apprentice' | 'guru' | 'master' = 'new'
 
       if (progress) {
         const totalAttempts = progress.timesAnswered
@@ -32,13 +32,15 @@ export async function GET(request: Request) {
           masteryLevel = Math.round((progress.timesCorrect / totalAttempts) * 100)
         }
 
-        // Determine learning status based on repetitions and interval
+        // Determine learning status based on repetitions, ease factor and interval
         if (progress.repetitions === 0) {
           learningStatus = 'new'
-        } else if (progress.interval < 21) {
-          learningStatus = 'learning'
+        } else if (progress.repetitions >= 3 && progress.easeFactor >= 2.3 && progress.interval >= 21) {
+          learningStatus = 'master'
+        } else if (progress.repetitions >= 3 && progress.easeFactor >= 2.3) {
+          learningStatus = 'guru'
         } else {
-          learningStatus = 'mature'
+          learningStatus = 'apprentice'
         }
       }
 

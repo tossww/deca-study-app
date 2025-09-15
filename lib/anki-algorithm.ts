@@ -183,7 +183,7 @@ export class AnkiScheduler {
     const oldInterval = card.interval
 
     if (quality === Quality.Again) {
-      // Failed - go to relearning
+      // Failed - reduce interval by 4x instead of full reset
       card.state = CardState.RELEARNING
       card.currentStep = 0
       card.lapses += 1
@@ -191,8 +191,9 @@ export class AnkiScheduler {
         this.config.minEaseFactor,
         card.easeFactor + this.config.againPenalty
       )
-      card.interval = this.minutesToDays(this.config.relearningSteps[0])
-      applied.push('failed_to_relearning', 'ease_penalty_again', 'lapse_recorded')
+      // Drop interval by 4x but minimum 1 day
+      card.interval = Math.max(1, card.interval / 4)
+      applied.push('failed_interval_reduced_4x', 'ease_penalty_again', 'lapse_recorded')
 
       // Check for leech
       if (card.lapses >= this.config.leechThreshold) {
@@ -243,10 +244,10 @@ export class AnkiScheduler {
     const steps = this.config.relearningSteps
 
     if (quality === Quality.Again) {
-      // Restart relearning
+      // Drop interval by 4x again
       card.currentStep = 0
-      card.interval = this.minutesToDays(steps[0])
-      applied.push('relearning_again_restart')
+      card.interval = Math.max(1, card.interval / 4)
+      applied.push('relearning_again_reduced_4x')
     } else if (quality === Quality.Easy) {
       // Graduate early
       card.state = CardState.REVIEW

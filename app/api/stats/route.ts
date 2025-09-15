@@ -30,10 +30,9 @@ export async function GET(request: NextRequest) {
     // Calculate mastery levels based on spaced repetition criteria
     const masteryLevels = {
       new: 0,        // Never seen (not in questionStats)
-      learning: 0,   // Seen but repetitions < 3 or ease factor < 2.3
-      young: 0,      // 3+ repetitions, ease factor >= 2.3, interval < 21 days
-      mature: 0,     // 3+ repetitions, ease factor >= 2.3, interval >= 21 days
-      relearning: 0, // Failed recently (needs review)
+      apprentice: 0, // Learning: Seen but repetitions < 3 or ease factor < 2.3 (includes relearning)
+      guru: 0,       // 3+ repetitions, ease factor >= 2.3, interval < 21 days
+      master: 0,     // 3+ repetitions, ease factor >= 2.3, interval >= 21 days
     }
 
     const topicProgress: { [key: string]: typeof masteryLevels } = {}
@@ -51,23 +50,19 @@ export async function GET(request: NextRequest) {
     // Process reviewed questions
     questionStats.forEach(stat => {
       const topicName = stat.question.topic.name
-      
-      if (stat.nextReview && stat.nextReview < now) {
-        // Needs review (overdue)
-        masteryLevels.relearning++
-        topicProgress[topicName].relearning++
-      } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
-        // Mature cards
-        masteryLevels.mature++
-        topicProgress[topicName].mature++
+
+      if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
+        // Master cards
+        masteryLevels.master++
+        topicProgress[topicName].master++
       } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3) {
-        // Young cards
-        masteryLevels.young++
-        topicProgress[topicName].young++
+        // Guru cards
+        masteryLevels.guru++
+        topicProgress[topicName].guru++
       } else {
-        // Still learning
-        masteryLevels.learning++
-        topicProgress[topicName].learning++
+        // Still apprentice (includes learning and relearning)
+        masteryLevels.apprentice++
+        topicProgress[topicName].apprentice++
       }
     })
 
@@ -90,8 +85,8 @@ export async function GET(request: NextRequest) {
     const totalReviewed = questionStats.length
     const progressPercentage = Math.round((totalReviewed / totalQuestions) * 100)
     
-    // Calculate mastery percentage (mature + young cards)
-    const masteredQuestions = masteryLevels.mature + masteryLevels.young
+    // Calculate mastery percentage (master + guru cards)
+    const masteredQuestions = masteryLevels.master + masteryLevels.guru
     const masteryPercentage = totalQuestions > 0 ? Math.round((masteredQuestions / totalQuestions) * 100) : 0
 
     // Get user's study sessions from the last 7 days for streak calculation

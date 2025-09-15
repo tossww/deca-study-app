@@ -42,9 +42,9 @@ export function InfoHelp() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-gray-600">First Time</span>
-            <span className="text-xs font-medium text-gray-600">Building Memory</span>
-            <span className="text-xs font-medium text-gray-600">Almost There</span>
-            <span className="text-xs font-medium text-gray-600">Mastered!</span>
+            <span className="text-xs font-medium text-gray-600">Apprentice</span>
+            <span className="text-xs font-medium text-gray-600">Guru</span>
+            <span className="text-xs font-medium text-gray-600">Master</span>
           </div>
           <div className="relative">
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -74,21 +74,21 @@ export function InfoHelp() {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">📚</span>
+              <span className="text-2xl">⚔️</span>
             </div>
-            <h4 className="font-semibold text-yellow-900">Learning</h4>
+            <h4 className="font-semibold text-yellow-900">Apprentice</h4>
             <p className="text-xs text-gray-600 mt-1">Building memory</p>
             <div className="mt-2 bg-yellow-50 rounded px-2 py-1">
-              <p className="text-xs font-medium text-yellow-700">Reviews: 1min → 10min → 1day</p>
+              <p className="text-xs font-medium text-yellow-700">Reviews: Minutes → Hours → Days</p>
             </div>
           </div>
 
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🔵</span>
+              <span className="text-2xl">🧙</span>
             </div>
-            <h4 className="font-semibold text-blue-900">Young</h4>
-            <p className="text-xs text-gray-600 mt-1">Recently learned (&lt;21 days)</p>
+            <h4 className="font-semibold text-blue-900">Guru</h4>
+            <p className="text-xs text-gray-600 mt-1">Solidifying knowledge (&lt;21 days)</p>
             <div className="mt-2 bg-blue-50 rounded px-2 py-1">
               <p className="text-xs font-medium text-blue-700">Reviews: Every few days</p>
             </div>
@@ -96,10 +96,10 @@ export function InfoHelp() {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">✅</span>
+              <span className="text-2xl">👑</span>
             </div>
-            <h4 className="font-semibold text-green-900">Mature</h4>
-            <p className="text-xs text-gray-600 mt-1">Long-term memory (≥21 days)</p>
+            <h4 className="font-semibold text-green-900">Master</h4>
+            <p className="text-xs text-gray-600 mt-1">Long-term mastery (≥21 days)</p>
             <div className="mt-2 bg-green-50 rounded px-2 py-1">
               <p className="text-xs font-medium text-green-700">Reviews: Weeks/months apart</p>
             </div>
@@ -113,11 +113,10 @@ export function InfoHelp() {
             How Questions Become Mature
           </h5>
           <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-            <li>Answer a new question correctly → Enters <span className="font-medium text-yellow-700">Learning</span> phase</li>
-            <li>Review it successfully at 1 minute, 10 minutes, then 1 day intervals</li>
-            <li>Graduate to <span className="font-medium text-blue-700">Young</span> status with longer intervals</li>
-            <li>After 21 days of successful reviews → Becomes <span className="font-medium text-green-700">Mature</span></li>
-            <li>If you fail a mature card → Goes to <span className="font-medium text-red-700">Relearning</span> (starts over)</li>
+            <li>Answer a new question correctly → Becomes <span className="font-medium text-yellow-700">Apprentice</span></li>
+            <li>Review it successfully multiple times → Graduates to <span className="font-medium text-blue-700">Guru</span></li>
+            <li>After 21 days of successful reviews → Achieves <span className="font-medium text-green-700">Master</span> status</li>
+            <li>If you fail any card → Interval drops by 4× (not full reset)</li>
           </ol>
 
           <div className="mt-4 pt-3 border-t border-gray-200">
@@ -126,7 +125,7 @@ export function InfoHelp() {
               <li><span className="font-medium text-green-700">Easy:</span> Advances faster - next review in 4× the current interval</li>
               <li><span className="font-medium text-blue-700">Good:</span> Normal progression - next review in 2.5× the current interval</li>
               <li><span className="font-medium text-orange-700">Hard:</span> Slower progression - next review in 1.2× the current interval</li>
-              <li><span className="font-medium text-red-700">Again:</span> Resets progress - starts learning phase over</li>
+              <li><span className="font-medium text-red-700">Again:</span> Drops interval by 4× - doesn't fully reset</li>
             </ul>
             <p className="text-xs text-gray-500 mt-2 italic">Example: A "Good" card at 1 day becomes 2.5 days, an "Easy" card jumps to 4 days!</p>
           </div>

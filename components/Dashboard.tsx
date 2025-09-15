@@ -20,10 +20,9 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
     masteryPercentage: 0,
     masteryLevels: {
       new: 500,
-      learning: 0,
-      young: 0,
-      mature: 0,
-      relearning: 0,
+      apprentice: 0,
+      guru: 0,
+      master: 0,
     },
     topicProgress: {} as any,
     correctAnswers: 0,
@@ -61,18 +60,16 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
 
   const masteryColors = {
     new: '#94a3b8',        // Gray - New
-    learning: '#f59e0b',    // Orange - Learning
-    young: '#3b82f6',      // Blue - Young
-    mature: '#10b981',     // Green - Mature
-    relearning: '#ef4444', // Red - Relearning
+    apprentice: '#f59e0b', // Orange - Apprentice
+    guru: '#3b82f6',       // Blue - Guru
+    master: '#10b981',     // Green - Master
   }
 
   const masteryLabels = {
     new: 'New',
-    learning: 'Learning',
-    young: 'Young',
-    mature: 'Mature', 
-    relearning: 'Relearning',
+    apprentice: 'Apprentice',
+    guru: 'Guru',
+    master: 'Master',
   }
 
   const masteryData = stats?.masteryLevels ? Object.entries(stats.masteryLevels).map(([key, value]) => ({
@@ -120,7 +117,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
             <div>
               <p className="text-gray-600 text-sm">Mastery Level</p>
               <p className="text-3xl font-bold text-green-600">{stats?.masteryPercentage || 0}%</p>
-              <p className="text-sm text-gray-500">mature + young</p>
+              <p className="text-sm text-gray-500">master + guru</p>
             </div>
             <div className="text-4xl">🎯</div>
           </div>
@@ -234,9 +231,9 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(stats.topicProgress).map(([topicName, progress]: [string, any]) => {
               const total = Object.values(progress).reduce((sum: number, val: any) => sum + val, 0)
-              const mastered = progress.mature + progress.young
+              const mastered = (progress.master || 0) + (progress.guru || 0)
               const masteryPercent = total > 0 ? Math.round((mastered / total) * 100) : 0
-              
+
               return (
                 <div key={topicName} className="border rounded-lg p-4">
                   <h4 className="font-semibold text-gray-900 mb-2 text-sm">{topicName}</h4>
@@ -247,15 +244,19 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">New:</span>
-                      <span>{progress.new}</span>
+                      <span>{progress.new || 0}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-orange-500">Learning:</span>
-                      <span>{progress.learning}</span>
+                      <span className="text-orange-500">Apprentice:</span>
+                      <span>{progress.apprentice || 0}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-500">Mature:</span>
-                      <span>{progress.mature}</span>
+                      <span className="text-blue-500">Guru:</span>
+                      <span>{progress.guru || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-green-500">Master:</span>
+                      <span>{progress.master || 0}</span>
                     </div>
                   </div>
                 </div>
