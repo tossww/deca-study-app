@@ -160,94 +160,90 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           ))}
         </div>
 
-        {/* Feedback Section - Compact mobile design */}
+        {/* Feedback Section - Cleaner mobile design */}
         {currentAnswerData && (
-          <div className="bg-white rounded-lg p-3 mt-3 shadow-sm flex-shrink-0">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-3 text-sm">
-                <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
-                  {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
-                </span>
-                <span className="text-gray-600">
-                  {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
-                </span>
-                <span className="text-gray-600">
-                  {sessionStats.correct}/{sessionStats.total}
-                </span>
-                <span className="font-medium text-blue-600">
-                  {Quality[currentAnswerData.suggestedGrade]}
-                </span>
+          <div className="space-y-3 mt-3">
+            {/* Result Card */}
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <span className={cn("text-lg font-semibold", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
+                    {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                  </span>
+                  <div className="text-sm text-gray-500">
+                    <span>{(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
+                    <span className="mx-2">•</span>
+                    <span className="font-medium">{Quality[currentAnswerData.suggestedGrade]}</span>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
-                  className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:border-gray-400 transition-colors"
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
                 >
                   Adjust
                 </button>
               </div>
+
+              {/* Grade Selector */}
+              {showGradeSelector && (
+                <div className="border-t border-gray-200 pt-3 mt-3 relative">
+                  <div className="grid grid-cols-4 gap-2">
+                    <button
+                      onClick={() => submitAnswer(Quality.Again)}
+                      className="px-2 py-2 text-sm rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                    >
+                      Again
+                    </button>
+                    <button
+                      onClick={() => submitAnswer(Quality.Hard)}
+                      className="px-2 py-2 text-sm rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                    >
+                      Hard
+                    </button>
+                    <button
+                      onClick={() => submitAnswer(Quality.Good)}
+                      className="px-2 py-2 text-sm rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                    >
+                      Good
+                    </button>
+                    <button
+                      onClick={() => submitAnswer(Quality.Easy)}
+                      className="px-2 py-2 text-sm rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                    >
+                      Easy
+                    </button>
+                  </div>
+                  {gradeNotification && (
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 animate-fade-in-up">
+                      <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
+                        {gradeNotification}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Grade Selector */}
-            {showGradeSelector && (
-              <div className="border-t border-gray-200 pt-3 mt-3 relative">
-                <p className="text-xs text-gray-600 mb-3">Override grade:</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => submitAnswer(Quality.Again)}
-                    className="px-3 py-2 text-sm rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors min-h-[44px]"
-                  >
-                    Again
-                  </button>
-                  <button
-                    onClick={() => submitAnswer(Quality.Hard)}
-                    className="px-3 py-2 text-sm rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors min-h-[44px]"
-                  >
-                    Hard
-                  </button>
-                  <button
-                    onClick={() => submitAnswer(Quality.Good)}
-                    className="px-3 py-2 text-sm rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors min-h-[44px]"
-                  >
-                    Good
-                  </button>
-                  <button
-                    onClick={() => submitAnswer(Quality.Easy)}
-                    className="px-3 py-2 text-sm rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors min-h-[44px]"
-                  >
-                    Easy
-                  </button>
-                </div>
-                {gradeNotification && (
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 animate-fade-in-up">
-                    <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs rounded-full shadow-lg whitespace-nowrap">
-                      {gradeNotification}
-                    </span>
-                  </div>
-                )}
-              </div>
+            {/* Next Button - Above explanation */}
+            {showExplanation && (
+              <button
+                onClick={nextQuestion}
+                className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-sm active:scale-[0.98]"
+              >
+                {currentIndex + 1 >= questions.length ? 'Finish' : 'Next Question →'}
+              </button>
             )}
           </div>
         )}
 
-        {/* Explanation - Compact for mobile */}
+        {/* Explanation - Clean design */}
         {showExplanation && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3 shadow-sm flex-shrink-0">
+          <div className="bg-blue-50 rounded-lg p-4 shadow-sm flex-shrink-0">
             <h4 className="font-semibold text-blue-900 mb-2 text-sm">Explanation</h4>
             <p className="text-blue-800 text-sm leading-relaxed">{currentQuestion.explanation}</p>
           </div>
         )}
       </div>
-
-      {/* Bottom Action Bar - Enhanced for mobile */}
-      {showExplanation && (
-        <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0 safe-area-bottom">
-          <button
-            onClick={nextQuestion}
-            className="w-full px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-lg min-h-[52px] touch-manipulation active:scale-95"
-          >
-            {currentIndex + 1 >= questions.length ? 'Finish' : 'Next →'}
-          </button>
-        </div>
-      )}
 
       {/* Quit Confirmation Modal */}
       {showQuitModal && (
