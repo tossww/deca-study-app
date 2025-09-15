@@ -84,7 +84,10 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
             onClick={onStartStudy}
             className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
           >
-            {(stats?.dueForReview || 0) > 0 ? `Review ${stats?.dueForReview || 0} Cards` : 'Start Study Session'}
+            Start Study Session
+            {(stats?.dueForReview || 0) > 0 && (
+              <span className="ml-2 text-sm opacity-90">({stats?.dueForReview} due)</span>
+            )}
           </button>
           
           <div className="text-right">
