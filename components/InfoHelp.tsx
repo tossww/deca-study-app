@@ -105,7 +105,7 @@ export function InfoHelp() {
               <li><span className="font-medium text-green-700">Easy (&lt;15s):</span> Advances 4× faster - confident recall means less frequent reviews</li>
               <li><span className="font-medium text-blue-700">Good (15-40s):</span> Normal 2.5× progression - standard spacing intervals</li>
               <li><span className="font-medium text-orange-700">Hard (40-120s):</span> Slower 1.2× progression - needs more practice</li>
-              <li><span className="font-medium text-red-700">Again (&gt;120s or wrong):</span> Interval drops by 4× - review again soon</li>
+              <li><span className="font-medium text-red-700">Incorrect (&gt;120s or wrong):</span> Interval drops by 4× - review again soon</li>
             </ul>
             <p className="text-xs text-gray-500 mt-2 italic">Example: A &quot;Good&quot; card at 1 day becomes 2.5 days, an &quot;Easy&quot; card jumps to 4 days!</p>
           </div>

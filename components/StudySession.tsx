@@ -52,7 +52,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         }
 
         // Grade override shortcuts
-        if (e.key === 'a' || e.key === 'A') {
+        if (e.key === 'i' || e.key === 'I') {
           submitAnswer(Quality.Again)
         } else if (e.key === 'h' || e.key === 'H') {
           submitAnswer(Quality.Hard)
@@ -194,7 +194,7 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                     onClick={() => submitAnswer(Quality.Again)}
                     className="px-4 py-2 rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
                   >
-                    Again
+                    Incorrect
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Hard)}

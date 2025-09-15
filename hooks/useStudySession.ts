@@ -176,7 +176,7 @@ export function useStudySession({ topics, onComplete, onQuit }: StudySessionProp
 
     // Show notification
     const gradeLabels = {
-      [Quality.Again]: 'Again',
+      [Quality.Again]: 'Incorrect',
       [Quality.Hard]: 'Hard',
       [Quality.Good]: 'Good',
       [Quality.Easy]: 'Easy'
