@@ -1,6 +1,7 @@
 # Mobile Study App Design Specification
 
 ## Overview
+This document is part of the centralized docs effort. See `../PRD.md` and `../../VERCEL_DEPLOYMENT.md` for related specs.
 This document outlines the mobile-friendly version design for the DECA Study App, based on 2024 mobile UX best practices and research into thumb zones, touch targets, and mobile navigation patterns.
 
 ## Research Summary

@@ -87,5 +87,3 @@ For local development, you can still use SQLite:
 ## Environment Switching
 
 The app is configured to work with both SQLite (local) and PostgreSQL (production). Adjust the schema and environment variables based on your deployment target.
-
-Note: This guide will be relocated to `docs/DEPLOYMENT.md` as part of documentation consolidation.

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     })
     console.log('✅ Session created successfully')
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -65,6 +65,17 @@ export async function POST(request: NextRequest) {
       },
       token,
     })
+
+    // Set HttpOnly session cookie for convenience and security
+    response.cookies.set('session-token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      expires: expiresAt,
+    })
+
+    return response
   } catch (error) {
     console.error('❌ Login error:', error)
     return NextResponse.json({

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { calculateNextReview, Quality, AnkiScheduler, CardState, CardData } from '@/lib/spaced-repetition'
 import { getUserFromRequest } from '@/lib/auth'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 const ankiScheduler = new AnkiScheduler()
 
 // Helper function to convert database record to CardData

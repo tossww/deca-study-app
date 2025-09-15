@@ -219,7 +219,8 @@ To eliminate cramming and improve long-term retention of DECA exam material thro
 - **Frontend**: Next.js 14 with React 18, TypeScript
 - **Styling**: Tailwind CSS with custom design system
 - **State Management**: Zustand with localStorage persistence
-- **Database**: SQLite with Prisma ORM
+- **Database (local/dev)**: SQLite previously, now Postgres parity via Prisma ORM
+- **Database (prod)**: PostgreSQL (Vercel Postgres / managed Postgres)
 - **Charts**: Recharts for data visualization
 - **UI Components**: Custom components with shadcn/ui inspiration
 
@@ -243,8 +244,8 @@ To eliminate cramming and improve long-term retention of DECA exam material thro
 ### 4.3 Key APIs
 
 #### 4.3.1 Authentication
-- `POST /api/auth/login`: User login/registration
-- Session token validation middleware
+- `POST /api/auth/login`: User login/registration, sets HttpOnly `session-token` cookie
+- Session token validation via database-backed sessions
 
 #### 4.3.2 Questions
 - `GET /api/questions`: Retrieve questions for study session
@@ -385,6 +386,6 @@ The current implementation provides a solid foundation with core study functiona
 
 ---
 
-*Last Updated: September 14, 2025*
+*Last Updated: September 15, 2025*
 *Version: 1.0*
 *Status: MVP Completed*

@@ -1,6 +1,6 @@
 # DECA Study App - TODO List
 
-## 🎯 **Current Status Summary (January 2025)**
+## 🎯 **Current Status Summary (September 2025)**
 ✅ **COMPLETED MAJOR FEATURES:**
 - **Full Anki Algorithm** - Complete spaced repetition system with learning states
 - **Mobile-First Experience** - Separate touch-optimized mobile components
@@ -9,7 +9,6 @@
 
 🔄 **HIGH-PRIORITY REMAINING:**
 - **PWA Implementation** - Service worker, offline mode, mobile app installation
-- **Database Schema Verification** - Ensure all Anki fields are properly migrated
 - **Enhanced Gestures** - Left swipe, long-press interactions
 
 ## Quick Wins (1-2 hours each)
@@ -36,7 +35,7 @@
 - [x] **Add Time-Based Answer Grading** - ✅ Suggest Easy/Good/Hard based on response time (10/20/40/120 second thresholds)
 - [x] **Learning Steps System** - ✅ Configurable short-term steps before cards become mature
 - [x] **Enhanced Answer Processing** - ✅ Specific ease factor adjustments per answer type (-20pp, -15pp, +15pp)
-- [ ] **Database Schema Updates** - Verify all state, currentStep, lapses fields are properly migrated
+- [x] **Database Schema Updates** - Verified fields: `state`, `currentStep`, `lapses`, `lastReviewDate`
 
 *See ANKI_ALGORITHM_PROPOSAL.md for detailed specifications*
 
@@ -101,3 +100,30 @@
 - **Mobile-first design** - Research-backed UX principles (49% one-handed usage, Material Design touch targets)
 - **Modern architecture** - Shared hooks, responsive detection, supports PWA/offline features
 - **Individual card tracking** - Each question has its own learning state and review schedule
+
+## Phased Implementation Plan
+
+### Phase 1 – Immediate hygiene (DONE)
+- [x] Standardize Prisma usage via `lib/prisma` in all API routes
+- [x] Set HttpOnly `session-token` cookie in auth login route
+- [x] Update PRD and TODO dates/status to September 2025
+- [x] Create `docs/DEPLOYMENT.md` (note: original deployment guide will be consolidated under docs)
+
+### Phase 2 – Docs consolidation
+- [ ] Move product docs to `/docs/` and link from README
+- [ ] Create `rules/README.md` and archive detailed doctrine files
+- [ ] Move UI/UX and cleanup proposals into `/docs`
+
+### Phase 3 – Algorithm module consolidation and performance
+- [ ] Create `lib/anki/index.ts` and update imports
+- [ ] Deprecate or re-export from `lib/spaced-repetition.ts`
+- [ ] Optimize `app/api/stats/route.ts` with batched aggregations
+
+### Phase 4 – Technical cleanup
+- [ ] Remove unused deps after confirming usage (`pdfjs-dist`, `bcryptjs`, `@vercel/postgres`, `date-fns`, `puppeteer`)
+- [ ] Remove `canvas`/`encoding` webpack aliases if unneeded
+- [ ] Add/update `.env.example` and deployment docs
+
+### Phase 5 – Enhancements
+- [ ] Add basic rate limiting to auth/answer routes
+- [ ] Add "due selection" endpoint using scheduler
