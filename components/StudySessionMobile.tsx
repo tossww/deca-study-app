@@ -117,23 +117,23 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       </div>
 
       {/* Main Content Area - Optimized spacing */}
-      <div className="flex-1 flex flex-col px-4 py-3">
-        {/* Question - Optimized for mobile */}
-        <div className="bg-white rounded-lg p-5 mb-3 shadow-sm flex-shrink-0">
+      <div className="flex-1 flex flex-col px-3 py-2">
+        {/* Question - Compact for mobile */}
+        <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed mb-2">
+            {currentQuestion.question}
+          </h2>
           {(currentQuestion.topic || currentQuestion.refId) && (
-            <div className="text-xs text-gray-400 mb-3">
+            <div className="text-xs text-gray-400">
               {currentQuestion.topic}
               {currentQuestion.topic && currentQuestion.refId && ' • '}
               {currentQuestion.refId && `#${currentQuestion.refId}`}
             </div>
           )}
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
-            {currentQuestion.question}
-          </h2>
         </div>
 
         {/* Answer Options - Enhanced mobile touch targets */}
-        <div className="space-y-2 flex-1">
+        <div className="space-y-2 mb-3">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
@@ -173,7 +173,15 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
                   <div className="text-sm text-gray-500">
                     <span>{(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
                     <span className="mx-2">•</span>
-                    <span className="font-medium">{Quality[currentAnswerData.suggestedGrade]}</span>
+                    <span className={cn(
+                      "font-medium",
+                      currentAnswerData.suggestedGrade === Quality.Easy && "text-green-600",
+                      currentAnswerData.suggestedGrade === Quality.Good && "text-blue-600",
+                      currentAnswerData.suggestedGrade === Quality.Hard && "text-orange-600",
+                      currentAnswerData.suggestedGrade === Quality.Again && "text-red-600"
+                    )}>
+                      {Quality[currentAnswerData.suggestedGrade]}
+                    </span>
                   </div>
                 </div>
                 <button
@@ -224,23 +232,23 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
               )}
             </div>
 
-            {/* Next Button - Above explanation */}
+            {/* Next Button - More prominent */}
             {showExplanation && (
               <button
                 onClick={nextQuestion}
-                className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-sm active:scale-[0.98]"
+                className="w-full px-6 py-3.5 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-base shadow-md active:scale-[0.98]"
               >
                 {currentIndex + 1 >= questions.length ? 'Finish' : 'Next Question →'}
               </button>
             )}
-          </div>
-        )}
 
-        {/* Explanation - Clean design */}
-        {showExplanation && (
-          <div className="bg-blue-50 rounded-lg p-4 shadow-sm flex-shrink-0">
-            <h4 className="font-semibold text-blue-900 mb-2 text-sm">Explanation</h4>
-            <p className="text-blue-800 text-sm leading-relaxed">{currentQuestion.explanation}</p>
+            {/* Explanation - Below Next button */}
+            {showExplanation && (
+              <div className="bg-blue-50 rounded-lg p-3 shadow-sm">
+                <h4 className="font-semibold text-blue-900 mb-1.5 text-sm">Explanation</h4>
+                <p className="text-blue-800 text-sm leading-relaxed">{currentQuestion.explanation}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
