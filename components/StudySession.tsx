@@ -141,25 +141,33 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
         </div>
 
         {currentAnswerData && (
-          <div className="mt-6 p-4 bg-white rounded-lg border border-gray-200">
-            <div className="flex items-center justify-between mb-3">
+          <div className="mt-6 p-3 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <span className={cn("font-medium", currentAnswerData.isCorrect ? "text-green-600" : "text-red-600")}>
                   {currentAnswerData.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                 </span>
-                <span className="text-gray-600">
+                <span className="text-gray-600 text-sm">
                   {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </span>
-                <span className="font-medium text-blue-600">
+                <span className="font-medium text-blue-600 text-sm">
                   Suggested: {Quality[currentAnswerData.suggestedGrade]}
                 </span>
                 <button
                   onClick={() => setShowGradeSelector(!showGradeSelector)}
-                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:border-gray-400 transition-colors"
+                  className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:border-gray-400 transition-colors"
                 >
                   Adjust
                 </button>
               </div>
+              {showExplanation && (
+                <button
+                  onClick={nextQuestion}
+                  className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                >
+                  {currentIndex + 1 >= questions.length ? 'Finish' : 'Continue →'}
+                </button>
+              )}
             </div>
 
             {showGradeSelector && (
@@ -191,17 +199,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                     Easy (E)
                   </button>
                 </div>
-              </div>
-            )}
-
-            {showExplanation && (
-              <div className="flex justify-end mt-4">
-                <button
-                  onClick={nextQuestion}
-                  className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-                >
-                  {currentIndex + 1 >= questions.length ? 'Finish Session' : 'Continue →'}
-                </button>
               </div>
             )}
           </div>
