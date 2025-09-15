@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         lastReviewDate: null,
       }
 
-      // Use Anki scheduler to process the answer
+      // Use Anki scheduler to process the answer (mutates initialCardData)
       const schedulingResult = ankiScheduler.schedule(initialCardData, quality as Quality, timeSpent)
 
       questionStat = await prisma.questionStat.create({
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       // Convert to CardData format
       const cardData = questionStatToCardData(questionStat)
 
-      // Use Anki scheduler to process the answer
+      // Use Anki scheduler to process the answer (mutates cardData)
       const schedulingResult = ankiScheduler.schedule(cardData, quality as Quality, timeSpent)
 
       questionStat = await prisma.questionStat.update({
