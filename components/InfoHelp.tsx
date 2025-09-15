@@ -125,9 +125,9 @@ export function InfoHelp() {
               <li><span className="font-medium text-green-700">Easy:</span> Advances faster - next review in 4× the current interval</li>
               <li><span className="font-medium text-blue-700">Good:</span> Normal progression - next review in 2.5× the current interval</li>
               <li><span className="font-medium text-orange-700">Hard:</span> Slower progression - next review in 1.2× the current interval</li>
-              <li><span className="font-medium text-red-700">Again:</span> Drops interval by 4× - doesn't fully reset</li>
+              <li><span className="font-medium text-red-700">Again:</span> Drops interval by 4× - doesn&apos;t fully reset</li>
             </ul>
-            <p className="text-xs text-gray-500 mt-2 italic">Example: A "Good" card at 1 day becomes 2.5 days, an "Easy" card jumps to 4 days!</p>
+            <p className="text-xs text-gray-500 mt-2 italic">Example: A &quot;Good&quot; card at 1 day becomes 2.5 days, an &quot;Easy&quot; card jumps to 4 days!</p>
           </div>
         </div>
       </div>
