@@ -154,6 +154,7 @@ export function Dashboard({ onStartStudy }: DashboardProps) {
                     cy="50%"
                     outerRadius={80}
                     label={({ name, value }) => `${name}: ${value}`}
+                    stroke="none"
                   >
                     {masteryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
