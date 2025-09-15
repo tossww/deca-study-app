@@ -177,9 +177,8 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
 
             {showGradeSelector && (
               <div className="border-t border-gray-200 pt-3 mt-3 relative">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm text-gray-600">Override suggested grade:</p>
-                  <span className="text-sm text-gray-500">Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
+                <div className="text-sm text-gray-500 mb-3">
+                  Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
                 </div>
                 <div className="grid grid-cols-4 gap-3">
                   <button
