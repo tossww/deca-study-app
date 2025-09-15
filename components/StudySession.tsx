@@ -158,9 +158,6 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
                 )}>
                   {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
                 </span>
-                <span className="text-gray-600 text-sm hidden">
-                  {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s
-                </span>
                 <span className={cn("text-sm font-medium",
                   currentAnswerData.suggestedGrade === Quality.Again ? "text-red-600" :
                   currentAnswerData.suggestedGrade === Quality.Hard ? "text-orange-600" :
@@ -188,29 +185,32 @@ export function StudySession({ topics, onComplete, onQuit }: StudySessionProps) 
 
             {showGradeSelector && (
               <div className="border-t border-gray-200 pt-3 mt-3 relative">
-                <p className="text-sm text-gray-600 mb-3">Override suggested grade:</p>
-                <div className="flex space-x-3">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-gray-600">Override suggested grade:</p>
+                  <span className="text-sm text-gray-500">Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</span>
+                </div>
+                <div className="grid grid-cols-4 gap-3">
                   <button
                     onClick={() => submitAnswer(Quality.Again)}
-                    className="px-4 py-2 rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                    className="px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors font-medium"
                   >
                     Incorrect
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Hard)}
-                    className="px-4 py-2 rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                    className="px-3 py-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors font-medium"
                   >
                     Hard
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Good)}
-                    className="px-4 py-2 rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                    className="px-3 py-2 rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors font-medium"
                   >
                     Good
                   </button>
                   <button
                     onClick={() => submitAnswer(Quality.Easy)}
-                    className="px-4 py-2 rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                    className="px-3 py-2 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors font-medium"
                   >
                     Easy
                   </button>

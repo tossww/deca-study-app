@@ -175,6 +175,9 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
       {/* Fixed Bottom Navigation Bar */}
       {currentAnswerData && (
         <>
+          {/* Background overlay to prevent bleed-through */}
+          <div className="fixed left-0 right-0 bg-white z-5" style={{ height: '100px', bottom: '0' }}></div>
+
           {/* Grade Selector Overlay */}
           {showGradeSelector && (
             <div className="fixed left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 12px)' }}>
@@ -209,7 +212,7 @@ export function StudySessionMobile({ topics, onComplete, onQuit }: StudySessionM
           )}
 
           {/* Main Bottom Bar */}
-          <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))', bottom: '12px' }}>
+          <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))', bottom: '12px' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <span className={cn(
