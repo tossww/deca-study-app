@@ -6,6 +6,7 @@ import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
 import { useStore } from '@/lib/store'
 import { AnimatedMasteryIndicator } from './AnimatedMasteryIndicator'
+import { SessionSummary } from './SessionSummary'
 
 interface StudySessionProps {
   topics: string[]
@@ -19,6 +20,7 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
   const { cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
+  const [showSummary, setShowSummary] = useState(false)
 
   const fetchMasteryData = async () => {
     if (!currentQuestion) return
@@ -48,6 +50,8 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
     selectedAnswer,
     showExplanation,
     sessionStats,
+    masteryChanges,
+    showSessionSummary,
     showQuitModal,
     setShowQuitModal,
     showGradeSelector,
@@ -462,6 +466,14 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
             </div>
           </div>
         </div>
+      )}
+
+      {showSessionSummary && (
+        <SessionSummary
+          stats={sessionStats}
+          masteryChanges={masteryChanges}
+          onContinue={onComplete}
+        />
       )}
 
     </div>

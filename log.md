@@ -482,3 +482,70 @@ Implementing 4-phase approach per TODO:
 ✅ Version bumped to 1.1 with updated date
 
 *Documentation workflow improved to ensure TODO.md is always maintained*
+
+---
+
+## Session: Mastery System Analysis & Planning - September 16, 2025
+
+### Issue Analysis
+**Problem**: Users can't clearly understand when they've truly mastered a question. The current "review" state doesn't communicate mastery level, and users don't know when content is in their long-term memory.
+
+**Key Questions Addressed**:
+1. Why do we need so many variables in the spaced repetition system?
+2. When can a user know that a question is in long-term memory?
+3. How can we simplify the system while maintaining functionality?
+
+### Research & Analysis
+1. ✅ **Analyzed current variable system** - Identified 11 variables with redundancy
+2. ✅ **Researched other tools** - Compared with Anki, SuperMemo, and simpler systems
+3. ✅ **Identified simplification opportunities** - Can reduce from 11 to 8 variables
+4. ✅ **Analyzed mastery criteria** - Current system has good logic but poor communication
+
+### Key Findings
+**Variable Redundancy**:
+- `timesAnswered` vs `repetitions` - Can derive from session history
+- `lastAnswered` vs `lastReviewDate` - Complete duplicates
+- `timesCorrect` - Only used for stats, can be calculated
+
+**Mastery Communication Issues**:
+- "Review" state doesn't indicate mastery level
+- "Guru" and "Master" statuses buried in UI
+- No clear progression from learning to mastery
+- Users don't understand when content is truly mastered
+
+**Current Mastery Criteria** (Good logic, poor communication):
+- **New**: Never attempted
+- **Apprentice**: Learning/relearning OR repetitions < 3
+- **Guru**: 3+ repetitions, ease factor ≥ 2.3, interval < 21 days
+- **Master**: 3+ repetitions, ease factor ≥ 2.3, interval ≥ 21 days
+
+### Solution Design
+**Enhanced Mastery System**:
+1. **Clear State Display**: New → Learning → Guru → Master
+2. **Visual Indicators**: Colors, icons, progress bars
+3. **User Feedback**: Celebration messages for achievements
+4. **Next Review Info**: Clear timing for when questions appear again
+
+**Simplified Variables** (Keep 4 states, reduce redundancy):
+- Keep: `interval`, `easeFactor`, `repetitions`, `state`, `currentStep`, `nextReview`, `lastReviewDate`, `lapses`
+- Remove: `timesAnswered`, `timesCorrect`, `lastAnswered`
+
+### Documentation Created
+1. **Mastery System Improvements Document**: `docs/MASTERY_SYSTEM_IMPROVEMENTS.md`
+   - Comprehensive analysis of current system
+   - Detailed improvement proposals
+   - Implementation plan with 4 phases
+   - Success criteria and examples
+
+2. **TODO.md Updated**: Added planned mastery system improvements section
+   - References the detailed document
+   - Outlines key issues and improvements
+   - Provides implementation phases
+
+### Next Steps
+- **Phase 1**: Implement core mastery logic and state display
+- **Phase 2**: Update UI components (Browse, Dashboard, StudySession)
+- **Phase 3**: Add enhanced feedback and progress indicators
+- **Phase 4**: Testing and polish
+
+*Mastery system analysis completed and documented for future implementation*

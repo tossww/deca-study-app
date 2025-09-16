@@ -42,6 +42,11 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     total: 0,
     timeSpent: 0,
   })
+  const [masteryChanges, setMasteryChanges] = useState({
+    improved: 0,
+    regressed: 0,
+  })
+  const [showSessionSummary, setShowSessionSummary] = useState(false)
   const [questionStartTime, setQuestionStartTime] = useState(Date.now())
   const [showQuitModal, setShowQuitModal] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
@@ -161,24 +166,40 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
         const currentLevel = updatedQuestions[currentIndex].masteryLevel || 'new'
 
         // Simple progression/regression logic for immediate visual feedback
+        let hasProgressed = false
+        let hasRegressed = false
+
         if (isCorrect) {
           // Progress on correct answer
           if (currentLevel === 'new') {
             updatedQuestions[currentIndex].masteryLevel = 'apprentice'
+            hasProgressed = true
           } else if (currentLevel === 'apprentice' && suggestedGrade >= Quality.Good) {
             updatedQuestions[currentIndex].masteryLevel = 'guru'
+            hasProgressed = true
           } else if (currentLevel === 'guru' && suggestedGrade === Quality.Easy) {
             updatedQuestions[currentIndex].masteryLevel = 'master'
+            hasProgressed = true
           }
         } else {
           // Regress on incorrect answer
           if (currentLevel === 'master') {
             updatedQuestions[currentIndex].masteryLevel = 'guru'
+            hasRegressed = true
           } else if (currentLevel === 'guru') {
             updatedQuestions[currentIndex].masteryLevel = 'apprentice'
+            hasRegressed = true
           } else if (currentLevel === 'apprentice') {
             updatedQuestions[currentIndex].masteryLevel = 'new'
+            hasRegressed = true
           }
+        }
+
+        // Update mastery change tracking
+        if (hasProgressed) {
+          setMasteryChanges(prev => ({ ...prev, improved: prev.improved + 1 }))
+        } else if (hasRegressed) {
+          setMasteryChanges(prev => ({ ...prev, regressed: prev.regressed + 1 }))
         }
 
         setQuestions(updatedQuestions)
@@ -304,15 +325,8 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
 
     if (currentIndex + 1 >= questions.length) {
       await completeSession()
-      const accuracy = sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0
-      
-      if (mode === 'test') {
-        toast.success(`Test complete! Score: ${sessionStats.correct}/${sessionStats.total} (${accuracy}%)`)
-      } else {
-        toast.success(`Study session complete! Reviewed ${sessionStats.total} questions (${accuracy}% correct)`)
-      }
-      
-      onComplete()
+      // Show summary instead of completing immediately
+      setShowSessionSummary(true)
       return
     }
 
@@ -323,7 +337,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
 
     // Scroll to top for new question
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [currentIndex, questions.length, completeSession, sessionStats, onComplete, mode])
+  }, [currentIndex, questions.length, completeSession])
 
   // Store callbacks in refs to avoid circular dependencies
   useEffect(() => {
@@ -354,6 +368,9 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     selectedAnswer,
     showExplanation,
     sessionStats,
+    masteryChanges,
+    showSessionSummary,
+    setShowSessionSummary,
     showQuitModal,
     setShowQuitModal,
     showGradeSelector,

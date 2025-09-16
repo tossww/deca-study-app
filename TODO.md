@@ -88,6 +88,42 @@ Added a "Test Mode" option that removes the period from the correct answer's num
 ## 🚧 In Progress
 - None currently
 
+## 📋 Planned: Mastery System Improvements
+
+### Overview
+Improve the mastery system to better communicate when users have truly mastered questions and provide clearer feedback on learning progress. **This also addresses technical complexity by simplifying the variable system and reducing maintenance burden.**
+
+**Reference Document**: [`docs/MASTERY_SYSTEM_IMPROVEMENTS.md`](./docs/MASTERY_SYSTEM_IMPROVEMENTS.md)
+
+### Key Issues to Address
+- **"Review" state** doesn't clearly indicate mastery level
+- **Users can't tell** when they've truly mastered a question (like "1+1=2")
+- **No clear progression** from learning to mastery
+- **Buried mastery status** (Guru/Master) in the UI
+- **Technical complexity** with 11 variables (many redundant)
+- **Maintenance burden** for future developers
+
+### Planned Improvements
+- [ ] **Enhanced State Display**: Show mastery level instead of just "review"
+- [ ] **Clear Mastery Criteria**: 3+ reviews, high ease factor, long intervals
+- [ ] **Visual Indicators**: Progress bars, colors, icons for mastery levels
+- [ ] **User Feedback**: Celebration messages for mastery achievements
+- [ ] **Next Review Info**: Clear timing for when questions will appear again
+- [ ] **Variable Simplification**: Reduce from 11 to 8 variables (remove redundancy)
+- [ ] **Cleaner Code**: Simplified state logic and easier debugging
+
+### Implementation Phases
+- [ ] **Phase 1**: Core mastery logic and state display
+- [ ] **Phase 2**: UI updates across Browse, Dashboard, StudySession
+- [ ] **Phase 3**: Enhanced feedback and progress indicators
+- [ ] **Phase 4**: Testing and polish
+
+### Success Criteria
+- Users understand when they've mastered content
+- Clear progression from New → Learning → Guru → Master
+- Motivating feedback that celebrates achievements
+- Better long-term retention through clear mastery goals
+
 ## 📝 Notes
 - **Full Anki Algorithm implemented** - Complete Anki-style spaced repetition with learning states
 - **Mobile-first design** - Research-backed UX principles with touch optimization
