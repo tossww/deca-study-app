@@ -24,7 +24,7 @@ export function SessionSummary({ stats, masteryChanges, onContinue }: SessionSum
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {isGoodScore ? '🎉 Great Job!' : '✅ Session Complete'}
           </h2>
-          <p className="text-gray-600">Here's how you did:</p>
+          <p className="text-gray-600">Here&apos;s how you did:</p>
         </div>
 
         {/* Performance */}
