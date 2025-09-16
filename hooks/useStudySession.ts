@@ -181,8 +181,8 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     const treatAsCorrect = selectedGrade !== Quality.Again
 
     // Adjust session stats based on the change
-    if (isAdjustment) {
-      const previousCorrect = lastSubmittedGrade !== Quality.Again
+    if (isAdjustment && lastSubmittedGrade) {
+      const previousCorrect = (lastSubmittedGrade as Quality) !== Quality.Again
       
       if (previousCorrect && !treatAsCorrect) {
         // Was correct, now treating as incorrect
