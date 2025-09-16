@@ -116,11 +116,38 @@ export async function GET(request: NextRequest) {
       console.log(`📝 Test mode: Found ${dbQuestions.length} total questions`)
     }
 
+    // Fisher-Yates shuffle algorithm for array with index tracking
+    const shuffleArrayWithIndexTracking = (array: string[]) => {
+      // Create an array of indices [0, 1, 2, 3]
+      const indices = array.map((_, i) => i)
+      const shuffled = [...array]
+
+      // Shuffle both the array and track the indices
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        // Swap elements
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        // Swap indices to track where elements moved
+        ;[indices[i], indices[j]] = [indices[j], indices[i]]
+      }
+
+      return { shuffled, indices }
+    }
+
     // Transform questions to match frontend format
     const questions = dbQuestions.map((q: any) => {
       // Convert letter answer (A, B, C, D) to index (0, 1, 2, 3)
       const letterToIndex = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
-      const correctAnswer = letterToIndex[q.correctAnswer as keyof typeof letterToIndex] ?? 0
+      const originalCorrectIndex = letterToIndex[q.correctAnswer as keyof typeof letterToIndex] ?? 0
+
+      // Get the original options array
+      const originalOptions = [q.optionA, q.optionB, q.optionC, q.optionD]
+
+      // Shuffle the options and track where each option moved
+      const { shuffled: shuffledOptions, indices } = shuffleArrayWithIndexTracking(originalOptions)
+
+      // Find the new position of the correct answer
+      const newCorrectIndex = indices.findIndex(idx => idx === originalCorrectIndex)
 
       // Determine mastery level if user is logged in and has stats
       let masteryLevel: 'new' | 'apprentice' | 'guru' | 'master' = 'new'
@@ -140,8 +167,8 @@ export async function GET(request: NextRequest) {
       return {
         id: q.id,
         question: q.questionText,
-        options: [q.optionA, q.optionB, q.optionC, q.optionD],
-        correctAnswer,
+        options: shuffledOptions,
+        correctAnswer: newCorrectIndex,
         explanation: q.explanation,
         topic: q.topic.name,
         refId: q.refId,
