@@ -16,6 +16,29 @@ interface StudySessionMobileProps {
 
 export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
   const { testMode } = useStore()
+  const [showMasteryModal, setShowMasteryModal] = useState(false)
+  const [masteryData, setMasteryData] = useState<any>(null)
+
+  const fetchMasteryData = async () => {
+    if (!currentQuestion) return
+    
+    try {
+      const { sessionToken } = useStore.getState()
+      const response = await fetch(`/api/questions/stats?questionId=${currentQuestion.id}`, {
+        headers: {
+          'X-Session-Token': sessionToken || '',
+        },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setMasteryData(data)
+        setShowMasteryModal(true)
+      }
+    } catch (error) {
+      console.error('Failed to fetch mastery data:', error)
+    }
+  }
   
   const {
     currentQuestion,
@@ -230,15 +253,23 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
                   <span className="font-medium text-gray-600">Submitted:</span>
                   <span className="ml-1 text-gray-800">{currentAnswerData.submitted ? 'Yes' : 'No'}</span>
                 </div>
-                <div className="col-span-2">
-                  <span className="font-medium text-gray-600">Adjustment History:</span>
-                  <span className="ml-1 text-gray-800">
-                    {currentAnswerData.adjustmentHistory ? currentAnswerData.adjustmentHistory.map(g => Quality[g]).join(' → ') : 'None'}
-                  </span>
+                  <div className="col-span-2">
+                    <span className="font-medium text-gray-600">Adjustment History:</span>
+                    <span className="ml-1 text-gray-800">
+                      {currentAnswerData.adjustmentHistory ? currentAnswerData.adjustmentHistory.map(g => Quality[g]).join(' → ') : 'None'}
+                    </span>
+                  </div>
+                  <div className="col-span-2 mt-2">
+                    <button
+                      onClick={fetchMasteryData}
+                      className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                    >
+                      Show Mastery Details
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Main Bottom Bar */}
           <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-4 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))', bottom: '0' }}>
@@ -323,6 +354,148 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
               >
                 End Session
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mastery Details Modal */}
+      {showMasteryModal && masteryData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Mastery Details</h3>
+                <button
+                  onClick={() => setShowMasteryModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {masteryData.isNew ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500 text-lg mb-2">📝</div>
+                  <div className="text-gray-600">This is a new question - no mastery data yet</div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Mastery Level */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">Mastery Level</h4>
+                    <div className="flex items-center space-x-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        masteryData.masteryLevel === 'new' ? 'bg-gray-100 text-gray-700' :
+                        masteryData.masteryLevel === 'apprentice' ? 'bg-orange-100 text-orange-700' :
+                        masteryData.masteryLevel === 'guru' ? 'bg-blue-100 text-blue-700' :
+                        'bg-purple-100 text-purple-700'
+                      }`}>
+                        {masteryData.masteryLevel.charAt(0).toUpperCase() + masteryData.masteryLevel.slice(1)}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {masteryData.masteryPercentage}% accuracy
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Basic Stats */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Basic Stats</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Times Answered:</span>
+                          <span className="font-medium">{masteryData.questionStat.timesAnswered}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Times Correct:</span>
+                          <span className="font-medium text-green-600">{masteryData.questionStat.timesCorrect}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Last Answered:</span>
+                          <span className="font-medium">
+                            {masteryData.questionStat.lastAnswered ? 
+                              new Date(masteryData.questionStat.lastAnswered).toLocaleDateString() : 
+                              'Never'
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Spaced Repetition Variables */}
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Spaced Repetition</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Repetitions:</span>
+                          <span className="font-medium">{masteryData.questionStat.repetitions}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Interval:</span>
+                          <span className="font-medium">{masteryData.questionStat.interval} days</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Ease Factor:</span>
+                          <span className="font-medium">{masteryData.questionStat.easeFactor.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">State:</span>
+                          <span className="font-medium">{masteryData.questionStat.state}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Details */}
+                  <div className="bg-yellow-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">Additional Details</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Current Step:</span>
+                          <span className="font-medium">{masteryData.questionStat.currentStep}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Lapses:</span>
+                          <span className="font-medium">{masteryData.questionStat.lapses}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Next Review:</span>
+                          <span className="font-medium">
+                            {masteryData.questionStat.nextReview ? 
+                              new Date(masteryData.questionStat.nextReview).toLocaleDateString() : 
+                              'Not scheduled'
+                            }
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Question ID:</span>
+                          <span className="font-medium text-xs">{masteryData.questionId}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Question Info */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">Question Info</h4>
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Ref ID:</span>
+                        <span className="font-medium">{masteryData.questionStat.question.refId}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Topic:</span>
+                        <span className="font-medium">{masteryData.questionStat.question.topic}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
