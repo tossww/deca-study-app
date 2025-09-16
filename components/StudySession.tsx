@@ -5,6 +5,7 @@ import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
 import { useStore } from '@/lib/store'
+import { MasteryIndicator } from './MasteryIndicator'
 
 interface StudySessionProps {
   topics: string[]
@@ -18,10 +19,11 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
   const { cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
+  const [currentMasteryLevel, setCurrentMasteryLevel] = useState<'new' | 'apprentice' | 'guru' | 'master'>('new')
 
-  const fetchMasteryData = async () => {
+  const fetchMasteryData = async (showModal = true) => {
     if (!currentQuestion) return
-    
+
     try {
       const { sessionToken } = useStore.getState()
       const response = await fetch(`/api/questions/stats?questionId=${currentQuestion.id}`, {
@@ -29,11 +31,14 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
           'X-Session-Token': sessionToken || '',
         },
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setMasteryData(data)
-        setShowMasteryModal(true)
+        setCurrentMasteryLevel(data.masteryLevel || 'new')
+        if (showModal) {
+          setShowMasteryModal(true)
+        }
       }
     } catch (error) {
       console.error('Failed to fetch mastery data:', error)
@@ -59,6 +64,26 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
     confirmQuit,
     isLoading,
   } = useStudySession({ topics, mode, limit, onComplete, onQuit })
+
+  // Fetch mastery level when question changes
+  useEffect(() => {
+    if (currentQuestion) {
+      fetchMasteryData(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion])
+
+  // Update mastery level after answer submission
+  useEffect(() => {
+    if (showExplanation && currentAnswerData?.submitted) {
+      // Fetch updated mastery level after a brief delay to ensure server has processed the answer
+      const timer = setTimeout(() => {
+        fetchMasteryData(false)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showExplanation, currentAnswerData?.submitted])
 
   // Keyboard shortcuts for desktop version
   useEffect(() => {
@@ -143,10 +168,13 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
       </div>
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-6">
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
+        <div className="bg-gray-50 rounded-lg p-4 mb-4 relative">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed pr-20">
             {currentQuestion.question}
           </h2>
+          <div className="absolute bottom-2 right-2">
+            <MasteryIndicator level={currentMasteryLevel} />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -235,7 +263,7 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
                   </div>
                   <div className="col-span-2 mt-2">
                     <button
-                      onClick={fetchMasteryData}
+                      onClick={() => fetchMasteryData()}
                       className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                     >
                       Show Mastery Details

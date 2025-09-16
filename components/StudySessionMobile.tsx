@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
 import { useStore } from '@/lib/store'
+import { MasteryIndicator } from './MasteryIndicator'
 
 interface StudySessionMobileProps {
   topics: string[]
@@ -18,10 +19,11 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
   const { cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
+  const [currentMasteryLevel, setCurrentMasteryLevel] = useState<'new' | 'apprentice' | 'guru' | 'master'>('new')
 
-  const fetchMasteryData = async () => {
+  const fetchMasteryData = async (showModal = true) => {
     if (!currentQuestion) return
-    
+
     try {
       const { sessionToken } = useStore.getState()
       const response = await fetch(`/api/questions/stats?questionId=${currentQuestion.id}`, {
@@ -29,11 +31,14 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
           'X-Session-Token': sessionToken || '',
         },
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setMasteryData(data)
-        setShowMasteryModal(true)
+        setCurrentMasteryLevel(data.masteryLevel || 'new')
+        if (showModal) {
+          setShowMasteryModal(true)
+        }
       }
     } catch (error) {
       console.error('Failed to fetch mastery data:', error)
@@ -59,6 +64,26 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
     confirmQuit,
     isLoading,
   } = useStudySession({ topics, mode, limit, onComplete, onQuit })
+
+  // Fetch mastery level when question changes
+  useEffect(() => {
+    if (currentQuestion) {
+      fetchMasteryData(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion])
+
+  // Update mastery level after answer submission
+  useEffect(() => {
+    if (showExplanation && currentAnswerData?.submitted) {
+      // Fetch updated mastery level after a brief delay to ensure server has processed the answer
+      const timer = setTimeout(() => {
+        fetchMasteryData(false)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showExplanation, currentAnswerData?.submitted])
 
   // Mobile-specific touch gestures
   useEffect(() => {
@@ -152,10 +177,13 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
       <div className="pt-12" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom) + 20px)' }}>
         <div className="px-3 py-2">
         {/* Question - Clean and focused */}
-        <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
+        <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0 relative">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed pr-20">
             {currentQuestion.question}
           </h2>
+          <div className="absolute bottom-2 right-2">
+            <MasteryIndicator level={currentMasteryLevel} />
+          </div>
         </div>
 
         {/* Answer Options - Enhanced mobile touch targets */}
@@ -230,7 +258,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
                   </div>
                   <div className="col-span-2 mt-2">
                     <button
-                      onClick={fetchMasteryData}
+                      onClick={() => fetchMasteryData()}
                       className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                     >
                       Show Mastery Details
