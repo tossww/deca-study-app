@@ -219,6 +219,29 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
                 </div>
               </div>
             )}
+
+            {/* Debug Panel - Mastery Variables */}
+            {testMode && currentAnswerData && (
+              <div className="border-t border-gray-200 pt-3 mt-3 bg-yellow-50 rounded-lg p-3">
+                <div className="text-xs font-semibold text-yellow-800 mb-2">DEBUG: Mastery Variables</div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="font-medium text-gray-600">Last Grade:</span>
+                    <span className="ml-1 text-gray-800">{currentAnswerData.lastSubmittedGrade ? Quality[currentAnswerData.lastSubmittedGrade] : 'None'}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Submitted:</span>
+                    <span className="ml-1 text-gray-800">{currentAnswerData.submitted ? 'Yes' : 'No'}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="font-medium text-gray-600">Adjustment History:</span>
+                    <span className="ml-1 text-gray-800">
+                      {currentAnswerData.adjustmentHistory ? currentAnswerData.adjustmentHistory.map(g => Quality[g]).join(' → ') : 'None'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

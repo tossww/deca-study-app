@@ -217,6 +217,29 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
             </div>
           )}
 
+          {/* Debug Panel - Mastery Variables */}
+          {testMode && currentAnswerData && (
+            <div className="fixed left-0 right-0 bg-yellow-50 border-t border-yellow-200 p-3 shadow-lg z-15" style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}>
+              <div className="text-xs font-semibold text-yellow-800 mb-2">DEBUG: Mastery Variables</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="font-medium text-gray-600">Last Grade:</span>
+                  <span className="ml-1 text-gray-800">{currentAnswerData.lastSubmittedGrade ? Quality[currentAnswerData.lastSubmittedGrade] : 'None'}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Submitted:</span>
+                  <span className="ml-1 text-gray-800">{currentAnswerData.submitted ? 'Yes' : 'No'}</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="font-medium text-gray-600">Adjustment History:</span>
+                  <span className="ml-1 text-gray-800">
+                    {currentAnswerData.adjustmentHistory ? currentAnswerData.adjustmentHistory.map(g => Quality[g]).join(' → ') : 'None'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Main Bottom Bar */}
           <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-4 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))', bottom: '0' }}>
             {/* Extra background to ensure coverage */}

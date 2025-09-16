@@ -27,7 +27,8 @@ interface AnswerData {
   responseTimeMs: number
   suggestedGrade: Quality
   submitted?: boolean
-  submittedGrade?: Quality
+  lastSubmittedGrade?: Quality
+  adjustmentHistory?: Quality[]
 }
 
 export function useStudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
@@ -157,7 +158,8 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       setCurrentAnswerData(prev => prev ? {
         ...prev,
         submitted: true,
-        submittedGrade: suggestedGrade
+        lastSubmittedGrade: suggestedGrade,
+        adjustmentHistory: [suggestedGrade]
       } : null)
     } catch (error) {
       console.error('Failed to save answer:', error)
@@ -172,26 +174,30 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       return
     }
 
-    const { answerIndex, isCorrect, responseTimeMs, suggestedGrade, submittedGrade } = currentAnswerData
+    const { answerIndex, isCorrect, responseTimeMs, suggestedGrade, lastSubmittedGrade, adjustmentHistory } = currentAnswerData
 
-    // Always use the original suggested grade as baseline for score adjustment
-    const baselineGrade = submittedGrade || suggestedGrade
+    // Check if this is an adjustment (not the first submission)
+    const isAdjustment = !!lastSubmittedGrade
     const treatAsCorrect = selectedGrade !== Quality.Again
-    const baselineCorrect = baselineGrade !== Quality.Again
 
-    // Adjust the score based on difference from baseline
-    if (baselineCorrect && !treatAsCorrect) {
-      // Was correct at baseline, now treating as incorrect
-      setSessionStats((prev) => ({
-        ...prev,
-        correct: prev.correct - 1,
-      }))
-    } else if (!baselineCorrect && treatAsCorrect) {
-      // Was incorrect at baseline, now treating as correct
-      setSessionStats((prev) => ({
-        ...prev,
-        correct: prev.correct + 1,
-      }))
+    // Adjust session stats based on the change
+    if (isAdjustment) {
+      const previousCorrect = lastSubmittedGrade !== Quality.Again
+      
+      if (previousCorrect && !treatAsCorrect) {
+        // Was correct, now treating as incorrect
+        setSessionStats((prev) => ({
+          ...prev,
+          correct: prev.correct - 1,
+        }))
+      } else if (!previousCorrect && treatAsCorrect) {
+        // Was incorrect, now treating as correct
+        setSessionStats((prev) => ({
+          ...prev,
+          correct: prev.correct + 1,
+        }))
+      }
+      // If both are correct or both are incorrect, no score change needed
     }
 
     try {
@@ -219,11 +225,12 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
         throw new Error(`API error: ${result.error || 'Unknown error'}`)
       }
 
-      // Update to track what grade was last submitted
+      // Update the answer data with the new submission
       setCurrentAnswerData(prev => prev ? {
         ...prev,
         submitted: true,
-        submittedGrade: baselineGrade // Keep original baseline
+        lastSubmittedGrade: selectedGrade,
+        adjustmentHistory: [...(adjustmentHistory || []), selectedGrade]
       } : null)
     } catch (error) {
       console.error('Failed to save answer:', error)
@@ -232,7 +239,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       return
     }
 
-    // Clear answer data and hide grade selector
+    // Hide grade selector after adjustment
     setShowGradeSelector(false)
   }, [currentAnswerData, questions, currentIndex])
 
