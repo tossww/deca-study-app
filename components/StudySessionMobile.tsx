@@ -15,7 +15,7 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
-  const { testMode } = useStore()
+  const { testMode, cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
 
@@ -171,6 +171,8 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
                   ? 'border-green-500 bg-green-50 text-green-800'
                   : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
                   ? 'border-red-500 bg-red-50 text-red-800'
+                  : cheatingMode && index === currentQuestion.correctAnswer
+                  ? 'border-yellow-500 bg-yellow-100 text-yellow-800'
                   : selectedAnswer === index
                   ? 'border-primary-500 bg-primary-50'
                   : 'border-gray-200 bg-white hover:border-gray-300 active:bg-gray-50'
@@ -210,7 +212,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
           {/* Grade Selector Overlay removed - will implement in future */}
 
           {/* Debug Panel - Mastery Variables */}
-          {testMode && currentAnswerData && (
+          {debugMode && currentAnswerData && (
             <div className="fixed left-0 right-0 bg-yellow-50 border-t border-yellow-200 p-3 shadow-lg z-15" style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}>
               <div className="text-xs font-semibold text-yellow-800 mb-2">DEBUG: Mastery Variables</div>
               <div className="grid grid-cols-2 gap-2 text-xs">

@@ -5,7 +5,16 @@ import { useStore } from '@/lib/store'
 import { useState, useEffect } from 'react'
 
 export function InfoHelp() {
-  const { studySessionSize, setStudySessionSize, testMode, setTestMode } = useStore()
+  const { 
+    studySessionSize, 
+    setStudySessionSize, 
+    testMode, 
+    setTestMode,
+    cheatingMode,
+    setCheatingMode,
+    debugMode,
+    setDebugMode
+  } = useStore()
   const [sessionSize, setSessionSize] = useState(studySessionSize)
 
   useEffect(() => {
@@ -102,6 +111,54 @@ export function InfoHelp() {
             {testMode && (
               <div className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
                 ⚠️ Test mode is ON - correct answers show without period (e.g., &quot;1&quot; instead of &quot;1.&quot;)
+              </div>
+            )}
+          </div>
+
+          {/* Cheating Mode Toggle */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-gray-900 mb-2">Cheating Mode</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              When enabled, the correct answer will be highlighted during study sessions for easy identification.
+            </p>
+            
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={cheatingMode}
+                onChange={(e) => setCheatingMode(e.target.checked)}
+                className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">Enable Cheating Mode</span>
+            </label>
+            
+            {cheatingMode && (
+              <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                🚨 Cheating mode is ON - correct answers will be highlighted
+              </div>
+            )}
+          </div>
+
+          {/* Debug Mode Toggle */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-gray-900 mb-2">Debug Mode</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              When enabled, a debug panel will show mastery variables and question statistics during study sessions.
+            </p>
+            
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={debugMode}
+                onChange={(e) => setDebugMode(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">Enable Debug Mode</span>
+            </label>
+            
+            {debugMode && (
+              <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                🔧 Debug mode is ON - mastery variables will be displayed
               </div>
             )}
           </div>

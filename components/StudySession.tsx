@@ -15,7 +15,7 @@ interface StudySessionProps {
 }
 
 export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
-  const { testMode } = useStore()
+  const { testMode, cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
 
@@ -161,6 +161,8 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
                   ? 'border-green-500 bg-green-50 text-green-800'
                   : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
                   ? 'border-red-500 bg-red-50 text-red-800'
+                  : cheatingMode && index === currentQuestion.correctAnswer
+                  ? 'border-yellow-500 bg-yellow-100 text-yellow-800'
                   : selectedAnswer === index
                   ? 'border-primary-500 bg-primary-50'
                   : 'border-gray-200 bg-white hover:border-gray-300'
@@ -215,7 +217,7 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
             {/* Grade selector removed - will implement in future */}
 
             {/* Debug Panel - Mastery Variables */}
-            {testMode && currentAnswerData && (
+            {debugMode && currentAnswerData && (
               <div className="border-t border-gray-200 pt-3 mt-3 bg-yellow-50 rounded-lg p-3">
                 <div className="text-xs font-semibold text-yellow-800 mb-2">DEBUG: Mastery Variables</div>
                 <div className="grid grid-cols-2 gap-2 text-xs">

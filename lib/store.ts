@@ -14,12 +14,16 @@ interface AppState {
   studySessionSize: number
   lastStudyMode: 'test' | 'study'
   testMode: boolean
+  cheatingMode: boolean
+  debugMode: boolean
   setUser: (user: User | null) => void
   setSessionToken: (token: string | null) => void
   setSelectedTopics: (topics: string[]) => void
   setStudySessionSize: (size: number) => void
   setLastStudyMode: (mode: 'test' | 'study') => void
   setTestMode: (enabled: boolean) => void
+  setCheatingMode: (enabled: boolean) => void
+  setDebugMode: (enabled: boolean) => void
   logout: () => void
 }
 
@@ -33,12 +37,16 @@ export const useStore = create<AppState>()(
       studySessionSize: 25,
       lastStudyMode: 'study' as const,
       testMode: false,
+      cheatingMode: false,
+      debugMode: false,
       setUser: (user) => set({ user, isLoading: false }),
       setSessionToken: (token) => set({ sessionToken: token }),
       setSelectedTopics: (topics) => set({ selectedTopics: topics }),
       setStudySessionSize: (size) => set({ studySessionSize: size }),
       setLastStudyMode: (mode) => set({ lastStudyMode: mode }),
       setTestMode: (enabled) => set({ testMode: enabled }),
+      setCheatingMode: (enabled) => set({ cheatingMode: enabled }),
+      setDebugMode: (enabled) => set({ debugMode: enabled }),
       logout: () => set({ user: null, sessionToken: null }),
     }),
     {
@@ -49,7 +57,9 @@ export const useStore = create<AppState>()(
         selectedTopics: state.selectedTopics,
         studySessionSize: state.studySessionSize,
         lastStudyMode: state.lastStudyMode,
-        testMode: state.testMode
+        testMode: state.testMode,
+        cheatingMode: state.cheatingMode,
+        debugMode: state.debugMode
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
