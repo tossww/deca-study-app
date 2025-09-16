@@ -6,129 +6,208 @@
 - **Mobile-First Experience** - Separate touch-optimized mobile components
 - **Time-Based Grading** - Auto-suggestion based on response time
 - **Advanced UI/UX** - No-scroll study page, mobile header hiding, gesture support
+- **Answer Randomization** - Prevents position memorization
+- **Version Display** - Shows version and build time for easy identification
 
-*See `TODO.archive.md` for detailed completed features and cleanup phases*
-
-## ✅ COMPLETED: Answer Submission Bug Fix - September 16, 2025
-
-### Issue Resolved
-Fixed bug where clicking a correct answer didn't update repetition variables because the 4-second auto-grade timer was being cleared when users clicked "Continue".
-
-### Root Cause
-- Answer submission was delayed by a 4-second timer
-- Clicking "Continue" cleared the timer without submitting the answer
-- Only users who waited 4+ seconds or clicked "Adjust" had their answers saved
-
-### Solution Implemented
-1. **Removed the 4-second timer** - Answers now submit immediately with the suggested grade
-2. **Fixed adjust button behavior** - Adjustments now always calculate from the baseline state (before initial submission)
-3. **Prevented cumulative changes** - Multiple clicks on "Adjust" no longer apply cumulative changes
-
-### Technical Changes
-- Modified `handleAnswer` to submit answer immediately instead of setting a timer
-- Added `submitted` and `submittedGrade` fields to track baseline state
-- Updated `submitAnswer` to always use baseline grade for score adjustments
-- Removed all `autoGradeTimer` related code
-
-## ✅ COMPLETED: Two Study Modes (Test vs Review) - September 15, 2025
-
-### Issue Resolved
-The app now offers two distinct study modes:
-- **Test All**: Practice all questions from selected topics (original behavior)
-- **Study Mode**: Limited sessions using spaced repetition (configurable 5-100 questions)
-
-### Implementation Summary
-
-#### Phase 1 – Topic Selector UI Update ✅
-- ✅ Replaced single "Start Study" button with "Test All" and "Study (25)" options
-- ✅ Pass study mode ('test' or 'study') to session component
-- ✅ Show configurable count on Study button
-- ✅ Store last selected mode in localStorage
-
-#### Phase 2 – Settings in Info Panel ✅
-- ✅ Added "Session Settings" section to InfoHelp component
-- ✅ Added number input for study session size (min: 5, max: 100, default: 25)
-- ✅ Save preference to localStorage via store
-- ✅ Update Study button label dynamically with saved preference
-- ✅ Added clear explanation of difference between Test and Study modes
-
-#### Phase 3 – API & Session Logic ✅
-- ✅ Updated `/api/questions` endpoint to accept `mode` and `limit` parameters
-- ✅ Test mode: returns all questions (maintains original behavior)
-- ✅ Study mode implementation:
-  - ✅ Filter by nextReview <= today for reviews
-  - ✅ Include new questions (never answered)
-  - ✅ Priority: overdue > due today > new
-  - ✅ Limit to requested session size
-- ✅ Updated useStudySession hook to pass mode and limit
-
-#### Phase 4 – Polish & Feedback ✅
-- ✅ Show mode indicator in study session header (blue for Test, primary for Study)
-- ✅ Different completion messages for Test vs Study
-- ✅ Mode indicators on both desktop and mobile interfaces
-
-## ✅ COMPLETED: Test Mode Feature - September 15, 2025
-
-### Feature Overview
-Added a "Test Mode" option that removes the period from the correct answer's number to make it easier to identify during practice sessions.
-
-### Implementation Details
-- ✅ Added `testMode` boolean state to the global store
-- ✅ Added test mode toggle in the InfoHelp component's Session Settings section
-- ✅ Updated StudySession component to conditionally hide period for correct answer when test mode is enabled
-- ✅ Updated StudySessionMobile component to conditionally hide period for correct answer when test mode is enabled
-- ✅ Test mode state persists across sessions via localStorage
-
-### How It Works
-- When test mode is OFF: All answer options show as "1.", "2.", "3.", "4."
-- When test mode is ON: The correct answer shows without period (e.g., "1" instead of "1.")
-- Toggle is available in the Info/Help panel under Session Settings
-- Warning message displays when test mode is active
+*See `TODO.archive.md` for detailed completed features*
 
 ## 🚧 In Progress
 - None currently
 
-## 📋 Planned: Mastery System Improvements
+## 📋 Priority Features - NEW
+
+### 1. ⭐ Starred Questions System
+**Overview**: Allow users to star/bookmark questions for focused review sessions
+
+#### User Stories
+- As a student, I want to star questions I find challenging
+- As a student, I want to test myself only on starred questions
+- As a student, I want to easily add/remove stars during any study session
+
+#### Implementation Plan
+
+**Phase 1 - Database & Backend**
+- [ ] Add `starred_questions` table or add to existing user stats
+  - `userId`, `questionId`, `starredAt`, `starredCount` (track how many times starred)
+- [ ] Create API endpoints:
+  - `POST /api/questions/star` - Add/remove star
+  - `GET /api/questions/starred` - Get all starred questions for user
+  - `GET /api/questions?mode=starred` - Fetch starred questions for study
+
+**Phase 2 - UI Components**
+- [ ] Add star icon button to StudySession and StudySessionMobile
+  - Position: Top-right corner of question card
+  - States: Empty star (☆) / Filled star (★)
+  - Animation: Pulse effect on toggle
+- [ ] Add "Starred Questions" option to TopicSelector
+  - Show count of starred questions
+  - Enable only if user has starred questions
+- [ ] Add starred indicator in Browse component table
+
+**Phase 3 - Study Mode Integration**
+- [ ] Create "Starred" study mode alongside Test/Study
+- [ ] Handle edge cases:
+  - What if no starred questions exist?
+  - Mix with spaced repetition or override?
+  - Show starred status during review
+
+**Success Metrics**
+- Users can star/unstar with single click
+- Starred state persists across sessions
+- Can start focused study on starred items only
+- Clear visual feedback for starred questions
+
+---
+
+### 2. 📊 Wrong Answers List
+**Overview**: Display questions sorted by most recent incorrect answers for targeted review
+
+#### User Stories
+- As a student, I want to see which questions I get wrong most often
+- As a student, I want to review questions I recently failed
+- As a student, I want to focus on my weak areas
+
+#### Implementation Plan
+
+**Phase 1 - Data Tracking**
+- [ ] Enhance QuestionStat model to track:
+  - `lastIncorrectAt` - Timestamp of last wrong answer
+  - `incorrectStreak` - Consecutive wrong answers
+  - `recentIncorrectCount` - Wrong answers in last 30 days
+- [ ] Update stats API to record wrong answer timestamps
+
+**Phase 2 - Wrong Answers View**
+- [ ] Create new page/component: `/wrong-answers` or modal in Browse
+- [ ] Display table with columns:
+  - Question (truncated)
+  - Topic
+  - Times Wrong (total)
+  - Recent Misses (last 30 days)
+  - Last Failed (relative time)
+  - Current Mastery Level
+- [ ] Sorting options:
+  - Most recent failure first (default)
+  - Most total failures
+  - Longest incorrect streak
+- [ ] Filter options:
+  - By topic
+  - By date range
+  - By mastery level
+
+**Phase 3 - Actions & Integration**
+- [ ] Add "Review These" button to start session with selected questions
+- [ ] Show "Recently Failed" indicator in study sessions
+- [ ] Add quick link from Dashboard when wrong answers exist
+- [ ] Optional: Email/notification for questions failed multiple times
+
+**Success Metrics**
+- Clear visibility into problem areas
+- Can quickly start review of failed questions
+- Improved performance on previously failed questions
+- Reduced incorrect streaks over time
+
+---
+
+### 3. 📝 Personal Notes System
+**Overview**: Allow users to add custom notes to questions for better understanding
+
+#### User Stories
+- As a student, I want to add my own explanations to questions
+- As a student, I want to add mnemonics or memory aids
+- As a student, I want to see my notes during review
+
+#### Implementation Plan
+
+**Phase 1 - Database & Storage**
+- [ ] Create `notes` table:
+  ```
+  - id
+  - userId
+  - questionId
+  - noteText (text, max 1000 chars)
+  - createdAt
+  - updatedAt
+  ```
+- [ ] API endpoints:
+  - `POST /api/questions/{id}/note` - Save/update note
+  - `GET /api/questions/{id}/note` - Get note for question
+  - `DELETE /api/questions/{id}/note` - Remove note
+
+**Phase 2 - Note Input UI**
+- [ ] Add collapsible note section below explanation in StudySession
+- [ ] Components needed:
+  - Textarea with character counter (max 500-1000 chars)
+  - Save/Cancel buttons
+  - Edit/Delete options for existing notes
+  - Auto-save draft functionality
+- [ ] Visual design:
+  - Light yellow background (like sticky note)
+  - Smaller font than main content
+  - "Your Notes" header with pencil icon
+
+**Phase 3 - Display & Management**
+- [ ] Show note indicator (📝) on questions with notes
+- [ ] Display notes in:
+  - Study sessions (below explanation)
+  - Browse table (tooltip or expandable row)
+  - Question detail views
+- [ ] Add "My Notes" section in Dashboard
+  - Count of questions with notes
+  - Recent notes added
+  - Quick access to edit
+
+**Phase 4 - Advanced Features (Optional)**
+- [ ] Rich text formatting (bold, italic, lists)
+- [ ] Support for images/diagrams (base64 or URLs)
+- [ ] Note templates for common patterns
+- [ ] Share notes with study groups (future)
+
+**Success Metrics**
+- 30%+ of active users add at least one note
+- Notes improve retention (track mastery of noted vs non-noted)
+- Quick note access during study sessions
+- Users report notes helpful in surveys
+
+---
+
+## 📋 Existing Plan: Mastery System Improvements
 
 ### Overview
-Improve the mastery system to better communicate when users have truly mastered questions and provide clearer feedback on learning progress. **This also addresses technical complexity by simplifying the variable system and reducing maintenance burden.**
+Improve the mastery system to better communicate when users have truly mastered questions and provide clearer feedback on learning progress.
 
 **Reference Document**: [`docs/MASTERY_SYSTEM_IMPROVEMENTS.md`](./docs/MASTERY_SYSTEM_IMPROVEMENTS.md)
 
 ### Key Issues to Address
 - **"Review" state** doesn't clearly indicate mastery level
-- **Users can't tell** when they've truly mastered a question (like "1+1=2")
+- **Users can't tell** when they've truly mastered a question
 - **No clear progression** from learning to mastery
-- **Buried mastery status** (Guru/Master) in the UI
-- **Technical complexity** with 11 variables (many redundant)
-- **Maintenance burden** for future developers
+- **Technical complexity** with redundant variables
 
 ### Planned Improvements
 - [ ] **Enhanced State Display**: Show mastery level instead of just "review"
 - [ ] **Clear Mastery Criteria**: 3+ reviews, high ease factor, long intervals
 - [ ] **Visual Indicators**: Progress bars, colors, icons for mastery levels
 - [ ] **User Feedback**: Celebration messages for mastery achievements
-- [ ] **Next Review Info**: Clear timing for when questions will appear again
-- [ ] **Variable Simplification**: Reduce from 11 to 8 variables (remove redundancy)
-- [ ] **Cleaner Code**: Simplified state logic and easier debugging
+- [ ] **Variable Simplification**: Reduce from 11 to 8 variables
 
-### Implementation Phases
-- [ ] **Phase 1**: Core mastery logic and state display
-- [ ] **Phase 2**: UI updates across Browse, Dashboard, StudySession
-- [ ] **Phase 3**: Enhanced feedback and progress indicators
-- [ ] **Phase 4**: Testing and polish
+---
 
-### Success Criteria
-- Users understand when they've mastered content
-- Clear progression from New → Learning → Guru → Master
-- Motivating feedback that celebrates achievements
-- Better long-term retention through clear mastery goals
-- **Reduced technical complexity** (27% fewer variables)
-- **Easier maintenance** for future developers
-- **Cleaner, more testable code**
+## 🔧 Technical Debt & Maintenance
+- [ ] Add comprehensive test suite for spaced repetition algorithm
+- [ ] Optimize database queries with proper indexing
+- [ ] Add error boundaries and better error handling
+- [ ] Implement proper logging system
+- [ ] Add data export functionality (CSV, Anki format)
+- [ ] Performance monitoring and analytics
+
+## 📅 Implementation Priority
+1. **Starred Questions** - Most requested, relatively simple
+2. **Personal Notes** - High value for learning
+3. **Wrong Answers List** - Helps identify weak areas
+4. **Mastery System Improvements** - Better UX but more complex
 
 ## 📝 Notes
-- **Full Anki Algorithm implemented** - Complete Anki-style spaced repetition with learning states
-- **Mobile-first design** - Research-backed UX principles with touch optimization
-- **Modern architecture** - Shared hooks, responsive detection, supports PWA/offline features
-- **Individual card tracking** - Each question has its own learning state and review schedule
+- Focus on user value and learning outcomes
+- Maintain mobile-first approach for all new features
+- Keep UI simple and distraction-free
+- Consider offline functionality for future PWA support
