@@ -155,6 +155,35 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
         throw new Error(`API error: ${result.error || 'Unknown error'}`)
       }
 
+      // Update mastery level in the current question
+      if (questions[currentIndex].masteryLevel !== undefined) {
+        const updatedQuestions = [...questions]
+        const currentLevel = updatedQuestions[currentIndex].masteryLevel || 'new'
+
+        // Simple progression/regression logic for immediate visual feedback
+        if (isCorrect) {
+          // Progress on correct answer
+          if (currentLevel === 'new') {
+            updatedQuestions[currentIndex].masteryLevel = 'apprentice'
+          } else if (currentLevel === 'apprentice' && suggestedGrade >= Quality.Good) {
+            updatedQuestions[currentIndex].masteryLevel = 'guru'
+          } else if (currentLevel === 'guru' && suggestedGrade === Quality.Easy) {
+            updatedQuestions[currentIndex].masteryLevel = 'master'
+          }
+        } else {
+          // Regress on incorrect answer
+          if (currentLevel === 'master') {
+            updatedQuestions[currentIndex].masteryLevel = 'guru'
+          } else if (currentLevel === 'guru') {
+            updatedQuestions[currentIndex].masteryLevel = 'apprentice'
+          } else if (currentLevel === 'apprentice') {
+            updatedQuestions[currentIndex].masteryLevel = 'new'
+          }
+        }
+
+        setQuestions(updatedQuestions)
+      }
+
       // Mark as submitted with the grade used
       setCurrentAnswerData(prev => prev ? {
         ...prev,
