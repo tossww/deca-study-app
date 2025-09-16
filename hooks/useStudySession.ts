@@ -46,6 +46,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   const [currentAnswerData, setCurrentAnswerData] = useState<AnswerData | null>(null)
   const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
   const nextQuestionRef = useRef<(() => void) | null>(null)
+  const submitAnswerRef = useRef<((grade: Quality) => void) | null>(null)
 
   // Load questions effect
   useEffect(() => {
@@ -126,13 +127,23 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
 
     // Auto-apply suggested grade after 4 seconds unless user intervenes
     const timer = setTimeout(() => {
-      submitAnswer(suggestedGrade)
+      console.log('Auto-grade timer fired, suggested grade:', suggestedGrade)
+      if (submitAnswerRef.current) {
+        console.log('Calling submitAnswer from timer')
+        submitAnswerRef.current(suggestedGrade)
+      } else {
+        console.log('submitAnswerRef.current is null!')
+      }
     }, 4000)
     setAutoGradeTimer(timer)
   }, [showExplanation, questionStartTime, questions, currentIndex])
 
   const submitAnswer = useCallback(async (selectedGrade: Quality) => {
-    if (!currentAnswerData) return
+    console.log('submitAnswer called with grade:', selectedGrade)
+    if (!currentAnswerData) {
+      console.log('No currentAnswerData, returning')
+      return
+    }
 
     // Clear auto-grade timer immediately to prevent duplicate submissions
     if (autoGradeTimer) {
@@ -261,10 +272,14 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [autoGradeTimer, currentIndex, questions.length, completeSession, sessionStats, onComplete])
 
-  // Store nextQuestion in ref to avoid circular dependency
+  // Store callbacks in refs to avoid circular dependencies
   useEffect(() => {
     nextQuestionRef.current = nextQuestion
   }, [nextQuestion])
+
+  useEffect(() => {
+    submitAnswerRef.current = submitAnswer
+  }, [submitAnswer])
 
   const handleQuit = useCallback(() => {
     setShowQuitModal(true)
