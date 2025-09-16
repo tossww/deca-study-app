@@ -490,6 +490,8 @@ Implementing 4-phase approach per TODO:
 ### Issue Analysis
 **Problem**: Users can't clearly understand when they've truly mastered a question. The current "review" state doesn't communicate mastery level, and users don't know when content is in their long-term memory.
 
+**Technical Problem**: The system has excessive complexity with 11 variables per question, many of which are redundant. This creates maintenance burden, debugging difficulties, and testing challenges.
+
 **Key Questions Addressed**:
 1. Why do we need so many variables in the spaced repetition system?
 2. When can a user know that a question is in long-term memory?
@@ -525,6 +527,12 @@ Implementing 4-phase approach per TODO:
 2. **Visual Indicators**: Colors, icons, progress bars
 3. **User Feedback**: Celebration messages for achievements
 4. **Next Review Info**: Clear timing for when questions appear again
+
+**Technical Simplification**:
+- **Variable Reduction**: From 11 to 8 variables (27% reduction)
+- **Eliminate Redundancy**: Remove duplicate and derivable variables
+- **Cleaner Logic**: Simplified state transitions and calculations
+- **Better Maintainability**: Easier for future developers to understand and modify
 
 **Simplified Variables** (Keep 4 states, reduce redundancy):
 - Keep: `interval`, `easeFactor`, `repetitions`, `state`, `currentStep`, `nextReview`, `lastReviewDate`, `lapses`
