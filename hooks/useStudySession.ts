@@ -98,13 +98,13 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   // Timer effect - separate to avoid reloading questions
   useEffect(() => {
     const interval = setInterval(() => {
-      // Only increment timer when quit modal is not open
-      if (!showQuitModal) {
+      // Only increment timer when quit modal and session summary are not open
+      if (!showQuitModal && !showSessionSummary) {
         setSessionStats((prev) => ({ ...prev, timeSpent: prev.timeSpent + 1 }))
       }
     }, 1000)
     return () => clearInterval(interval)
-  }, [showQuitModal])
+  }, [showQuitModal, showSessionSummary])
 
   const handleAnswer = useCallback(async (answerIndex: number) => {
     if (showExplanation) return
