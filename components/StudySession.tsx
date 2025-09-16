@@ -5,7 +5,7 @@ import { cn, formatTime } from '@/lib/utils'
 import { Quality } from '@/lib/spaced-repetition'
 import { useStudySession } from '@/hooks/useStudySession'
 import { useStore } from '@/lib/store'
-import { MasteryIndicator } from './MasteryIndicator'
+import { AnimatedMasteryIndicator } from './AnimatedMasteryIndicator'
 
 interface StudySessionProps {
   topics: string[]
@@ -151,8 +151,12 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
           <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
-          <div className="absolute bottom-2 right-2">
-            <MasteryIndicator level={currentMasteryLevel} className="text-[11px]" />
+          <div className="absolute bottom-1 right-2">
+            <AnimatedMasteryIndicator
+              level={currentMasteryLevel}
+              questionId={currentQuestion.id.toString()}
+              className="text-[11px]"
+            />
           </div>
         </div>
 
