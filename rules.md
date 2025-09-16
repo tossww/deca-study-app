@@ -2,6 +2,13 @@
 
 ## Mandatory Workflow Requirements
 
+### 🚀 CRITICAL: Always Push When Ready to Test
+**RULE #1: When there's something for the user to test, ALWAYS commit and push immediately.**
+- Never ask user to test without pushing first
+- Push after every feature completion or bug fix
+- This ensures user can test the latest changes on deployed version
+- Commands: `git add .` → `git commit -m "..."` → `git push origin main`
+
 ### 1. Pre-Development Documentation Updates
 
 **BEFORE making ANY changes to the project, ALWAYS:**
@@ -73,7 +80,7 @@
 6. ✅ **Test the changes thoroughly**
 7. ✅ Run lint/typecheck if available
 8. ✅ **NEVER ask user to test - always test yourself first**
-9. ✅ **ALWAYS commit and push changes to GitHub immediately**
+9. 🚀 **ALWAYS commit and push changes to GitHub immediately when there's something to test**
 10. ✅ **Inform user that changes are pushed and ready to test**
 
 #### Testing & Deployment:
