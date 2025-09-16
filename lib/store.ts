@@ -6,6 +6,14 @@ interface User {
   email: string
 }
 
+export type SortColumn = 'id' | 'question' | 'topic' | 'status' | 'score' | 'answer'
+export type SortDirection = 'asc' | 'desc'
+
+export interface SortConfig {
+  column: SortColumn
+  direction: SortDirection
+}
+
 interface AppState {
   user: User | null
   isLoading: boolean
@@ -15,6 +23,7 @@ interface AppState {
   lastStudyMode: 'test' | 'study'
   cheatingMode: boolean
   debugMode: boolean
+  browseSortConfig: SortConfig
   setUser: (user: User | null) => void
   setSessionToken: (token: string | null) => void
   setSelectedTopics: (topics: string[]) => void
@@ -22,6 +31,7 @@ interface AppState {
   setLastStudyMode: (mode: 'test' | 'study') => void
   setCheatingMode: (enabled: boolean) => void
   setDebugMode: (enabled: boolean) => void
+  setBrowseSortConfig: (config: SortConfig) => void
   logout: () => void
 }
 
@@ -36,6 +46,7 @@ export const useStore = create<AppState>()(
       lastStudyMode: 'study' as const,
       cheatingMode: false,
       debugMode: false,
+      browseSortConfig: { column: 'id', direction: 'asc' } as SortConfig,
       setUser: (user) => set({ user, isLoading: false }),
       setSessionToken: (token) => set({ sessionToken: token }),
       setSelectedTopics: (topics) => set({ selectedTopics: topics }),
@@ -43,6 +54,7 @@ export const useStore = create<AppState>()(
       setLastStudyMode: (mode) => set({ lastStudyMode: mode }),
       setCheatingMode: (enabled) => set({ cheatingMode: enabled }),
       setDebugMode: (enabled) => set({ debugMode: enabled }),
+      setBrowseSortConfig: (config) => set({ browseSortConfig: config }),
       logout: () => set({ user: null, sessionToken: null }),
     }),
     {
@@ -54,7 +66,8 @@ export const useStore = create<AppState>()(
         studySessionSize: state.studySessionSize,
         lastStudyMode: state.lastStudyMode,
         cheatingMode: state.cheatingMode,
-        debugMode: state.debugMode
+        debugMode: state.debugMode,
+        browseSortConfig: state.browseSortConfig
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

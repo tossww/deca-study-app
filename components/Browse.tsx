@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useStore } from '@/lib/store'
+import { useStore, type SortColumn, type SortDirection } from '@/lib/store'
 
 interface Question {
   id: number
@@ -18,7 +18,7 @@ interface Question {
 }
 
 export function Browse() {
-  const { user } = useStore()
+  const { user, browseSortConfig, setBrowseSortConfig } = useStore()
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [showAnswers, setShowAnswers] = useState(false)
@@ -46,7 +46,6 @@ export function Browse() {
     }
   }
 
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new':
@@ -62,7 +61,49 @@ export function Browse() {
     }
   }
 
-  const filteredQuestions = questions.filter(q => {
+  const handleSort = (column: SortColumn) => {
+    if (browseSortConfig.column === column) {
+      // Toggle direction if same column
+      setBrowseSortConfig({
+        column,
+        direction: browseSortConfig.direction === 'asc' ? 'desc' : 'asc'
+      })
+    } else {
+      // New column, default to ascending
+      setBrowseSortConfig({
+        column,
+        direction: 'asc'
+      })
+    }
+  }
+
+  const getSortIcon = (column: SortColumn) => {
+    if (browseSortConfig.column !== column) {
+      return (
+        <span className="ml-1 text-gray-400">
+          <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+        </span>
+      )
+    }
+
+    return browseSortConfig.direction === 'asc' ? (
+      <span className="ml-1 text-primary-600">
+        <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      </span>
+    ) : (
+      <span className="ml-1 text-primary-600">
+        <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </span>
+    )
+  }
+
+  const sortedAndFilteredQuestions = questions.filter(q => {
     if (!q || !q.question || !q.answer || !q.topic) return false
 
     const matchesSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,7 +113,48 @@ export function Browse() {
     const matchesStatus = statusFilter === 'all' || q.learningStatus === statusFilter
 
     return matchesSearch && matchesTopic && matchesStatus
-  }).sort((a, b) => a.id - b.id)
+  }).sort((a, b) => {
+    const { column, direction } = browseSortConfig
+    let aVal: any, bVal: any
+
+    switch (column) {
+      case 'id':
+        aVal = a.id
+        bVal = b.id
+        break
+      case 'question':
+        aVal = a.question.toLowerCase()
+        bVal = b.question.toLowerCase()
+        break
+      case 'topic':
+        aVal = a.topic.toLowerCase()
+        bVal = b.topic.toLowerCase()
+        break
+      case 'status':
+        const statusOrder = { 'new': 0, 'apprentice': 1, 'guru': 2, 'master': 3 }
+        aVal = statusOrder[a.learningStatus]
+        bVal = statusOrder[b.learningStatus]
+        break
+      case 'score':
+        // Sort by percentage correct (with 0 answered at the end)
+        aVal = a.timesAnswered > 0 ? (a.timesCorrect / a.timesAnswered) : -1
+        bVal = b.timesAnswered > 0 ? (b.timesCorrect / b.timesAnswered) : -1
+        break
+      case 'answer':
+        aVal = a.answer.toLowerCase()
+        bVal = b.answer.toLowerCase()
+        break
+      default:
+        aVal = a.id
+        bVal = b.id
+    }
+
+    if (direction === 'asc') {
+      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+    } else {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0
+    }
+  })
 
   const uniqueTopics = Array.from(new Set(questions.filter(q => q && q.topic).map(q => q.topic)))
 
@@ -134,37 +216,66 @@ export function Browse() {
         </div>
 
         <div className="text-sm text-gray-600 mb-4">
-          Showing {filteredQuestions.length} of {questions.length} questions
+          Showing {sortedAndFilteredQuestions.length} of {questions.length} questions
+          {browseSortConfig.column !== 'id' && (
+            <span className="ml-2 text-primary-600">
+              • Sorted by {browseSortConfig.column} ({browseSortConfig.direction === 'asc' ? 'ascending' : 'descending'})
+            </span>
+          )}
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('id')}
+                >
                   ID
+                  {getSortIcon('id')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('question')}
+                >
                   Question
+                  {getSortIcon('question')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('topic')}
+                >
                   Topic
+                  {getSortIcon('topic')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('status')}
+                >
                   Status
+                  {getSortIcon('status')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('score')}
+                >
                   Score
+                  {getSortIcon('score')}
                 </th>
                 {showAnswers && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('answer')}
+                  >
                     Answer
+                    {getSortIcon('answer')}
                   </th>
                 )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredQuestions.map((question) => (
+              {sortedAndFilteredQuestions.map((question) => (
                 <tr key={question.id} className="hover:bg-gray-50">
                   <td className="px-3 py-4 text-sm text-gray-900 font-medium">
                     {question.id}
@@ -212,7 +323,7 @@ export function Browse() {
           </table>
         </div>
 
-        {filteredQuestions.length === 0 && (
+        {sortedAndFilteredQuestions.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             No questions found matching your filters.
           </div>
