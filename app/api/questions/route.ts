@@ -59,17 +59,24 @@ export async function GET(request: NextRequest) {
       })
 
       // Separate questions into categories
+      const starredQuestions = []
       const overdueQuestions = []
       const dueQuestions = []
       const newQuestions = []
 
       for (const q of questionsWithStats) {
+        const isStarred = q.stats.length > 0 && q.stats[0].isStarred
+
         if (q.stats.length === 0) {
           // New question (never answered)
           newQuestions.push(q)
         } else {
           const stat = q.stats[0]
-          if (stat.nextReview && stat.nextReview <= now) {
+
+          // Check if starred (starred questions get priority)
+          if (isStarred) {
+            starredQuestions.push(q)
+          } else if (stat.nextReview && stat.nextReview <= now) {
             if (stat.nextReview < new Date(now.getTime() - 24 * 60 * 60 * 1000)) {
               // Overdue (more than 1 day late)
               overdueQuestions.push(q)
@@ -81,8 +88,9 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Combine in priority order: overdue > due > new
+      // Combine in priority order: starred > overdue > due > new
       const prioritizedQuestions = [
+        ...starredQuestions,
         ...overdueQuestions,
         ...dueQuestions,
         ...newQuestions
@@ -91,7 +99,7 @@ export async function GET(request: NextRequest) {
       // Take only the requested limit
       dbQuestions = prioritizedQuestions.slice(0, limit)
       
-      console.log(`📚 Study mode: ${overdueQuestions.length} overdue, ${dueQuestions.length} due, ${newQuestions.length} new`)
+      console.log(`📚 Study mode: ${starredQuestions.length} starred, ${overdueQuestions.length} overdue, ${dueQuestions.length} due, ${newQuestions.length} new`)
       console.log(`📚 Returning ${dbQuestions.length} questions (limit: ${limit})`)
     } else {
       // Test mode: Get all questions for topics (but still include stats if user is logged in)

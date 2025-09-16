@@ -15,6 +15,7 @@ interface Question {
   interval: number
   timesCorrect: number
   timesAnswered: number
+  isStarred: boolean
 }
 
 export function Browse() {
@@ -25,6 +26,7 @@ export function Browse() {
   const [searchTerm, setSearchTerm] = useState('')
   const [topicFilter, setTopicFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [starredFilter, setStarredFilter] = useState<'all' | 'starred' | 'unstarred'>('all')
 
   useEffect(() => {
     fetchQuestions()
@@ -43,6 +45,33 @@ export function Browse() {
       console.error('Failed to fetch questions:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const toggleStar = async (questionId: number, currentStarred: boolean) => {
+    if (!user?.id) return
+
+    try {
+      const response = await fetch('/api/questions/star', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'user-id': user.id
+        },
+        body: JSON.stringify({
+          questionId,
+          isStarred: !currentStarred
+        })
+      })
+
+      if (response.ok) {
+        // Update local state
+        setQuestions(questions.map(q =>
+          q.id === questionId ? { ...q, isStarred: !currentStarred } : q
+        ))
+      }
+    } catch (error) {
+      console.error('Failed to toggle star:', error)
     }
   }
 
@@ -111,8 +140,11 @@ export function Browse() {
                           q.topic.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesTopic = topicFilter === 'all' || q.topic === topicFilter
     const matchesStatus = statusFilter === 'all' || q.learningStatus === statusFilter
+    const matchesStarred = starredFilter === 'all' ||
+                           (starredFilter === 'starred' && q.isStarred) ||
+                           (starredFilter === 'unstarred' && !q.isStarred)
 
-    return matchesSearch && matchesTopic && matchesStatus
+    return matchesSearch && matchesTopic && matchesStatus && matchesStarred
   }).sort((a, b) => {
     const { column, direction } = browseSortConfig
     let aVal: any, bVal: any
@@ -206,6 +238,16 @@ export function Browse() {
               <option value="master">Master</option>
             </select>
 
+            <select
+              value={starredFilter}
+              onChange={(e) => setStarredFilter(e.target.value as 'all' | 'starred' | 'unstarred')}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="all">All Questions</option>
+              <option value="starred">⭐ Starred Only</option>
+              <option value="unstarred">Unstarred Only</option>
+            </select>
+
             <button
               onClick={() => setShowAnswers(!showAnswers)}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
@@ -234,6 +276,9 @@ export function Browse() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                ⭐
+              </th>
               <th
                 className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
                 onClick={() => handleSort('id')}
@@ -283,6 +328,15 @@ export function Browse() {
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedAndFilteredQuestions.map((question) => (
               <tr key={question.id} className="hover:bg-gray-50">
+                <td className="px-2 py-4 text-center">
+                  <button
+                    onClick={() => toggleStar(question.id, question.isStarred)}
+                    className="text-xl hover:scale-110 transition-transform"
+                    title={question.isStarred ? "Unstar question" : "Star question"}
+                  >
+                    {question.isStarred ? '⭐' : '☆'}
+                  </button>
+                </td>
                 <td className="px-3 py-4 text-sm text-gray-900 font-medium">
                   {question.id}
                 </td>

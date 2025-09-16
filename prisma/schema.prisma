@@ -58,6 +58,7 @@ model QuestionStat {
   easeFactor     Float    @default(2.5)
   interval       Int      @default(1)
   repetitions    Int      @default(0)
+  isStarred      Boolean  @default(false) // User can star questions for prioritization
 
   // Anki Algorithm Fields
   state          String   @default("new") // new, learning, review, relearning, suspended
