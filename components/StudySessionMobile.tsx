@@ -207,38 +207,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
       {/* Fixed Bottom Navigation Bar */}
       {currentAnswerData && (
         <>
-          {/* Grade Selector Overlay */}
-          {showGradeSelector && (
-            <div className="fixed left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg animate-slide-up z-20" style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}>
-              <div className="text-xs text-gray-500 mb-2">Response time: {(currentAnswerData.responseTimeMs / 1000).toFixed(1)}s</div>
-              <div className="grid grid-cols-4 gap-2">
-                <button
-                  onClick={() => submitAnswer(Quality.Again)}
-                  className="px-2 py-3 text-sm rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors font-medium"
-                >
-                  Incorrect
-                </button>
-                <button
-                  onClick={() => submitAnswer(Quality.Hard)}
-                  className="px-2 py-3 text-sm rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors font-medium"
-                >
-                  Hard
-                </button>
-                <button
-                  onClick={() => submitAnswer(Quality.Good)}
-                  className="px-2 py-3 text-sm rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors font-medium"
-                >
-                  Good
-                </button>
-                <button
-                  onClick={() => submitAnswer(Quality.Easy)}
-                  className="px-2 py-3 text-sm rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors font-medium"
-                >
-                  Easy
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Grade Selector Overlay removed - will implement in future */}
 
           {/* Debug Panel - Mastery Variables */}
           {testMode && currentAnswerData && (
@@ -292,12 +261,15 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
                 )}>
                   {currentAnswerData.isCorrect ? Quality[currentAnswerData.suggestedGrade] : "Incorrect"}
                 </span>
-                <button
-                  onClick={() => setShowGradeSelector(!showGradeSelector)}
-                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
-                >
-                  Adjust
-                </button>
+                {/* Adjust button hidden for now - will implement in future */}
+                {false && (
+                  <button
+                    onClick={() => setShowGradeSelector(!showGradeSelector)}
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
+                  >
+                    Adjust
+                  </button>
+                )}
               </div>
               {showExplanation && (
                 <button

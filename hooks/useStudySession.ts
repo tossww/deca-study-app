@@ -181,43 +181,23 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     const treatAsCorrect = selectedGrade !== Quality.Again
 
     // Adjust session stats based on the change
-    console.log('🔍 Score Debug:', {
-      isAdjustment,
-      lastSubmittedGrade: lastSubmittedGrade ? Quality[lastSubmittedGrade] : 'None',
-      selectedGrade: Quality[selectedGrade],
-      treatAsCorrect,
-      currentStats: sessionStats
-    })
-
     if (isAdjustment && lastSubmittedGrade) {
       const previousCorrect = (lastSubmittedGrade as Quality) !== Quality.Again
       
-      console.log('🔍 Adjustment Logic:', {
-        previousCorrect,
-        treatAsCorrect,
-        willChangeScore: (previousCorrect && !treatAsCorrect) || (!previousCorrect && treatAsCorrect)
-      })
-      
       if (previousCorrect && !treatAsCorrect) {
         // Was correct, now treating as incorrect
-        console.log('📉 Decreasing score: correct -> incorrect')
         setSessionStats((prev) => ({
           ...prev,
           correct: prev.correct - 1,
         }))
       } else if (!previousCorrect && treatAsCorrect) {
         // Was incorrect, now treating as correct
-        console.log('📈 Increasing score: incorrect -> correct')
         setSessionStats((prev) => ({
           ...prev,
           correct: prev.correct + 1,
         }))
-      } else {
-        console.log('➖ No score change needed: same correctness')
       }
       // If both are correct or both are incorrect, no score change needed
-    } else {
-      console.log('⚠️ Not adjusting score:', { isAdjustment, hasLastGrade: !!lastSubmittedGrade })
     }
 
     try {
