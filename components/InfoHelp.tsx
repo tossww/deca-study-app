@@ -15,7 +15,6 @@ export function InfoHelp() {
   } = useStore()
   const [sessionSize, setSessionSize] = useState(studySessionSize)
   const [buildTime, setBuildTime] = useState<string>('')
-  const [gitBranch, setGitBranch] = useState<string>('staging')
 
   useEffect(() => {
     setSessionSize(studySessionSize)
@@ -24,18 +23,6 @@ export function InfoHelp() {
   useEffect(() => {
     // Set build time on client side to avoid hydration mismatch
     setBuildTime(new Date().toISOString())
-
-    // Fetch git branch info if available
-    fetch('/api/build-info')
-      .then(res => res.json())
-      .then(data => {
-        if (data.branch) {
-          setGitBranch(data.branch)
-        }
-      })
-      .catch(() => {
-        // Fallback to default if API not available
-      })
   }, [])
 
   const handleSizeChange = (newSize: number) => {
@@ -48,26 +35,19 @@ export function InfoHelp() {
 
   return (
     <div className="space-y-6">
-      {/* Version Info Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <span className="text-sm font-semibold text-blue-900">v{packageVersion}</span>
-            <span className="text-xs text-blue-600 ml-3">Branch: {gitBranch}</span>
-            <span className="text-xs text-gray-500 ml-2">({process.env.NODE_ENV || 'development'})</span>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-600">
-              {buildTime && `Loaded: ${new Date(buildTime).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-              })}`}
-            </p>
-          </div>
+      {/* Version Info Header - Simple and Clean */}
+      <div className="bg-gray-100 rounded-lg p-3 border border-gray-300">
+        <div className="text-center">
+          <span className="text-sm font-mono text-gray-700">
+            v{packageVersion} • {buildTime && new Date(buildTime).toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            })}
+          </span>
         </div>
       </div>
 
