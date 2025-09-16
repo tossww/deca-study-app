@@ -11,6 +11,7 @@ interface Question {
   explanation: string
   topic?: string
   refId?: number | null
+  masteryLevel?: 'new' | 'apprentice' | 'guru' | 'master'
 }
 
 interface StudySessionProps {

@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No valid topics found' }, { status: 400 })
     }
 
-    // Get user ID for study mode
-    const userId = mode === 'study' ? await getUserFromRequest(request) : null
+    // Get user ID (for both modes now, to fetch mastery levels)
+    const userId = await getUserFromRequest(request)
 
     let dbQuestions
 
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       console.log(`📚 Study mode: ${overdueQuestions.length} overdue, ${dueQuestions.length} due, ${newQuestions.length} new`)
       console.log(`📚 Returning ${dbQuestions.length} questions (limit: ${limit})`)
     } else {
-      // Test mode: Get all questions for topics
+      // Test mode: Get all questions for topics (but still include stats if user is logged in)
       dbQuestions = await prisma.question.findMany({
         where: {
           topic: {
@@ -104,7 +104,12 @@ export async function GET(request: NextRequest) {
           }
         },
         include: {
-          topic: true
+          topic: true,
+          stats: userId ? {
+            where: {
+              userId: userId
+            }
+          } : false
         }
       })
       
@@ -112,10 +117,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform questions to match frontend format
-    const questions = dbQuestions.map(q => {
+    const questions = dbQuestions.map((q: any) => {
       // Convert letter answer (A, B, C, D) to index (0, 1, 2, 3)
       const letterToIndex = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
       const correctAnswer = letterToIndex[q.correctAnswer as keyof typeof letterToIndex] ?? 0
+
+      // Determine mastery level if user is logged in and has stats
+      let masteryLevel: 'new' | 'apprentice' | 'guru' | 'master' = 'new'
+      if (userId && q.stats && q.stats.length > 0) {
+        const stat = q.stats[0]
+        if (stat.repetitions === 0) {
+          masteryLevel = 'new'
+        } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3 && stat.interval >= 21) {
+          masteryLevel = 'master'
+        } else if (stat.repetitions >= 3 && stat.easeFactor >= 2.3) {
+          masteryLevel = 'guru'
+        } else {
+          masteryLevel = 'apprentice'
+        }
+      }
 
       return {
         id: q.id,
@@ -124,7 +144,8 @@ export async function GET(request: NextRequest) {
         correctAnswer,
         explanation: q.explanation,
         topic: q.topic.name,
-        refId: q.refId
+        refId: q.refId,
+        masteryLevel
       }
     })
 

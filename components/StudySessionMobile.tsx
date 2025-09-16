@@ -19,9 +19,8 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
   const { cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
-  const [currentMasteryLevel, setCurrentMasteryLevel] = useState<'new' | 'apprentice' | 'guru' | 'master'>('new')
 
-  const fetchMasteryData = async (showModal = true) => {
+  const fetchMasteryData = async () => {
     if (!currentQuestion) return
 
     try {
@@ -35,10 +34,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
       if (response.ok) {
         const data = await response.json()
         setMasteryData(data)
-        setCurrentMasteryLevel(data.masteryLevel || 'new')
-        if (showModal) {
-          setShowMasteryModal(true)
-        }
+        setShowMasteryModal(true)
       }
     } catch (error) {
       console.error('Failed to fetch mastery data:', error)
@@ -65,25 +61,8 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
     isLoading,
   } = useStudySession({ topics, mode, limit, onComplete, onQuit })
 
-  // Fetch mastery level when question changes
-  useEffect(() => {
-    if (currentQuestion) {
-      fetchMasteryData(false)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQuestion])
-
-  // Update mastery level immediately after answering
-  useEffect(() => {
-    if (showExplanation) {
-      // Fetch updated mastery level after a brief delay to ensure server has processed the answer
-      const timer = setTimeout(() => {
-        fetchMasteryData(false)
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showExplanation])
+  // Get current mastery level from the question data
+  const currentMasteryLevel = currentQuestion?.masteryLevel || 'new'
 
   // Mobile-specific touch gestures
   useEffect(() => {
