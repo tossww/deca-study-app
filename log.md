@@ -482,3 +482,53 @@ Implementing 4-phase approach per TODO:
 ✅ Version bumped to 1.1 with updated date
 
 *Documentation workflow improved to ensure TODO.md is always maintained*
+
+---
+
+## Session: Bug Fix - Wrong Answer Rating Issue - September 16, 2025
+
+### Issue Investigation
+**Problem**: When users get a question wrong on a brand new account, the question incorrectly moves from "New" to "Apprentice" status instead of staying as "New".
+
+**Investigation Process**:
+1. ✅ Analyzed quality determination logic in `suggestGradeFromTime` function
+2. ✅ Traced through Anki algorithm's `handleNewCard` logic for wrong answers  
+3. ✅ Verified how database state maps to UI learning status labels
+4. ✅ Found root cause in stats API fallback logic
+
+### Root Cause Identified
+The issue was in `/app/api/stats/route.ts` lines 72-73:
+```typescript
+} else {
+  // Fallback to apprentice for any edge cases
+  masteryLevels.apprentice++  // ← BUG: Incorrectly categorized new cards with failed attempts
+}
+```
+
+**The Problem Chain**:
+1. User gets question wrong → card state correctly remains "new"
+2. Stats API fallback logic → incorrectly categorizes as "apprentice" 
+3. UI displays question as "Apprentice" instead of "New"
+
+### Solution Implemented
+1. **Updated stats API logic** (`/app/api/stats/route.ts`):
+   - Added explicit handling for `state === 'new'` questions
+   - New cards that have been attempted but failed now stay categorized as "new"
+   - Improved fallback logic to only apply to true edge cases
+
+2. **Updated Browse API logic** (`/app/api/questions/all/route.ts`):
+   - Prioritize card state over repetitions/interval for learning status determination
+   - Cards with `state === 'new'` always show as "New" regardless of attempts
+
+### Technical Changes Made
+- Modified mastery level calculation in stats API to properly handle new cards with failed attempts
+- Updated learning status determination in browse API to use card state as primary indicator
+- Ensured consistency between stats dashboard and browse page displays
+- Build tested successfully with no errors
+
+### Files Modified
+- `/app/api/stats/route.ts` - Fixed mastery level categorization logic
+- `/app/api/questions/all/route.ts` - Fixed learning status determination logic
+- `/TODO.md` - Documented the bug fix completion
+
+*Bug fix completed and ready for testing*

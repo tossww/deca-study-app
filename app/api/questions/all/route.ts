@@ -32,8 +32,16 @@ export async function GET(request: Request) {
           masteryLevel = Math.round((progress.timesCorrect / totalAttempts) * 100)
         }
 
-        // Determine learning status based on repetitions, ease factor and interval
-        if (progress.repetitions === 0) {
+        // Determine learning status based on state first, then repetitions/interval
+        if (progress.state === 'new') {
+          learningStatus = 'new'
+        } else if (progress.state === 'learning' || progress.state === 'relearning') {
+          learningStatus = 'apprentice'
+        } else if (progress.state === 'review' && progress.interval >= 21) {
+          learningStatus = 'master'
+        } else if (progress.state === 'review') {
+          learningStatus = 'guru'
+        } else if (progress.repetitions === 0) {
           learningStatus = 'new'
         } else if (progress.repetitions >= 3 && progress.easeFactor >= 2.3 && progress.interval >= 21) {
           learningStatus = 'master'

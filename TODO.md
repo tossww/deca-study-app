@@ -85,6 +85,32 @@ Added a "Test Mode" option that removes the period from the correct answer's num
 - Toggle is available in the Info/Help panel under Session Settings
 - Warning message displays when test mode is active
 
+## ✅ COMPLETED: Wrong Answer Rating Bug Fix - September 16, 2025
+
+### Issue Resolved
+Fixed bug where getting a question wrong on a brand new account incorrectly moved the question from "New" to "Apprentice" status.
+
+### Root Cause
+The stats API had a fallback logic that categorized any question with an attempted answer as "Apprentice" if it didn't match the specific learning/review state criteria. This meant:
+1. User gets question wrong → card state remains "new" (correct)
+2. Stats API fallback logic → incorrectly categorizes as "apprentice"
+3. UI displays question as "Apprentice" instead of "New"
+
+### Solution Implemented
+1. **Updated stats API logic** (`/app/api/stats/route.ts`):
+   - Added explicit handling for `state === 'new'` questions
+   - New cards that have been attempted but failed now stay categorized as "new"
+   - Improved fallback logic to only apply to edge cases
+
+2. **Updated Browse API logic** (`/app/api/questions/all/route.ts`):
+   - Prioritize card state over repetitions/interval for learning status determination
+   - Cards with `state === 'new'` always show as "New" regardless of attempts
+
+### Technical Changes
+- Modified mastery level calculation to properly handle new cards with failed attempts
+- Updated learning status determination to use card state as primary indicator
+- Ensured consistency between stats dashboard and browse page
+
 ## 🚧 In Progress
 - None currently
 

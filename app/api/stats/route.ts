@@ -66,8 +66,13 @@ export async function GET(request: NextRequest) {
         // Guru: Review cards with < 21 day intervals
         masteryLevels.guru++
         topicProgress[topicName].guru++
+      } else if (stat.state === 'new') {
+        // New cards that have been attempted but failed should stay as new
+        // They will be counted in the "new" category when we calculate unseen questions
+        masteryLevels.new++
+        topicProgress[topicName].new++
       } else {
-        // Fallback to apprentice for any edge cases
+        // Fallback to apprentice for any other edge cases (shouldn't happen)
         masteryLevels.apprentice++
         topicProgress[topicName].apprentice++
       }
