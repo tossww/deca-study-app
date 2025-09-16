@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       where: {
         userId_questionId: {
           userId,
-          questionId,
+          questionId: parseInt(questionId),
         },
       },
       include: {
