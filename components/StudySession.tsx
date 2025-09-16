@@ -73,17 +73,17 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestion])
 
-  // Update mastery level after answer submission
+  // Update mastery level immediately after answering
   useEffect(() => {
-    if (showExplanation && currentAnswerData?.submitted) {
+    if (showExplanation) {
       // Fetch updated mastery level after a brief delay to ensure server has processed the answer
       const timer = setTimeout(() => {
         fetchMasteryData(false)
-      }, 500)
+      }, 300)
       return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showExplanation, currentAnswerData?.submitted])
+  }, [showExplanation])
 
   // Keyboard shortcuts for desktop version
   useEffect(() => {
@@ -173,7 +173,7 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
             {currentQuestion.question}
           </h2>
           <div className="absolute bottom-2 right-2">
-            <MasteryIndicator level={currentMasteryLevel} className="text-[10px] px-1.5 py-0.5" />
+            <MasteryIndicator level={currentMasteryLevel} className="text-[11px]" />
           </div>
         </div>
 
