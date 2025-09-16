@@ -15,7 +15,7 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
-  const { testMode, cheatingMode, debugMode } = useStore()
+  const { cheatingMode, debugMode } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
 
@@ -171,8 +171,6 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
                   ? 'border-green-500 bg-green-50 text-green-800'
                   : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
                   ? 'border-red-500 bg-red-50 text-red-800'
-                  : cheatingMode && index === currentQuestion.correctAnswer
-                  ? 'border-yellow-500 bg-yellow-100 text-yellow-800'
                   : selectedAnswer === index
                   ? 'border-primary-500 bg-primary-50'
                   : 'border-gray-200 bg-white hover:border-gray-300 active:bg-gray-50'
@@ -180,7 +178,7 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
             >
               <div className="flex items-center w-full">
                 <span className="font-semibold mr-3 flex-shrink-0 text-gray-600">
-                  {index + 1}{testMode && index === currentQuestion.correctAnswer ? '' : '.'}
+                  {index + 1}{cheatingMode && index === currentQuestion.correctAnswer ? '' : '.'}
                 </span>
                 <span className="text-base">{option}</span>
               </div>
