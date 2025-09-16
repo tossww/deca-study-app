@@ -178,11 +178,11 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
         <div className="px-3 py-2">
         {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0 relative">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed pr-20">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
           <div className="absolute bottom-2 right-2">
-            <MasteryIndicator level={currentMasteryLevel} />
+            <MasteryIndicator level={currentMasteryLevel} className="text-[10px] px-1.5 py-0.5" />
           </div>
         </div>
 

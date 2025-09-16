@@ -169,11 +169,11 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-6">
         <div className="bg-gray-50 rounded-lg p-4 mb-4 relative">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed pr-20">
+          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
             {currentQuestion.question}
           </h2>
           <div className="absolute bottom-2 right-2">
-            <MasteryIndicator level={currentMasteryLevel} />
+            <MasteryIndicator level={currentMasteryLevel} className="text-[10px] px-1.5 py-0.5" />
           </div>
         </div>
 
