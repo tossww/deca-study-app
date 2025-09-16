@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Quality, suggestGradeFromTime } from '@/lib/spaced-repetition'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
@@ -45,6 +45,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   const [showGradeSelector, setShowGradeSelector] = useState(false)
   const [currentAnswerData, setCurrentAnswerData] = useState<AnswerData | null>(null)
   const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
+  const nextQuestionRef = useRef<(() => void) | null>(null)
 
   // Load questions effect
   useEffect(() => {
@@ -191,13 +192,17 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       return
     }
 
-    // Clear answer data
+    // Clear answer data and trigger next question
     setShowGradeSelector(false)
     setCurrentAnswerData(null)
 
-    // Proceed to next question after successful save
-    nextQuestion()
-  }, [currentAnswerData, autoGradeTimer, questions, currentIndex, nextQuestion])
+    // Set a flag to trigger nextQuestion after render
+    setTimeout(() => {
+      if (nextQuestionRef.current) {
+        nextQuestionRef.current()
+      }
+    }, 0)
+  }, [currentAnswerData, autoGradeTimer, questions, currentIndex])
 
   const completeSession = useCallback(async () => {
     if (sessionId) {
@@ -255,6 +260,11 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     // Scroll to top for new question
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [autoGradeTimer, currentIndex, questions.length, completeSession, sessionStats, onComplete])
+
+  // Store nextQuestion in ref to avoid circular dependency
+  useEffect(() => {
+    nextQuestionRef.current = nextQuestion
+  }, [nextQuestion])
 
   const handleQuit = useCallback(() => {
     setShowQuitModal(true)
