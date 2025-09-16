@@ -1,6 +1,6 @@
 {
   "name": "deca-study-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DECA exam study app with spaced repetition",
   "private": true,
   "scripts": {
