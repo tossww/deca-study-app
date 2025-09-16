@@ -77,14 +77,6 @@ export function Browse() {
     }
   }
 
-  const handleStatusClick = (status: string) => {
-    if (statusFilter === status) {
-      setStatusFilter('all')
-    } else {
-      setStatusFilter(status)
-    }
-  }
-
   const getSortIcon = (column: SortColumn) => {
     if (browseSortConfig.column !== column) {
       return (
@@ -175,106 +167,97 @@ export function Browse() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Fixed Header Section */}
-      <div className="flex-shrink-0 bg-white rounded-t-lg shadow-sm">
-        <div className="p-6 pb-0">
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search questions, answers, or topics..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-
-            <select
-              value={topicFilter}
-              onChange={(e) => setTopicFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="all">All Topics</option>
-              {uniqueTopics.map(topic => (
-                <option key={topic} value={topic}>{topic}</option>
-              ))}
-            </select>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="all">All Status</option>
-              <option value="new">New</option>
-              <option value="apprentice">Apprentice</option>
-              <option value="guru">Guru</option>
-              <option value="master">Master</option>
-            </select>
-
-            <button
-              onClick={() => setShowAnswers(!showAnswers)}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                showAnswers
-                  ? 'bg-primary-600 text-white hover:bg-primary-700'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {showAnswers ? 'Hide' : 'Show'} Answers
-            </button>
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search questions, answers, or topics..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
           </div>
 
-          <div className="text-sm text-gray-600 mb-4">
-            Showing {sortedAndFilteredQuestions.length} of {questions.length} questions
-            {browseSortConfig.column !== 'id' && (
-              <span className="ml-2 text-primary-600">
-                • Sorted by {browseSortConfig.column} ({browseSortConfig.direction === 'asc' ? 'ascending' : 'descending'})
-              </span>
-            )}
-            {statusFilter !== 'all' && (
-              <span className="ml-2 text-primary-600">
-                • Filtered by status: {statusFilter}
-              </span>
-            )}
-          </div>
+          <select
+            value={topicFilter}
+            onChange={(e) => setTopicFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="all">All Topics</option>
+            {uniqueTopics.map(topic => (
+              <option key={topic} value={topic}>{topic}</option>
+            ))}
+          </select>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="all">All Status</option>
+            <option value="new">New</option>
+            <option value="apprentice">Apprentice</option>
+            <option value="guru">Guru</option>
+            <option value="master">Master</option>
+          </select>
+
+          <button
+            onClick={() => setShowAnswers(!showAnswers)}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              showAnswers
+                ? 'bg-primary-600 text-white hover:bg-primary-700'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {showAnswers ? 'Hide' : 'Show'} Answers
+          </button>
         </div>
 
-        {/* Fixed Table Header */}
-        <div className="overflow-x-auto border-t border-gray-200">
-          <table className="min-w-full">
+        <div className="text-sm text-gray-600 mb-4">
+          Showing {sortedAndFilteredQuestions.length} of {questions.length} questions
+          {browseSortConfig.column !== 'id' && (
+            <span className="ml-2 text-primary-600">
+              • Sorted by {browseSortConfig.column} ({browseSortConfig.direction === 'asc' ? 'ascending' : 'descending'})
+            </span>
+          )}
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th
-                  className="sticky top-0 z-10 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('id')}
                 >
                   ID
                   {getSortIcon('id')}
                 </th>
                 <th
-                  className="sticky top-0 z-10 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('question')}
                 >
                   Question
                   {getSortIcon('question')}
                 </th>
                 <th
-                  className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('topic')}
                 >
                   Topic
                   {getSortIcon('topic')}
                 </th>
                 <th
-                  className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('status')}
                 >
                   Status
                   {getSortIcon('status')}
                 </th>
                 <th
-                  className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('score')}
                 >
                   Score
@@ -282,7 +265,7 @@ export function Browse() {
                 </th>
                 {showAnswers && (
                   <th
-                    className="sticky top-0 z-10 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('answer')}
                   >
                     Answer
@@ -291,64 +274,54 @@ export function Browse() {
                 )}
               </tr>
             </thead>
-          </table>
-        </div>
-      </div>
-
-      {/* Scrollable Table Body */}
-      <div className="flex-1 overflow-auto bg-white rounded-b-lg shadow-sm">
-        <table className="min-w-full">
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedAndFilteredQuestions.map((question) => (
-              <tr key={question.id} className="hover:bg-gray-50">
-                <td className="px-3 py-4 text-sm text-gray-900 font-medium">
-                  {question.id}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  <div className="max-w-md">
-                    {question.question}
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
-                  <div className="leading-tight">
-                    {question.topic.split(' & ').map((part, index) => (
-                      <span key={index}>
-                        {part}
-                        {index < question.topic.split(' & ').length - 1 && <><br />& </>}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => handleStatusClick(question.learningStatus)}
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-all hover:scale-105 cursor-pointer ${getStatusColor(question.learningStatus)}`}
-                    title={`Click to filter by ${question.learningStatus}`}
-                  >
-                    {question.learningStatus}
-                  </button>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <span className="text-gray-900 font-medium">
-                    {question.timesCorrect}/{question.timesAnswered}
-                  </span>
-                  {question.timesAnswered > 0 && (
-                    <span className="ml-2 text-gray-500">
-                      ({Math.round((question.timesCorrect / question.timesAnswered) * 100)}%)
-                    </span>
-                  )}
-                </td>
-                {showAnswers && (
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sortedAndFilteredQuestions.map((question) => (
+                <tr key={question.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-4 text-sm text-gray-900 font-medium">
+                    {question.id}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="max-w-md">
-                      {question.answer}
+                      {question.question}
                     </div>
                   </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <td className="px-4 py-4 text-sm text-gray-900">
+                    <div className="leading-tight">
+                      {question.topic.split(' & ').map((part, index) => (
+                        <span key={index}>
+                          {part}
+                          {index < question.topic.split(' & ').length - 1 && <><br />& </>}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(question.learningStatus)}`}>
+                      {question.learningStatus}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <span className="text-gray-900 font-medium">
+                      {question.timesCorrect}/{question.timesAnswered}
+                    </span>
+                    {question.timesAnswered > 0 && (
+                      <span className="ml-2 text-gray-500">
+                        ({Math.round((question.timesCorrect / question.timesAnswered) * 100)}%)
+                      </span>
+                    )}
+                  </td>
+                  {showAnswers && (
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div className="max-w-md">
+                        {question.answer}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {sortedAndFilteredQuestions.length === 0 && (
           <div className="text-center py-12 text-gray-500">
