@@ -9,6 +9,27 @@
 
 *See `TODO.archive.md` for detailed completed features and cleanup phases*
 
+## ✅ COMPLETED: Answer Submission Bug Fix - September 16, 2025
+
+### Issue Resolved
+Fixed bug where clicking a correct answer didn't update repetition variables because the 4-second auto-grade timer was being cleared when users clicked "Continue".
+
+### Root Cause
+- Answer submission was delayed by a 4-second timer
+- Clicking "Continue" cleared the timer without submitting the answer
+- Only users who waited 4+ seconds or clicked "Adjust" had their answers saved
+
+### Solution Implemented
+1. **Removed the 4-second timer** - Answers now submit immediately with the suggested grade
+2. **Fixed adjust button behavior** - Adjustments now always calculate from the baseline state (before initial submission)
+3. **Prevented cumulative changes** - Multiple clicks on "Adjust" no longer apply cumulative changes
+
+### Technical Changes
+- Modified `handleAnswer` to submit answer immediately instead of setting a timer
+- Added `submitted` and `submittedGrade` fields to track baseline state
+- Updated `submitAnswer` to always use baseline grade for score adjustments
+- Removed all `autoGradeTimer` related code
+
 ## ✅ COMPLETED: Two Study Modes (Test vs Review) - September 15, 2025
 
 ### Issue Resolved

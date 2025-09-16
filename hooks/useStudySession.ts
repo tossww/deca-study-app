@@ -26,6 +26,8 @@ interface AnswerData {
   isCorrect: boolean
   responseTimeMs: number
   suggestedGrade: Quality
+  submitted?: boolean
+  submittedGrade?: Quality
 }
 
 export function useStudySession({ topics, mode, limit, onComplete, onQuit }: StudySessionProps) {
@@ -44,7 +46,6 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   const [sessionStartTime] = useState(Date.now())
   const [showGradeSelector, setShowGradeSelector] = useState(false)
   const [currentAnswerData, setCurrentAnswerData] = useState<AnswerData | null>(null)
-  const [autoGradeTimer, setAutoGradeTimer] = useState<NodeJS.Timeout | null>(null)
   const nextQuestionRef = useRef<(() => void) | null>(null)
   const submitAnswerRef = useRef<((grade: Quality) => void) | null>(null)
 
@@ -98,7 +99,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     return () => clearInterval(interval)
   }, [showQuitModal])
 
-  const handleAnswer = useCallback((answerIndex: number) => {
+  const handleAnswer = useCallback(async (answerIndex: number) => {
     if (showExplanation) return
 
     setSelectedAnswer(answerIndex)
@@ -122,20 +123,46 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       isCorrect,
       responseTimeMs,
       suggestedGrade,
+      submitted: false,
     }
     setCurrentAnswerData(answerData)
 
-    // Auto-apply suggested grade after 4 seconds unless user intervenes
-    const timer = setTimeout(() => {
-      console.log('Auto-grade timer fired, suggested grade:', suggestedGrade)
-      if (submitAnswerRef.current) {
-        console.log('Calling submitAnswer from timer')
-        submitAnswerRef.current(suggestedGrade)
-      } else {
-        console.log('submitAnswerRef.current is null!')
+    // Submit immediately with suggested grade
+    try {
+      const { sessionToken } = useStore.getState()
+      const payload = {
+        questionId: questions[currentIndex].id,
+        userAnswer: answerIndex,
+        isCorrect: suggestedGrade !== Quality.Again, // Treat as correct unless it's "Again"
+        timeSpent: Math.floor(responseTimeMs / 1000),
+        quality: suggestedGrade,
       }
-    }, 4000)
-    setAutoGradeTimer(timer)
+
+      const response = await fetch('/api/questions/answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-Token': sessionToken || '',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(`API error: ${result.error || 'Unknown error'}`)
+      }
+
+      // Mark as submitted with the grade used
+      setCurrentAnswerData(prev => prev ? {
+        ...prev,
+        submitted: true,
+        submittedGrade: suggestedGrade
+      } : null)
+    } catch (error) {
+      console.error('Failed to save answer:', error)
+      toast.error('Failed to save answer')
+    }
   }, [showExplanation, questionStartTime, questions, currentIndex])
 
   const submitAnswer = useCallback(async (selectedGrade: Quality) => {
@@ -145,27 +172,22 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       return
     }
 
-    // Clear auto-grade timer immediately to prevent duplicate submissions
-    if (autoGradeTimer) {
-      clearTimeout(autoGradeTimer)
-      setAutoGradeTimer(null)
-    }
+    const { answerIndex, isCorrect, responseTimeMs, suggestedGrade, submittedGrade } = currentAnswerData
 
-    const { answerIndex, isCorrect, responseTimeMs } = currentAnswerData
-
-    // Update score based on quality selection
-    // If user selects "Again", treat as incorrect; otherwise treat as correct
+    // Always use the original suggested grade as baseline for score adjustment
+    const baselineGrade = submittedGrade || suggestedGrade
     const treatAsCorrect = selectedGrade !== Quality.Again
+    const baselineCorrect = baselineGrade !== Quality.Again
 
-    // Adjust the score if grade changes the correctness
-    if (isCorrect && !treatAsCorrect) {
-      // Was correct, now treating as incorrect (user selected Again)
+    // Adjust the score based on difference from baseline
+    if (baselineCorrect && !treatAsCorrect) {
+      // Was correct at baseline, now treating as incorrect
       setSessionStats((prev) => ({
         ...prev,
         correct: prev.correct - 1,
       }))
-    } else if (!isCorrect && treatAsCorrect) {
-      // Was incorrect, now treating as correct (user selected Hard/Good/Easy)
+    } else if (!baselineCorrect && treatAsCorrect) {
+      // Was incorrect at baseline, now treating as correct
       setSessionStats((prev) => ({
         ...prev,
         correct: prev.correct + 1,
@@ -177,7 +199,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       const payload = {
         questionId: questions[currentIndex].id,
         userAnswer: answerIndex,
-        isCorrect: treatAsCorrect, // Use the adjusted correctness
+        isCorrect: treatAsCorrect,
         timeSpent: Math.floor(responseTimeMs / 1000),
         quality: selectedGrade,
       }
@@ -196,6 +218,13 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       if (!response.ok) {
         throw new Error(`API error: ${result.error || 'Unknown error'}`)
       }
+
+      // Update to track what grade was last submitted
+      setCurrentAnswerData(prev => prev ? {
+        ...prev,
+        submitted: true,
+        submittedGrade: baselineGrade // Keep original baseline
+      } : null)
     } catch (error) {
       console.error('Failed to save answer:', error)
       toast.error('Failed to save answer')
@@ -203,17 +232,9 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
       return
     }
 
-    // Clear answer data and trigger next question
+    // Clear answer data and hide grade selector
     setShowGradeSelector(false)
-    setCurrentAnswerData(null)
-
-    // Set a flag to trigger nextQuestion after render
-    setTimeout(() => {
-      if (nextQuestionRef.current) {
-        nextQuestionRef.current()
-      }
-    }, 0)
-  }, [currentAnswerData, autoGradeTimer, questions, currentIndex])
+  }, [currentAnswerData, questions, currentIndex])
 
   const completeSession = useCallback(async () => {
     if (sessionId) {
@@ -239,11 +260,6 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   }, [sessionId, sessionStats])
 
   const nextQuestion = useCallback(async () => {
-    // Clear any pending auto-grade timer
-    if (autoGradeTimer) {
-      clearTimeout(autoGradeTimer)
-      setAutoGradeTimer(null)
-    }
 
     // Clear answer data
     setCurrentAnswerData(null)
@@ -270,7 +286,7 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
 
     // Scroll to top for new question
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [autoGradeTimer, currentIndex, questions.length, completeSession, sessionStats, onComplete])
+  }, [currentIndex, questions.length, completeSession, sessionStats, onComplete, mode])
 
   // Store callbacks in refs to avoid circular dependencies
   useEffect(() => {
@@ -306,7 +322,6 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
     showGradeSelector,
     setShowGradeSelector,
     currentAnswerData,
-    autoGradeTimer,
 
     // Actions
     handleAnswer,
