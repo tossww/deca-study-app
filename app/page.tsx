@@ -50,8 +50,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className={`bg-white shadow-sm border-b ${isInStudyMode ? 'hidden' : ''}`}>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className={`bg-white shadow-sm border-b flex-shrink-0 ${isInStudyMode ? 'hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 sm:py-4 gap-2">
             <button
@@ -123,7 +123,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className={`${isInStudyMode ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
+      <main className={`${isInStudyMode ? '' : currentView === 'browse' ? 'flex-1 flex flex-col overflow-hidden p-4 sm:p-6 lg:p-8' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
         {currentView === 'dashboard' && (
           <Dashboard onStartStudy={() => setCurrentView('study')} />
         )}
