@@ -78,15 +78,22 @@
 4. ✅ Update PRD.md status if applicable
 5. ✅ Log completion and results in log.md
 6. ✅ **Test the changes thoroughly**
-7. ✅ Run lint/typecheck if available
-8. ✅ **NEVER ask user to test - always test yourself first**
-9. 🚀 **ALWAYS commit and push changes to GitHub immediately when there's something to test**
-10. ✅ **Inform user that changes are pushed and ready to test**
+7. ✅ **🚨 Run `npm run build` to test build locally**
+8. ✅ Run lint/typecheck if available
+9. ✅ **NEVER ask user to test - always test yourself first**
+10. 🚀 **ALWAYS commit and push changes to GitHub immediately when there's something to test**
+11. ✅ **Inform user that changes are pushed and ready to test**
 
 #### Testing & Deployment:
 - **When making changes that need user testing**: Automatically commit and push to deploy on Vercel
 - **This ensures the user can test the latest changes** without having to ask for deployment
+- **🚨 CRITICAL: Always test build locally before pushing**:
+  - Run `npm run build` before every commit
+  - Fix any TypeScript or build errors locally
+  - Never push code that fails to build
+  - Avoid user having to copy/paste build errors from Vercel
 - **Commands to remember**:
+  - Build test: `npm run build`
   - Lint: `npm run lint`
   - Type check: `npm run typecheck`
 
