@@ -117,10 +117,10 @@ export function StudySession({ topics, mode, limit, onComplete, onQuit }: StudyS
           }
         })
         const data = await response.json()
-        const starred = new Set(
+        const starred = new Set<number>(
           data.questions
             .filter((q: any) => q.isStarred)
-            .map((q: any) => q.id)
+            .map((q: any) => Number(q.id))
         )
         setStarredQuestions(starred)
       } catch (error) {
