@@ -17,10 +17,12 @@ interface StudySessionMobileProps {
 }
 
 export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: StudySessionMobileProps) {
-  const { cheatingMode, debugMode } = useStore()
+  const { cheatingMode, debugMode, user } = useStore()
   const [showMasteryModal, setShowMasteryModal] = useState(false)
   const [masteryData, setMasteryData] = useState<any>(null)
   const [showSummary, setShowSummary] = useState(false)
+  const [starredQuestions, setStarredQuestions] = useState<Set<number>>(new Set())
+  const isStarredOnly = topics.length === 1 && topics[0] === 'starred'
 
   const fetchMasteryData = async () => {
     if (!currentQuestion) return
@@ -40,6 +42,41 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
       }
     } catch (error) {
       console.error('Failed to fetch mastery data:', error)
+    }
+  }
+
+  const toggleStar = async (questionId: number) => {
+    if (!user?.id) return
+
+    const isCurrentlyStarred = starredQuestions.has(questionId)
+
+    try {
+      const response = await fetch('/api/questions/star', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'user-id': user.id
+        },
+        body: JSON.stringify({
+          questionId,
+          isStarred: !isCurrentlyStarred
+        })
+      })
+
+      if (response.ok) {
+        // Update local state
+        setStarredQuestions(prev => {
+          const newSet = new Set(prev)
+          if (isCurrentlyStarred) {
+            newSet.delete(questionId)
+          } else {
+            newSet.add(questionId)
+          }
+          return newSet
+        })
+      }
+    } catch (error) {
+      console.error('Failed to toggle star:', error)
     }
   }
   
@@ -67,6 +104,32 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
 
   // Get current mastery level from the question data
   const currentMasteryLevel = currentQuestion?.masteryLevel || 'new'
+
+  // Fetch starred questions on mount
+  useEffect(() => {
+    const fetchStarredQuestions = async () => {
+      if (!user?.id) return
+
+      try {
+        const response = await fetch('/api/questions/all', {
+          headers: {
+            'user-id': user.id
+          }
+        })
+        const data = await response.json()
+        const starred = new Set(
+          data.questions
+            .filter((q: any) => q.isStarred)
+            .map((q: any) => q.id)
+        )
+        setStarredQuestions(starred)
+      } catch (error) {
+        console.error('Failed to fetch starred questions:', error)
+      }
+    }
+
+    fetchStarredQuestions()
+  }, [user?.id])
 
   // Mobile-specific touch gestures
   useEffect(() => {
@@ -124,8 +187,30 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
   if (!currentQuestion) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <p className="text-gray-600">No questions available</p>
+        <div className="text-center px-4">
+          {isStarredOnly ? (
+            <>
+              <p className="text-xl font-semibold text-gray-700 mb-2">No Starred Questions</p>
+              <p className="text-gray-600 mb-4">You haven&apos;t starred any questions yet.</p>
+              <p className="text-sm text-gray-500">Go to Browse Questions to star some questions first!</p>
+              <button
+                onClick={onQuit}
+                className="mt-6 px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+              >
+                Back to Topic Selection
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-600">No questions available</p>
+              <button
+                onClick={onQuit}
+                className="mt-4 px-6 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
+              >
+                Back
+              </button>
+            </>
+          )}
         </div>
       </div>
     )
@@ -161,9 +246,18 @@ export function StudySessionMobile({ topics, mode, limit, onComplete, onQuit }: 
         <div className="px-3 py-2">
         {/* Question - Clean and focused */}
         <div className="bg-white rounded-lg p-4 mb-2 shadow-sm flex-shrink-0 relative">
-          <h2 className="text-lg font-semibold text-gray-900 leading-relaxed">
-            {currentQuestion.question}
-          </h2>
+          <div className="flex items-start justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 leading-relaxed flex-1">
+              {currentQuestion.question}
+            </h2>
+            <button
+              onClick={() => toggleStar(parseInt(currentQuestion.id))}
+              className="ml-3 text-xl"
+              title={starredQuestions.has(parseInt(currentQuestion.id)) ? "Unstar question" : "Star question"}
+            >
+              {starredQuestions.has(parseInt(currentQuestion.id)) ? '⭐' : '☆'}
+            </button>
+          </div>
           <div className="absolute bottom-1 right-2">
             <AnimatedMasteryIndicator
               level={currentMasteryLevel}
