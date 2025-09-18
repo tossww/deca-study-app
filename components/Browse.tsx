@@ -135,7 +135,8 @@ export function Browse() {
   const sortedAndFilteredQuestions = questions.filter(q => {
     if (!q || !q.question || !q.answer || !q.topic) return false
 
-    const matchesSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = q.id.toString().includes(searchTerm) ||
+                          q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           q.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           q.topic.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesTopic = topicFilter === 'all' || q.topic === topicFilter
@@ -208,7 +209,7 @@ export function Browse() {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Search questions, answers, or topics..."
+                placeholder="Search by ID, question, answer, or topic..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
