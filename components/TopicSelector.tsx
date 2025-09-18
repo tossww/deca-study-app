@@ -96,7 +96,7 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
           />
           <div className="flex-1">
             <span className="text-sm font-medium text-gray-900">⭐ Study Starred Questions Only</span>
-            <p className="text-xs text-gray-600 mt-1">Practice only the questions you've starred</p>
+            <p className="text-xs text-gray-600 mt-1">Practice only the questions you&apos;ve starred</p>
           </div>
         </label>
       </div>
