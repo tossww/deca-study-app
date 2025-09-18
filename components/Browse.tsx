@@ -155,6 +155,10 @@ export function Browse() {
         aVal = a.id
         bVal = b.id
         break
+      case 'starred':
+        aVal = a.isStarred ? 1 : 0
+        bVal = b.isStarred ? 1 : 0
+        break
       case 'question':
         aVal = a.question.toLowerCase()
         bVal = b.question.toLowerCase()
@@ -265,7 +269,7 @@ export function Browse() {
             Showing {sortedAndFilteredQuestions.length} of {questions.length} questions
             {browseSortConfig.column !== 'id' && (
               <span className="ml-2 text-primary-600">
-                • Sorted by {browseSortConfig.column} ({browseSortConfig.direction === 'asc' ? 'ascending' : 'descending'})
+                • Sorted by {browseSortConfig.column === 'starred' ? 'starred' : browseSortConfig.column} ({browseSortConfig.direction === 'asc' ? 'ascending' : 'descending'})
               </span>
             )}
           </div>
@@ -277,8 +281,12 @@ export function Browse() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
-              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+              <th
+                className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"
+                onClick={() => handleSort('starred')}
+              >
                 ⭐
+                {getSortIcon('starred')}
               </th>
               <th
                 className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 bg-gray-50"

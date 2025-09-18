@@ -6,7 +6,7 @@ interface User {
   email: string
 }
 
-export type SortColumn = 'id' | 'question' | 'topic' | 'status' | 'score' | 'answer'
+export type SortColumn = 'id' | 'starred' | 'question' | 'topic' | 'status' | 'score' | 'answer'
 export type SortDirection = 'asc' | 'desc'
 
 export interface SortConfig {
