@@ -14,28 +14,64 @@ export async function GET(request: NextRequest) {
     }
 
     const requestedTopics = topicsParam.split(',')
-    
-    // Map frontend topic IDs to database topic names
-    const topicMapping: { [key: string]: string } = {
-      'business-management': 'Business Management & Administration',
-      'entrepreneurship': 'Entrepreneurship',
-      'finance': 'Finance',
-      'hospitality-tourism': 'Hospitality & Tourism',
-      'marketing': 'Marketing',
-    }
 
-    const topicNames = requestedTopics.map(topic => topicMapping[topic]).filter(Boolean)
-    
-    if (topicNames.length === 0) {
-      return NextResponse.json({ error: 'No valid topics found' }, { status: 400 })
-    }
-
-    // Get user ID (for both modes now, to fetch mastery levels)
+    // Get user ID (for both modes now, to fetch mastery levels and starred)
     const userId = await getUserFromRequest(request)
+
+    // Check if this is a starred-only request
+    const isStarredOnly = requestedTopics.length === 1 && requestedTopics[0] === 'starred'
 
     let dbQuestions
 
-    if (mode === 'study' && userId) {
+    if (isStarredOnly) {
+      // Starred questions only mode
+      if (!userId) {
+        return NextResponse.json({ error: 'Must be logged in to view starred questions' }, { status: 401 })
+      }
+
+      dbQuestions = await prisma.question.findMany({
+        where: {
+          stats: {
+            some: {
+              userId: userId,
+              isStarred: true
+            }
+          }
+        },
+        include: {
+          topic: true,
+          stats: {
+            where: {
+              userId: userId
+            }
+          }
+        }
+      })
+
+      console.log(`⭐ Starred mode: Found ${dbQuestions.length} starred questions`)
+
+      if (mode === 'study' && dbQuestions.length > limit) {
+        dbQuestions = dbQuestions.slice(0, limit)
+        console.log(`⭐ Limited to ${limit} questions for study mode`)
+      }
+    } else {
+      // Normal topic-based mode
+      // Map frontend topic IDs to database topic names
+      const topicMapping: { [key: string]: string } = {
+        'business-management': 'Business Management & Administration',
+        'entrepreneurship': 'Entrepreneurship',
+        'finance': 'Finance',
+        'hospitality-tourism': 'Hospitality & Tourism',
+        'marketing': 'Marketing',
+      }
+
+      const topicNames = requestedTopics.map(topic => topicMapping[topic]).filter(Boolean)
+
+      if (topicNames.length === 0) {
+        return NextResponse.json({ error: 'No valid topics found' }, { status: 400 })
+      }
+
+      if (mode === 'study' && userId) {
       // Study mode: Use spaced repetition filtering
       const now = new Date()
       
@@ -98,12 +134,12 @@ export async function GET(request: NextRequest) {
 
       // Take only the requested limit
       dbQuestions = prioritizedQuestions.slice(0, limit)
-      
+
       console.log(`📚 Study mode: ${starredQuestions.length} starred, ${overdueQuestions.length} overdue, ${dueQuestions.length} due, ${newQuestions.length} new`)
       console.log(`📚 Returning ${dbQuestions.length} questions (limit: ${limit})`)
-    } else {
-      // Test mode: Get all questions for topics (but still include stats if user is logged in)
-      dbQuestions = await prisma.question.findMany({
+      } else {
+        // Test mode: Get all questions for topics (but still include stats if user is logged in)
+        dbQuestions = await prisma.question.findMany({
         where: {
           topic: {
             name: {
@@ -119,9 +155,10 @@ export async function GET(request: NextRequest) {
             }
           } : false
         }
-      })
-      
-      console.log(`📝 Test mode: Found ${dbQuestions.length} total questions`)
+        })
+
+        console.log(`📝 Test mode: Found ${dbQuestions.length} total questions`)
+      }
     }
 
     // Fisher-Yates shuffle algorithm for array with index tracking

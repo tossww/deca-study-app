@@ -37,14 +37,15 @@ const TOPICS = [
 ]
 
 export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
-  const { 
-    selectedTopics: savedTopics, 
+  const {
+    selectedTopics: savedTopics,
     setSelectedTopics: saveTopics,
     studySessionSize,
     lastStudyMode,
-    setLastStudyMode 
+    setLastStudyMode
   } = useStore()
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
+  const [starredOnly, setStarredOnly] = useState(false)
 
   useEffect(() => {
     // Initialize with saved topics on mount
@@ -66,7 +67,12 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
   }
 
   const handleStart = (mode: 'test' | 'study') => {
-    if (selectedTopics.length > 0) {
+    if (starredOnly) {
+      // Pass special marker for starred questions
+      saveTopics(['starred'])
+      setLastStudyMode(mode)
+      onTopicsSelected(['starred'], mode)
+    } else if (selectedTopics.length > 0) {
       saveTopics(selectedTopics) // Save topic IDs to store
       setLastStudyMode(mode) // Save the selected mode
       onTopicsSelected(selectedTopics, mode) // Pass topic IDs and mode to parent
@@ -79,7 +85,26 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Select Topics</h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 mb-4">
+      {/* Starred questions toggle */}
+      <div className="mb-4 p-3 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={starredOnly}
+            onChange={(e) => setStarredOnly(e.target.checked)}
+            className="w-4 h-4 text-yellow-600 rounded focus:ring-yellow-500 mr-3"
+          />
+          <div className="flex-1">
+            <span className="text-sm font-medium text-gray-900">⭐ Study Starred Questions Only</span>
+            <p className="text-xs text-gray-600 mt-1">Practice only the questions you've starred</p>
+          </div>
+        </label>
+      </div>
+
+      <div className={cn(
+        "grid grid-cols-1 gap-2 mb-4",
+        starredOnly && "opacity-50 pointer-events-none"
+      )}>
         {TOPICS.map((topic) => (
           <div
             key={topic.id}
@@ -131,40 +156,45 @@ export function TopicSelector({ onTopicsSelected }: TopicSelectorProps) {
         <div className="flex justify-center items-center space-x-3">
           <button
             onClick={() => handleStart('test')}
-            disabled={selectedTopics.length === 0}
+            disabled={!starredOnly && selectedTopics.length === 0}
             className={cn(
               'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
-              selectedTopics.length > 0
+              (starredOnly || selectedTopics.length > 0)
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             )}
           >
-            Test All
+            {starredOnly ? 'Test Starred' : 'Test All'}
           </button>
           <div className="text-gray-400">or</div>
           <button
             onClick={() => handleStart('study')}
-            disabled={selectedTopics.length === 0}
+            disabled={!starredOnly && selectedTopics.length === 0}
             className={cn(
               'px-5 py-2 rounded-lg font-semibold text-sm transition-all',
-              selectedTopics.length > 0
+              (starredOnly || selectedTopics.length > 0)
                 ? 'bg-primary-600 text-white hover:bg-primary-700'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             )}
           >
-            Study ({studySessionSize})
+            {starredOnly ? 'Study Starred' : `Study (${studySessionSize})`}
           </button>
         </div>
 
         {/* Help text */}
-        {selectedTopics.length === 0 && (
+        {!starredOnly && selectedTopics.length === 0 && (
           <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
             Select at least one topic to start
           </p>
         )}
-        {selectedTopics.length > 0 && (
+        {starredOnly && (
           <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
-            <span className="font-medium">Test All:</span> Practice all questions • 
+            <span className="font-medium">⭐ Starred Mode:</span> Practice only your starred questions
+          </p>
+        )}
+        {!starredOnly && selectedTopics.length > 0 && (
+          <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
+            <span className="font-medium">Test All:</span> Practice all questions •
             <span className="font-medium ml-1">Study:</span> Spaced repetition review
           </p>
         )}
