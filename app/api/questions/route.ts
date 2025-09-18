@@ -224,7 +224,12 @@ export async function GET(request: NextRequest) {
     // Shuffle questions
     const shuffledQuestions = questions.sort(() => Math.random() - 0.5)
 
-    console.log(`🎯 Serving ${shuffledQuestions.length} questions in ${mode} mode for topics: ${topicNames.join(', ')}`)
+    // Log message based on whether it's starred or topic mode
+    if (isStarredOnly) {
+      console.log(`🎯 Serving ${shuffledQuestions.length} starred questions in ${mode} mode`)
+    } else {
+      console.log(`🎯 Serving ${shuffledQuestions.length} questions in ${mode} mode`)
+    }
 
     return NextResponse.json({ questions: shuffledQuestions })
   } catch (error) {
