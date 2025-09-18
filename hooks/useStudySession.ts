@@ -60,14 +60,21 @@ export function useStudySession({ topics, mode, limit, onComplete, onQuit }: Stu
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const params = new URLSearchParams({ 
+        const params = new URLSearchParams({
           topics: topics.join(','),
           mode: mode
         })
         if (limit) {
           params.append('limit', limit.toString())
         }
-        const response = await fetch('/api/questions?' + params)
+        const { user } = useStore.getState()
+        const headers: HeadersInit = {}
+        if (user?.id) {
+          headers['user-id'] = user.id
+        }
+        const response = await fetch('/api/questions?' + params, {
+          headers
+        })
         const data = await response.json()
         setQuestions(data.questions || [])
 
